@@ -1,0 +1,60 @@
+{
+    "name": "brockhaus-ag/contao-release-stages-bundle",
+    "description": "Release Stages",
+    "keywords": [
+        "contao",
+        "bundle",
+        "tag 3",
+        "tag 4"
+    ],
+    "type": "contao-bundle",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "BROCKHAUS AG",
+            "email": "info@brockhaus-ag.de",
+            "homepage": "https://www.brockhaus-ag.de",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/brockhaus-ag/contao-release-stages-bundle/issues",
+        "source": "https://github.com/brockhaus-ag/contao-release-stages-bundle"
+    },
+    "require": {
+        "php": ">=7.1",
+        "contao/core-bundle": "^4.9",
+        "symfony/config": "^4.2 || ^5.1",
+        "symfony/dependency-injection": "^4.2 || ^5.1",
+        "symfony/http-kernel": "^4.2 || ^5.1",
+        "twig/twig": "^2.12 || ^3.0",
+        "ext-gd": "*",
+        "ext-curl": "*",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "contao/manager-plugin": "^2.3",
+        "contao/test-case": "^4.0",
+        "phpunit/phpunit": "^8.4",
+        "symfony/http-client": "4.4.*",
+        "symfony/phpunit-bridge": "4.4.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "BrockhausAg\\ContaoReleaseStagesBundle\\": "src/"
+        },
+        "classmap": [
+            "src/Resources/contao"
+        ],
+        "exclude-from-classmap": [
+            "src/Resources/contao/config",
+            "src/Resources/contao/dca",
+            "src/Resources/contao/languages",
+            "src/Resources/contao/templates"
+        ]
+    },
+    "extra": {
+        "contao-manager-plugin": "BrockhausAg\\ContaoReleaseStagesBundle\\ContaoManager\\Plugin"
+    },
+    "version": "1.0.0"
+}
