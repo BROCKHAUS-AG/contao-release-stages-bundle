@@ -1,0 +1,41 @@
+<?xml version="1.0" ?><xliff version="1.1">
+    <file datatype="php" original="src/Resources/contao/languages/en/tl_release_stages.php" source-language="en">
+        <body>
+            <!-- operations -->
+            <trans-unit id="tl_release_stages.show.0">
+                <source>Show details with ID: %s</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages.show.1">
+                <source>Show details with ID: %s</source>
+            </trans-unit>
+
+            <!-- fields -->
+            <trans-unit id="tl_release_stages.kindOfRelease.0">
+                <source>Kind of release</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages.kindOfRelease.1">
+                <source>Enter, how you want to release</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages.kindOfReleaseOptions.release">
+                <source>Release</source>
+            </trans-unit>
+             <trans-unit id="tl_release_stages.kindOfReleaseOptions.majorRelease">
+                <source>Major release</source>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages.title.0">
+                <source>Title</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages.title.1">
+                <source>Enter the title</source>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages.description.0">
+                <source>Description</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages.description.1">
+                <source>Enter a description</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

@@ -12,16 +12,10 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\DatabaseLogic;
 use Contao\Backend;
-use Contao\DC_Table;
-use Contao\Input;
 
-/**
- * Table tl_release_stages
- */
 $GLOBALS['TL_DCA']['tl_release_stages'] = array(
-
-    // Config
     'config' => array(
         'dataContainer' => 'Table',
         'enableVersioning' => true,
@@ -30,10 +24,8 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
                 'id' => 'primary'
             )
         ),
-    ),
-    'edit' => array(
-        'buttons_callback' => array(
-            array('tl_release_stages', 'buttonsCallback')
+        'onsubmit_callback' => array(
+            array('tl_release_stages', 'changeVersionNumber')
         )
     ),
     'list' => array(
@@ -45,17 +37,10 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
             'panelLayout' => 'sort,search,limit'
         ),
         'label' => array(
-            'fields' => array('version', 'title', 'kindOfRelease'),
-            'format' => '%s - %s - %s',
+            'fields' => array('version', 'title'),
+            'format' => '%s - %s',
         ),
         'operations' => array(
-            // should be later a feature to go a version back
-            /*'delete' => array(
-                'label'      => &$GLOBALS['TL_LANG']['tl_release_stages']['delete'],
-                'href'       => 'act=delete',
-                'icon'       => 'delete.gif',
-                'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
-            ),*/
             'show' => array(
                 'label'      => &$GLOBALS['TL_LANG']['tl_release_stages']['show'],
                 'href'       => 'act=show',
@@ -64,32 +49,27 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
             )
         )
     ),
-    // Palettes
-    'palettes' => array(
-        '__selector__' => array('addSubpalette'),
-        'default' => 'kindOfRelease,title,description'
-    ),
-    // Fields (database)
     'fields' => array(
         'id' => array(
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => ['type' => 'integer', 'length' => '10', 'unsigned' => true, 'autoincrement' => true]
         ),
         'tstamp' => array(
-            'sql' => "int(10) unsigned NOT NULL default '0'"
+            'sql' => ['type' => 'integer', 'length' => '10', 'unsigned' => true, 'default' => 0]
         ),
         'version' => array(
-            'sql' => "varchar(255) NOT NULL default '1.0'"
+            'sql' => ['type' => 'string', 'length' => '255', 'default' => 'None']
         ),
         'kindOfRelease' => array(
             'inputType' => 'select',
-            'options' => ['release' => 'Release', 'majorRelease' => 'Major Release'],
+            'options' => array('release', 'majorRelease'),
+            'reference' => &$GLOBALS['TL_LANG']['tl_release_stages']['kindOfReleaseOptions'],
             'exclude' => true,
             'search' => true,
             'filter' => true,
             'sorting' => true,
             'flag' => 1,
             'eval' => array('mandatory' => true, 'tl_class' => 'w50'),
-            'sql' => "varchar(255) NOT NULL default ''"
+            'sql' => ['type' => 'string', 'length' => '255', 'default' => '']
         ),
         'title' => array(
             'inputType' => 'text',
@@ -99,7 +79,7 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
             'sorting' => true,
             'flag' => 1,
             'eval' => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'),
-            'sql' => "varchar(255) NOT NULL default ''"
+            'sql' => ['type' => 'string', 'length' => '255', 'default' => '']
         ),
         'description' => array(
             'inputType' => 'textarea',
@@ -109,29 +89,58 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
             'sorting' => true,
             'flag' => 1,
             'eval' => array('mandatory' => true, 'maxlength' => 1024, 'tl_class' => 'clr w50'),
-            'sql' => "varchar(1024) NOT NULL default ''"
+            'sql' => ['type' => 'string', 'length' => '1024', 'default' => '']
         )
+    ),
+    'palettes' => array(
+        '__selector__' => array('addSubpalette'),
+        'default' => 'kindOfRelease,title,description'
     )
 );
 
-/**
- * Class tl_release_stages
- */
 class tl_release_stages extends Backend
 {
-    /**
-     * @param $arrButtons
-     * @param  DC_Table $dc
-     * @return mixed
-     */
-    public function buttonsCallback($arrButtons, DC_Table $dc)
-    {
-        if (Input::get('act') === 'edit')
-        {
-            /*$arrButtons['createRelease'] = '<button type="submit" name="customButton" id="customButton" class="tl_submit customButton" accesskey="x">' . $GLOBALS['TL_LANG']['tl_release_stages']['createRelease'] . '</button>';
-            $arrButtons['createMajorRelease'] = '<button type="submit" name="customButton" id="customButton" class="tl_submit customButton" accesskey="x">' . $GLOBALS['TL_LANG']['tl_release_stages']['createMajorRelease'] . '</button>';
-        */}
+    private DatabaseLogic $_databaseLogic;
 
-        return $arrButtons;
+    public function __construct()
+    {
+        $this->_databaseLogic = new DatabaseLogic();
+    }
+
+    public function changeVersionNumber() : void
+    {
+        $release_stages = $this->_databaseLogic->getLastRows(2);
+        $actualId = $release_stages->id;
+        $kindOfRelease = $release_stages->kindOfRelease;
+
+        $counter = $this->_databaseLogic->countRows($release_stages);
+        $oldVersion = $release_stages->version;
+
+        $newVersion = $this->createVersion($counter, $oldVersion, $kindOfRelease);
+
+        $this->_databaseLogic->updateVersion($actualId, $newVersion);
+    }
+
+    private function createVersion(int $counter, string $oldVersion, string $kindOfRelease) : string
+    {
+        if ($counter > 0) {
+            $version = explode(".", $oldVersion);
+            var_dump($version);
+            if (strcmp($kindOfRelease, "release") == 0) {
+                return $this->createRelease($version);
+            }
+            return $this->createMajorRelease($version);
+        }
+        return "1.0";
+    }
+
+    private function createRelease(array $version) : string
+    {
+        return $version[0]. ".". intval($version[1]+1);
+    }
+
+    private function createMajorRelease(array $version) : string
+    {
+        return intval($version[0]+1). ".0";
     }
 }

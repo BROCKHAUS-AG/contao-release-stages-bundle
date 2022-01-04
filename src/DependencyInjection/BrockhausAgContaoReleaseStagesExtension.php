@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
  * This file is part of contao-release-stages-bundle.
- * 
+ *
  * (c) BROCKHAUS AG 2021 <info@brockhaus-ag.de>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
@@ -30,15 +30,11 @@ class BrockhausAgContaoReleaseStagesExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
-
         $loader = new YamlFileLoader(
             $container,
             new FileLocator(__DIR__ . '/../Resources/config')
         );
 
-        $loader->load('parameters.yml');
         $loader->load('services.yml');
-        $loader->load('listener.yml');
-
     }
 }

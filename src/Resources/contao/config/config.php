@@ -2,7 +2,7 @@
 
 /*
  * This file is part of contao-release-stages-bundle.
- * 
+ *
  * (c) BROCKHAUS AG 2021 <info@brockhaus-ag.de>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
@@ -15,7 +15,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\ReleaseStagesModel;
 /**
  * Backend modules
  */
-$GLOBALS['BE_MOD']['release']['release'] = array(
+$GLOBALS['BE_MOD']['release']['release_stages'] = array(
     'tables' => array('tl_release_stages')
 );
 
