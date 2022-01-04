@@ -23,7 +23,7 @@ DEFINE("PROD_USER", "prodContao");
 DEFINE("PROD_USER_PASSWORD", "admin1234");
 
 // tl_news_categories has no id column !!!!!!! must be fixed in copyToDatabase !!!!!
-DEFINE("DO_NOT_COPY_TABLES", array("tl_release_stages", "tl_contao_bundle_creator", "tl_news_categories"));
+DEFINE("DO_NOT_COPY_TABLES", array("tl_release_stages", "tl_contao_bundle_creator", "tl_news_categories", "tl_log", "dokumentanforderung", "webinaranmeldung", "webinaraufnahme"));
 
 class CopyLogic extends Backend
 {
@@ -34,58 +34,14 @@ class CopyLogic extends Backend
 
         $conn = $this->createConnectionToProdDatabase();
 
-        $commandsToBeExecuted = null;
-
         echo "to be inserted into table: </br>";
         foreach ($tables as $table) {
             $tableName = $table[0];
             $tableContent = $table[1];
-
-            $sql = "SELECT id FROM ". $tableName. " ORDER BY id DESC LIMIT 1";
-
-            $req = $conn->query($sql);
-            if ($req->num_rows > 0) {
-                echo $tableName. "</br>";
-
-                $row = $req->fetch_assoc();
-                $lastId = $row["id"];
-
-
-                $values = array();
-                foreach ($tableContent as $column) {
-                    $value = "";
-                    $index = 1;
-                    if (intval($column["id"]) > intval($lastId)) {
-                        foreach ($column as $y) {
-                            if ($y == null || strcmp($y, "") == 0) {
-                                $value .= "''";
-                            }else {
-                                $value .= "'". $y. "'";
-                            }
-                            if ($index < count($column)) {
-                                $value .= ", ";
-                            }
-                            $index++;
-                        }
-                        $values[] = $value;
-                    }
-                }
-
-                foreach ($values as $value) {
-                    $commandsToBeExecuted .= "INSERT INTO ". PROD_DATABASE. ".". $tableName. " VALUES (". $value. ");";
-                }
-            }
+            $commandsToBeExecuted = $this->create($conn, $tableName, $tableContent);
+            $this->runInsertCommands($conn, $commandsToBeExecuted);
         }
-
-        if ($commandsToBeExecuted != null) {
-            if ($conn->multi_query($commandsToBeExecuted) === FALSE) {
-                echo "Datenbank konnte nicht aktualisiert werden! Es ist ein Fehler aufgetreten :)";
-            }
-        }else {
-            echo "Die Datenbank wurde nicht aktualisiert, da keine Änderungen vorliegen!";
-            die;
-        }
-
+        $this->runInsertCommands($conn, $this->createLogForProd());
         $conn->close();
     }
 
@@ -124,5 +80,79 @@ class CopyLogic extends Backend
             die("Connection failed: " . $conn->connect_error);
         }
         return $conn;
+    }
+
+    private function create(mysqli $conn, string $tableName, array $tableContent) : array
+    {
+        $sql = "SELECT id FROM ". PROD_DATABASE.$tableName. " ORDER BY id DESC LIMIT 1";
+        $req = $conn->query($sql);
+        echo $tableName. "</br>";
+
+        if ($req->num_rows > 0) {
+            $row = $req->fetch_assoc();
+            $lastId = $row["id"];
+        }else {
+            $lastId = "0";
+        }
+        $values = $this->createValuesForCommand($tableContent, $lastId);
+        return $this->createCommands($values, $tableName);
+    }
+
+    private function createValuesForCommand(array $tableContent, string $lastId) : array
+    {
+        $values = array();
+        foreach ($tableContent as $column) {
+            if (intval($column["id"]) > intval($lastId)) {
+                $values[] = $this->createValueForCommand($column);
+            }
+        }
+        return $values;
+    }
+
+    private function createValueForCommand(array $column) : string
+    {
+        $value = "";
+        $index = 1;
+        foreach ($column as $x) {
+            if ($x == null || strcmp($x, "") == 0) {
+                $value .= "''";
+            }else {
+                $value .= "'". $x. "'";
+            }
+            if ($index < count($column)) {
+                $value .= ", ";
+            }
+            $index++;
+        }
+        return $value;
+    }
+
+    private function createCommands(array $values, string $tableName) : array
+    {
+        $commandsToBeExecuted = array();
+        foreach ($values as $value) {
+            $commandsToBeExecuted[] = "INSERT INTO ". PROD_DATABASE. ".". $tableName. " VALUES (". $value. ");";
+        }
+        if ($commandsToBeExecuted == null) return array();
+        return $commandsToBeExecuted;
+    }
+
+    private function createLogForProd() : array
+    {
+        return array("INSERT INTO ". PROD_DATABASE. ".tl_log (tstamp, action, username, text, func, browser) VALUES
+        ('". time(). "', 'RELEASE', 'release', 'Released a new version', 'auto release', 'N/A');");
+    }
+
+    private function runInsertCommands(mysqli $conn, array $commandsToBeExecuted) : void
+    {
+        if ($commandsToBeExecuted != null) {
+            foreach ($commandsToBeExecuted as $command) {
+                if ($conn->query($command) === FALSE) {
+                    echo "Datenbank konnte nicht aktualisiert werden! Es ist ein Fehler aufgetreten :)</br>";
+                    echo $conn->error;
+                    die;
+                }
+            }
+        }
     }
 }
