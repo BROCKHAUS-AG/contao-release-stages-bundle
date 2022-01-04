@@ -22,7 +22,8 @@ DEFINE("PROD_DATABASE", "prodContao");
 DEFINE("PROD_USER", "prodContao");
 DEFINE("PROD_USER_PASSWORD", "admin1234");
 
-DEFINE("DO_NOT_COPY_TABLES", array("tl_release_stages", "tl_contao_bundle_creator"));
+// tl_news_categories has no id column !!!!!!! must be fixed in copyToDatabase !!!!!
+DEFINE("DO_NOT_COPY_TABLES", array("tl_release_stages", "tl_contao_bundle_creator", "tl_news_categories"));
 
 class CopyLogic extends Backend
 {
@@ -33,17 +34,58 @@ class CopyLogic extends Backend
 
         $conn = $this->createConnectionToProdDatabase();
 
-        // insert
+        $commandsToBeExecuted = null;
+
+        echo "to be inserted into table: </br>";
+        foreach ($tables as $table) {
+            $tableName = $table[0];
+            $tableContent = $table[1];
+
+            $sql = "SELECT id FROM ". $tableName. " ORDER BY id DESC LIMIT 1";
+
+            $req = $conn->query($sql);
+            if ($req->num_rows > 0) {
+                echo $tableName. "</br>";
+
+                $row = $req->fetch_assoc();
+                $lastId = $row["id"];
 
 
+                $values = array();
+                foreach ($tableContent as $column) {
+                    $value = "";
+                    $index = 1;
+                    if (intval($column["id"]) > intval($lastId)) {
+                        foreach ($column as $y) {
+                            if ($y == null || strcmp($y, "") == 0) {
+                                $value .= "''";
+                            }else {
+                                $value .= "'". $y. "'";
+                            }
+                            if ($index < count($column)) {
+                                $value .= ", ";
+                            }
+                            $index++;
+                        }
+                        $values[] = $value;
+                    }
+                }
 
-        /*if ($conn->query($sql) === TRUE) {
-            echo "erstellt";
-        }else {
-            die("fehlgeschlagen");
+                foreach ($values as $value) {
+                    $commandsToBeExecuted .= "INSERT INTO ". PROD_DATABASE. ".". $tableName. " VALUES (". $value. ");";
+                }
+            }
         }
-*/
-        die;
+
+        if ($commandsToBeExecuted != null) {
+            if ($conn->multi_query($commandsToBeExecuted) === FALSE) {
+                echo "Datenbank konnte nicht aktualisiert werden! Es ist ein Fehler aufgetreten :)";
+            }
+        }else {
+            echo "Die Datenbank wurde nicht aktualisiert, da keine Änderungen vorliegen!";
+            die;
+        }
+
         $conn->close();
     }
 
@@ -56,7 +98,7 @@ class CopyLogic extends Backend
             $tableContent = $this->Database->prepare("SELECT * FROM contao.". $tableName)
                 ->execute()
                 ->fetchAllAssoc();
-            array_push($table, array($tableName, $tableContent));
+            $table[] = array($tableName, $tableContent);
         }
         return $table;
     }
@@ -69,7 +111,7 @@ class CopyLogic extends Backend
         while ($tables->next()) {
             $tableName = $tables->Tables_in_contao;
             if (!in_array($tableName, DO_NOT_COPY_TABLES)) {
-                array_push($tableNames, $tableName);
+                $tableNames[] = $tableName;
             }
         }
         return $tableNames;
@@ -80,8 +122,6 @@ class CopyLogic extends Backend
         $conn = new mysqli(PROD_SERVER, PROD_USER, PROD_USER_PASSWORD, PROD_DATABASE);
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
-        }else {
-            echo "Connected successfully";
         }
         return $conn;
     }

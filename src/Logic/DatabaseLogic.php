@@ -18,10 +18,11 @@ use Contao\Backend;
 
 class DatabaseLogic extends Backend
 {
-    public function getLastRows(int $count): \Contao\Database\Result
+    public function getLastRows(int $count, array $columns, string $tableName): \Contao\Database\Result
     {
         return $this->Database
-            ->prepare("SELECT id, version, kindOfRelease FROM tl_release_stages ORDER BY id DESC LIMIT ". $count)
+            ->prepare("SELECT ". implode(", ", $columns). " FROM ". $tableName.
+                " ORDER BY id DESC LIMIT ". $count)
             ->execute();
     }
 

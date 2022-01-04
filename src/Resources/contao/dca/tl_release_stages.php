@@ -113,7 +113,8 @@ class tl_release_stages extends Backend
 
     public function changeVersionNumber() : void
     {
-        $release_stages = $this->_databaseLogic->getLastRows(2);
+        $release_stages = $this->_databaseLogic->getLastRows(2, array("id", "version", "kindOfRelease"),
+            "tl_release_stages");
         $actualId = $release_stages->id;
         $kindOfRelease = $release_stages->kindOfRelease;
 
@@ -129,7 +130,6 @@ class tl_release_stages extends Backend
     {
         if ($counter > 0) {
             $version = explode(".", $oldVersion);
-            var_dump($version);
             if (strcmp($kindOfRelease, "release") == 0) {
                 return $this->createRelease($version);
             }
