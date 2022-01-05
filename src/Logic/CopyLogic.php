@@ -22,8 +22,16 @@ DEFINE("PROD_DATABASE", "prodContao");
 DEFINE("PROD_USER", "prodContao");
 DEFINE("PROD_USER_PASSWORD", "admin1234");
 
-// tl_news_categories has no id column !!!!!!! must be fixed in copyToDatabase !!!!!
-DEFINE("DO_NOT_COPY_TABLES", array("tl_release_stages", "tl_contao_bundle_creator", "tl_news_categories", "tl_log", "dokumentanforderung", "webinaranmeldung", "webinaraufnahme"));
+// should never be copied: "tl_release_stages", "tl_contao_bundle_creator", "tl_log", "tl_cron_job", "tl_user"
+
+// tl_search_index: in einem wort ist ein: '    SELECT * FROM `tl_search_index` WHERE word like 'girls%';
+// same at tl_search: SELECT * FROM `tl_search` WHERE text like '%den Lokalnachrichten Bergkamen%';
+// same at tl_page
+
+
+DEFINE("DO_NOT_COPY_TABLES", array("tl_release_stages", "tl_contao_bundle_creator", "tl_log", "tl_cron_job", "tl_user",
+    "tl_content", "tl_news", "tl_news_archive", "tl_news_category", "tl_page", "tl_search", "tl_search_index",
+    "tl_url_rewrite", "tl_undo", "tl_version"));
 
 class CopyLogic extends Backend
 {
@@ -51,7 +59,7 @@ class CopyLogic extends Backend
         $table = array();
         foreach ($tableNames as $tableName)
         {
-            $tableContent = $this->Database->prepare("SELECT * FROM contao.". $tableName)
+            $tableContent = $this->Database->prepare("SELECT * FROM ". $tableName)
                 ->execute()
                 ->fetchAllAssoc();
             $table[] = array($tableName, $tableContent);
@@ -94,44 +102,84 @@ class CopyLogic extends Backend
         }else {
             $lastId = "0";
         }
-        $values = $this->createValuesForCommand($tableContent, $lastId);
+        $values = $this->createColumnWithValuesForCommand($conn, $tableName, $tableContent, $lastId);
         return $this->createCommands($values, $tableName);
     }
 
-    private function createValuesForCommand(array $tableContent, string $lastId) : array
+    private function createColumnWithValuesForCommand(mysqli $conn, string $tableName, array $tableContent,
+                                                      string $lastId) : array
     {
+        $sql = "DESCRIBE ". PROD_DATABASE. ".". $tableName;
+        $req = $conn->query($sql);
+        $tableSchemes = array();
+        while($tableScheme = $req->fetch_assoc()) {
+            $tableSchemes[] = array(
+                "field" => $tableScheme["Field"],
+                "type" => $tableScheme["Type"],
+                "nullable" => $tableScheme["Null"]
+            );
+        }
+
         $values = array();
         foreach ($tableContent as $column) {
-            if (intval($column["id"]) > intval($lastId)) {
-                $values[] = $this->createValueForCommand($column);
-            }
+            $values[] = $this->createColumnWithValueForCommand($column, $tableSchemes, $tableName);
         }
         return $values;
     }
 
-    private function createValueForCommand(array $column) : string
+    private function createColumnWithValueForCommand(array $column, array $tableSchemes, string $tableName) : array
     {
-        $value = "";
-        $index = 1;
-        foreach ($column as $x) {
-            if ($x == null || strcmp($x, "") == 0) {
-                $value .= "''";
+        $index = 0;
+        $tableSchemesFields = array();
+        $rows = array();
+        $test = array();
+        foreach ($column as $row) {
+            if (strpos($tableSchemes[$index]["type"], "varchar") ||
+                strpos($tableSchemes[$index]["type"], "string") ||
+                strpos($tableSchemes[$index]["type"], "char") ||
+                strcmp($tableSchemes[$index]["type"], "char(1)") == 0 ||
+                strpos($tableSchemes[$index]["type"], "text")) {
+                $rows[] = '\''. $row. '\'';
+                $test[] = $tableSchemes[$index]["field"]. " = '". $row. "'";
+            }else if (empty($row) && strcmp($tableSchemes[$index]["nullable"], "YES") == 0) {
+                $rows[] = "NULL";
+                $test[] = $tableSchemes[$index]["field"]. " = NULL";
+            }else if (strcmp($tableSchemes[$index]["type"], "binary(16)") == 0) {
+                // load hex from db and lod it unhexed to prod db
+                $req = $this->Database->prepare("SELECT hex(". $tableSchemes[$index]["field"]. ") FROM ".
+                    $tableName. " WHERE id = ". $column["id"])
+                    ->execute(1)
+                    ->fetchAllAssoc();
+                $rows[] = "UNHEX('". $req[0]["hex(singleSRC)"]. "')";
+                $test[] = $tableSchemes[$index]["field"]. "= UNHEX('". $req[0]["hex(singleSRC)"]. "')";
+            }else if (strcmp($tableSchemes[$index]["type"], "blob") == 0 ||
+                strcmp($tableSchemes[$index]["type"], "mediumblob") == 0 ||
+                strpos($tableSchemes[$index]["type"], "varbinary")) {
+                $rows[] = "NULL";
+                $test[] = $tableSchemes[$index]["field"]. " = NULL";
             }else {
-                $value .= "'". $x. "'";
+                $rows[] = $row;
+                $test[] = $tableSchemes[$index]["field"]. " = ". $row;
             }
-            if ($index < count($column)) {
-                $value .= ", ";
-            }
+
+            $tableSchemesFields[] = $tableSchemes[$index]["field"];
             $index++;
         }
-        return $value;
+        $value = implode(", ", $rows);
+        $columnName = implode(", ", $tableSchemesFields);
+
+        $a = implode(", ", $test);
+
+        return array($columnName, $value, $a);
     }
 
     private function createCommands(array $values, string $tableName) : array
     {
         $commandsToBeExecuted = array();
         foreach ($values as $value) {
-            $commandsToBeExecuted[] = "INSERT INTO ". PROD_DATABASE. ".". $tableName. " VALUES (". $value. ");";
+            $commandsToBeExecuted[]
+                = 'INSERT INTO '. PROD_DATABASE. '.'. $tableName. ' ('. $value[0]. ') VALUES ('. $value[1].
+                ') ON DUPLICATE KEY UPDATE '. $value[2]. ';';
         }
         if ($commandsToBeExecuted == null) return array();
         return $commandsToBeExecuted;
@@ -148,8 +196,7 @@ class CopyLogic extends Backend
         if ($commandsToBeExecuted != null) {
             foreach ($commandsToBeExecuted as $command) {
                 if ($conn->query($command) === FALSE) {
-                    echo "Datenbank konnte nicht aktualisiert werden! Es ist ein Fehler aufgetreten :)</br>";
-                    echo $conn->error;
+                    echo "<br/>Es ist ein Fehler aufgetreten :)</br>Fehler: ". $conn->error;
                     die;
                 }
             }
