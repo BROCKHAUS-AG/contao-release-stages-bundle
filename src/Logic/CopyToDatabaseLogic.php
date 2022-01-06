@@ -26,7 +26,7 @@ DEFINE("PROD_DNS_RECORDS", array(
     array("alias" => "space-it-up", "dns" => "www.spaceitup.de")
 ));
 
-class CopyLogic extends Backend
+class CopyToDatabaseLogic extends Backend
 {
     private DatabaseLogic $_databaseLogic;
     private ProdDatabaseLogic $_prodDatabaseLogic;

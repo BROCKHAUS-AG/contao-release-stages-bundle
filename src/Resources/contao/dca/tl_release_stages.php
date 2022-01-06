@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\CopyLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\CopyToDatabaseLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\DatabaseLogic;
 use Contao\Backend;
 
@@ -103,12 +103,12 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
 class tl_release_stages extends Backend
 {
     private DatabaseLogic $_databaseLogic;
-    private CopyLogic $_copyLogic;
+    private CopyToDatabaseLogic $_copyToDatabaseLogic;
 
     public function __construct()
     {
         $this->_databaseLogic = new DatabaseLogic();
-        $this->_copyLogic = new CopyLogic();
+        $this->_copyToDatabaseLogic = new CopyToDatabaseLogic();
     }
 
     public function changeVersionNumber() : void
@@ -150,6 +150,6 @@ class tl_release_stages extends Backend
 
     public function copy() : void
     {
-        $this->_copyLogic->copyToDatabase();
+        $this->_copyToDatabaseLogic->copyToDatabase();
     }
 }
