@@ -1,4 +1,4 @@
-![Alt text](docs/logo.png?raw=true "logo")
+![Alt text](docs/logo.svg?raw=true "logo")
 
 
 # Welcome to contao-release-stages-bundle
