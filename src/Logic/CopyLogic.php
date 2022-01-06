@@ -17,11 +17,6 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 use Contao\Backend;
 use mysqli;
 
-DEFINE("PROD_SERVER", "192.168.0.2");
-DEFINE("PROD_DATABASE", "prodContao");
-DEFINE("PROD_USER", "prodContao");
-DEFINE("PROD_USER_PASSWORD", "admin1234");
-
 // should never be copied: "tl_release_stages", "tl_contao_bundle_creator", "tl_log", "tl_cron_job", "tl_user"
 DEFINE("DO_NOT_COPY_TABLES", array("tl_release_stages", "tl_contao_bundle_creator", "tl_cron_job", "tl_user"));
 
@@ -33,96 +28,54 @@ DEFINE("PROD_DNS_RECORDS", array(
 
 class CopyLogic extends Backend
 {
+    private DatabaseLogic $_databaseLogic;
+    private ProdDatabaseLogic $_prodDatabaseLogic;
+
+    public function __construct()
+    {
+        $this->_databaseLogic = new DatabaseLogic();
+        $this->_prodDatabaseLogic = new ProdDatabaseLogic();
+    }
 
     public function copyToDatabase() : void
     {
-        $tables = $this->downloadFromDatabase();
-
-        $conn = $this->createConnectionToProdDatabase();
+        $tables = $this->_databaseLogic->downloadFromDatabase();
 
         echo "to be inserted into table: </br>";
         foreach ($tables as $table) {
             $tableName = $table[0];
             $tableContent = $table[1];
             echo $tableName. "</br>";
-            $commandsToBeExecuted = $this->create($conn, $tableName, $tableContent);
-            $this->runSqlCommandsOnProdDatabase($conn, $commandsToBeExecuted);
+            $commandsToBeExecuted = $this->create($tableName, $tableContent);
+            $this->_prodDatabaseLogic->runSqlCommandsOnProdDatabase($commandsToBeExecuted);
         }
 
-        $lastId = $this->getLastId($conn, "tl_log");
-        $this->checkForDeleteFromInTlLogTable($lastId, $conn);
-
-        $conn->close();
+        $lastId = $this->_prodDatabaseLogic->getLastIdFromTable("tl_log");
+        $this->checkForDeleteFromInTlLogTable($lastId);
     }
 
-    public function downloadFromDatabase() : array
+    private function create(string $tableName, array $tableContent) : array
     {
-        $tableNames = $this->getTableNamesFromDatabase();
-        $table = array();
-        foreach ($tableNames as $tableName)
-        {
-            $tableContent = $this->Database->prepare("SELECT * FROM ". $tableName)
-                ->execute()
-                ->fetchAllAssoc();
-            $table[] = array($tableName, $tableContent);
-        }
-        return $table;
-    }
-
-    private function getTableNamesFromDatabase() : array
-    {
-        $tables = $this->Database->prepare("SHOW TABLES FROM contao WHERE Tables_in_contao LIKE \"tl_%\"")
-            ->execute();
-        $tableNames = array();
-        while ($tables->next()) {
-            $tableName = $tables->Tables_in_contao;
-            if (!in_array($tableName, DO_NOT_COPY_TABLES)) {
-                $tableNames[] = $tableName;
-            }
-        }
-        return $tableNames;
-    }
-
-    private function createConnectionToProdDatabase()
-    {
-        $conn = new mysqli(PROD_SERVER, PROD_USER, PROD_USER_PASSWORD, PROD_DATABASE);
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
-        return $conn;
-    }
-
-    private function create(mysqli $conn, string $tableName, array $tableContent) : array
-    {
-        $values = $this->createColumnWithValuesForCommand($conn, $tableName, $tableContent);
+        $values = $this->createColumnWithValuesForCommand($tableName, $tableContent);
         return $this->createCommands($values, $tableName);
     }
 
-    private function checkForDeleteFromInTlLogTable(int $lastId, mysqli $conn) : void
+    private function checkForDeleteFromInTlLogTable(int $lastId) : void
     {
-        $res = $this->Database->prepare("SELECT text from tl_log WHERE id > ". $lastId.
-            " AND text LIKE \"DELETE FROM %\"")
-            ->execute()
+        $whereStatement = "id > ". $lastId. " AND text LIKE \"DELETE FROM %\"";
+        $res = $this->_databaseLogic->getLastRowsWithWhereStatement(array("text"), "tl_log", $whereStatement)
             ->fetchAllAssoc();
+
         $deleteStatements = array();
         foreach ($res as $statement) {
             $deleteStatements[] = $statement["text"];
         }
-        $this->runSqlCommandsOnProdDatabase($conn, $deleteStatements);
+        $this->_prodDatabaseLogic->runSqlCommandsOnProdDatabase($deleteStatements);
     }
 
-    private function createColumnWithValuesForCommand(mysqli $conn, string $tableName, array $tableContent) : array
+    private function createColumnWithValuesForCommand(string $tableName, array $tableContent) : array
     {
-        $sql = "DESCRIBE ". PROD_DATABASE. ".". $tableName;
-        $req = $conn->query($sql);
-        $tableSchemes = array();
-        while($tableScheme = $req->fetch_assoc()) {
-            $tableSchemes[] = array(
-                "field" => $tableScheme["Field"],
-                "type" => $tableScheme["Type"],
-                "nullable" => $tableScheme["Null"]
-            );
-        }
+        $tableSchemes = $this->_prodDatabaseLogic->getTableSchemes($tableName);
 
         $values = array();
         foreach ($tableContent as $column) {
@@ -154,10 +107,7 @@ class CopyLogic extends Backend
                 $columnAndValue[] = $tableSchemes[$index]["field"]. " = NULL";
             }else if (strcmp($tableSchemes[$index]["type"], "binary(16)") == 0 ||
                 strcmp($tableSchemes[$index]["type"], "varbinary(128)") == 0) {
-                // load hex from db and add for upload to prod db
-                $req = $this->Database->prepare("SELECT hex(". $tableSchemes[$index]["field"]. ") FROM ".
-                    $tableName. " WHERE id = ". $column["id"])
-                    ->execute(1)
+                $req = $this->_databaseLogic->loadHexById($tableSchemes[$index]["field"], $tableName, $column["id"])
                     ->fetchAllAssoc();
                 $rows[] = "UNHEX('". $req[0]["hex(". $tableSchemes[$index]["field"]. ")"]. "')";
                 $columnAndValue[] = $tableSchemes[$index]["field"]. "= UNHEX('". $req[0]["hex(".
@@ -203,31 +153,5 @@ class CopyLogic extends Backend
         }
         if ($commandsToBeExecuted == null) return array();
         return $commandsToBeExecuted;
-    }
-
-    private function runSqlCommandsOnProdDatabase(mysqli $conn, array $commandsToBeExecuted) : void
-    {
-        if ($commandsToBeExecuted != null) {
-            foreach ($commandsToBeExecuted as $command) {
-                if ($conn->query($command) === FALSE) {
-                    echo "<br/>Es ist ein Fehler aufgetreten :)</br>Fehler: ". $conn->error;
-                    die;
-                }
-            }
-        }
-    }
-
-    private function getLastId(mysqli $conn, string $tableName) : int
-    {
-        $sql = "SELECT id FROM ". PROD_DATABASE.$tableName. " ORDER BY id DESC LIMIT 1";
-        $req = $conn->query($sql);
-        echo $tableName. "</br>";
-
-        $lastId = 0;
-        if ($req->num_rows > 0) {
-            $row = $req->fetch_assoc();
-            $lastId = intval($row["id"]);
-        }
-        return $lastId;
     }
 }
