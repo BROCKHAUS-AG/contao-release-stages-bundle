@@ -76,7 +76,6 @@ class CopyToDatabaseLogic extends Backend
     private function createColumnWithValuesForCommand(string $tableName, array $tableContent) : array
     {
         $tableSchemes = $this->_prodDatabaseLogic->getTableSchemes($tableName);
-
         $values = array();
         foreach ($tableContent as $column) {
             if (strcmp($tableName, "tl_page") == 0 && strcmp($column["type"], "root") == 0) {
@@ -90,7 +89,7 @@ class CopyToDatabaseLogic extends Backend
     private function createColumnWithValueForCommand(array $column, array $tableSchemes, string $tableName) : array
     {
         $index = 0;
-        $tableSchemesFields = array();
+        $tableSchemeFields = array();
         $rows = array();
         $columnAndValue = array();
         foreach ($column as $row) {
@@ -122,15 +121,23 @@ class CopyToDatabaseLogic extends Backend
                 $columnAndValue[] = $tableSchemes[$index]["field"]. " = ". $row;
             }
 
-            $tableSchemesFields[] = $tableSchemes[$index]["field"];
+            $tableSchemeFields[] = $tableSchemes[$index]["field"];
             $index++;
         }
-        $value = implode(", ", $rows);
-        $columnName = implode(", ", $tableSchemesFields);
+        return $this->createReturnValue($rows, $tableSchemeFields, $columnAndValue);
+    }
 
+    private function createReturnValue(array $rows, array $tableSchemeFields, array $columnAndValue) : array
+    {
+        $value = implode(", ", $rows);
+        $columnName = implode(", ", $tableSchemeFields);
         $updateColumnAndValue = implode(", ", $columnAndValue);
 
-        return array($columnName, $value, $updateColumnAndValue);
+        return array(
+            "columnName" => $columnName,
+            "value" => $value,
+            "updateColumnAndValue" => $updateColumnAndValue
+        );
     }
 
     private function changeDNSEntryForProd(string $alias) : string
@@ -148,8 +155,8 @@ class CopyToDatabaseLogic extends Backend
         $commandsToBeExecuted = array();
         foreach ($values as $value) {
             $commandsToBeExecuted[]
-                = 'INSERT INTO '. PROD_DATABASE. '.'. $tableName. ' ('. $value[0]. ') VALUES ('. $value[1].
-                ') ON DUPLICATE KEY UPDATE '. $value[2]. ';';
+                = 'INSERT INTO '. PROD_DATABASE. '.'. $tableName. ' ('. $value["columnName"]. ') VALUES ('.
+                $value["value"]. ') ON DUPLICATE KEY UPDATE '. $value["updateColumnAndValue"]. ';';
         }
         if ($commandsToBeExecuted == null) return array();
         return $commandsToBeExecuted;

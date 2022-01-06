@@ -27,7 +27,6 @@ class ProdDatabaseLogic
 
     public function __construct()
     {
-        // create conn
         $this->_conn = $this->createConnectionToProdDatabase(PROD_SERVER, PROD_USER,
             PROD_USER_PASSWORD, PROD_DATABASE);
     }
