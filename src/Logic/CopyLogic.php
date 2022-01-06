@@ -23,15 +23,7 @@ DEFINE("PROD_USER", "prodContao");
 DEFINE("PROD_USER_PASSWORD", "admin1234");
 
 // should never be copied: "tl_release_stages", "tl_contao_bundle_creator", "tl_log", "tl_cron_job", "tl_user"
-
-// tl_search_index: in einem wort ist ein: '    SELECT * FROM `tl_search_index` WHERE word like 'girls%';
-// same at tl_search: SELECT * FROM `tl_search` WHERE text like '%den Lokalnachrichten Bergkamen%';
-// same at tl_page
-
-
-DEFINE("DO_NOT_COPY_TABLES", array("tl_release_stages", "tl_contao_bundle_creator", "tl_cron_job", "tl_user",
-    "tl_content", "tl_news", "tl_news_archive", "tl_news_category", "tl_page", "tl_search", "tl_search_index",
-    "tl_url_rewrite", "tl_undo", "tl_version"));
+DEFINE("DO_NOT_COPY_TABLES", array("tl_release_stages", "tl_contao_bundle_creator", "tl_cron_job", "tl_user"));
 
 class CopyLogic extends Backend
 {
@@ -46,9 +38,14 @@ class CopyLogic extends Backend
         foreach ($tables as $table) {
             $tableName = $table[0];
             $tableContent = $table[1];
+            echo $tableName. "</br>";
             $commandsToBeExecuted = $this->create($conn, $tableName, $tableContent);
             $this->runSqlCommandsOnProdDatabase($conn, $commandsToBeExecuted);
         }
+
+        $lastId = $this->getLastId($conn, "tl_log");
+        $this->checkForDeleteFromInTlLogTable($lastId, $conn);
+
         $conn->close();
     }
 
@@ -91,20 +88,6 @@ class CopyLogic extends Backend
 
     private function create(mysqli $conn, string $tableName, array $tableContent) : array
     {
-        $sql = "SELECT id FROM ". PROD_DATABASE.$tableName. " ORDER BY id DESC LIMIT 1";
-        $req = $conn->query($sql);
-        echo $tableName. "</br>";
-
-        $lastId = 0;
-        if ($req->num_rows > 0) {
-            $row = $req->fetch_assoc();
-            $lastId = intval($row["id"]);
-        }
-
-        if (strcmp($tableName, "tl_log") == 0) {
-            $this->checkForDeleteFromInTlLogTable($lastId, $conn);
-        }
-
         $values = $this->createColumnWithValuesForCommand($conn, $tableName, $tableContent);
         return $this->createCommands($values, $tableName);
     }
@@ -154,24 +137,27 @@ class CopyLogic extends Backend
                 strpos($tableSchemes[$index]["type"], "char") ||
                 strcmp($tableSchemes[$index]["type"], "char(1)") == 0 ||
                 strpos($tableSchemes[$index]["type"], "text")) {
+                $row = str_replace("'", "\'", $row);
                 $rows[] = '\''. $row. '\'';
                 $columnAndValue[] = $tableSchemes[$index]["field"]. " = '". $row. "'";
             }else if (empty($row) && strcmp($tableSchemes[$index]["nullable"], "YES") == 0) {
                 $rows[] = "NULL";
                 $columnAndValue[] = $tableSchemes[$index]["field"]. " = NULL";
-            }else if (strcmp($tableSchemes[$index]["type"], "binary(16)") == 0) {
+            }else if (strcmp($tableSchemes[$index]["type"], "binary(16)") == 0 ||
+                strcmp($tableSchemes[$index]["type"], "varbinary(128)") == 0) {
                 // load hex from db and add for upload to prod db
                 $req = $this->Database->prepare("SELECT hex(". $tableSchemes[$index]["field"]. ") FROM ".
                     $tableName. " WHERE id = ". $column["id"])
                     ->execute(1)
                     ->fetchAllAssoc();
-                $rows[] = "UNHEX('". $req[0]["hex(singleSRC)"]. "')";
-                $columnAndValue[] = $tableSchemes[$index]["field"]. "= UNHEX('". $req[0]["hex(singleSRC)"]. "')";
+                $rows[] = "UNHEX('". $req[0]["hex(". $tableSchemes[$index]["field"]. ")"]. "')";
+                $columnAndValue[] = $tableSchemes[$index]["field"]. "= UNHEX('". $req[0]["hex(".
+                    $tableSchemes[$index]["field"]. ")"]. "')";
             }else if (strcmp($tableSchemes[$index]["type"], "blob") == 0 ||
                 strcmp($tableSchemes[$index]["type"], "mediumblob") == 0 ||
-                strpos($tableSchemes[$index]["type"], "varbinary")) {
-                $rows[] = "NULL";
-                $columnAndValue[] = $tableSchemes[$index]["field"]. " = NULL";
+                strcmp($tableSchemes[$index]["type"], "longblob") == 0) {
+                $rows[] = "x'". bin2hex($row). "'";
+                $columnAndValue[] = $tableSchemes[$index]["field"]. " = x'". bin2hex($row). "'";
             }else {
                 $rows[] = $row;
                 $columnAndValue[] = $tableSchemes[$index]["field"]. " = ". $row;
@@ -210,5 +196,19 @@ class CopyLogic extends Backend
                 }
             }
         }
+    }
+
+    private function getLastId(mysqli $conn, string $tableName) : int
+    {
+        $sql = "SELECT id FROM ". PROD_DATABASE.$tableName. " ORDER BY id DESC LIMIT 1";
+        $req = $conn->query($sql);
+        echo $tableName. "</br>";
+
+        $lastId = 0;
+        if ($req->num_rows > 0) {
+            $row = $req->fetch_assoc();
+            $lastId = intval($row["id"]);
+        }
+        return $lastId;
     }
 }
