@@ -68,7 +68,7 @@ class CopyLogic extends Backend
 
     private function getTableNamesFromDatabase() : array
     {
-        $tables = $this->Database->prepare("SHOW TABLES FROM contao")
+        $tables = $this->Database->prepare("SHOW TABLES FROM contao WHERE Tables_in_contao LIKE \"tl_%\"")
             ->execute();
         $tableNames = array();
         while ($tables->next()) {
