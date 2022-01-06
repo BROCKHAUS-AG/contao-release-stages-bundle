@@ -25,6 +25,12 @@ DEFINE("PROD_USER_PASSWORD", "admin1234");
 // should never be copied: "tl_release_stages", "tl_contao_bundle_creator", "tl_log", "tl_cron_job", "tl_user"
 DEFINE("DO_NOT_COPY_TABLES", array("tl_release_stages", "tl_contao_bundle_creator", "tl_cron_job", "tl_user"));
 
+DEFINE("PROD_DNS_RECORDS", array(
+    array("alias" => "BROCKHAUS-AG", "dns" => "www.brockhaus-ag.de"),
+    array("alias" => "brockhaus-karriere", "dns" => "www.brockhaus-ag.careers"),
+    array("alias" => "space-it-up", "dns" => "www.spaceitup.de")
+));
+
 class CopyLogic extends Backend
 {
 
@@ -120,6 +126,9 @@ class CopyLogic extends Backend
 
         $values = array();
         foreach ($tableContent as $column) {
+            if (strcmp($tableName, "tl_page") == 0 && strcmp($column["type"], "root") == 0) {
+                $column["dns"] = $this->changeDNSEntryForProd($column["alias"]);
+            }
             $values[] = $this->createColumnWithValueForCommand($column, $tableSchemes, $tableName);
         }
         return $values;
@@ -172,6 +181,16 @@ class CopyLogic extends Backend
         $updateColumnAndValue = implode(", ", $columnAndValue);
 
         return array($columnName, $value, $updateColumnAndValue);
+    }
+
+    private function changeDNSEntryForProd(string $alias) : string
+    {
+        foreach (PROD_DNS_RECORDS as $dnsRecord) {
+            if (strcmp($dnsRecord["alias"], $alias) == 0) {
+                return $dnsRecord["dns"];
+            }
+        }
+        return "";
     }
 
     private function createCommands(array $values, string $tableName) : array
