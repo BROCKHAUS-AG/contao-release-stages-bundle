@@ -29,7 +29,7 @@ DEFINE("PROD_USER_PASSWORD", "admin1234");
 // same at tl_page
 
 
-DEFINE("DO_NOT_COPY_TABLES", array("tl_release_stages", "tl_contao_bundle_creator", "tl_log", "tl_cron_job", "tl_user",
+DEFINE("DO_NOT_COPY_TABLES", array("tl_release_stages", "tl_contao_bundle_creator", "tl_cron_job", "tl_user",
     "tl_content", "tl_news", "tl_news_archive", "tl_news_category", "tl_page", "tl_search", "tl_search_index",
     "tl_url_rewrite", "tl_undo", "tl_version"));
 
@@ -47,9 +47,8 @@ class CopyLogic extends Backend
             $tableName = $table[0];
             $tableContent = $table[1];
             $commandsToBeExecuted = $this->create($conn, $tableName, $tableContent);
-            $this->runInsertCommands($conn, $commandsToBeExecuted);
+            $this->runSqlCommandsOnProdDatabase($conn, $commandsToBeExecuted);
         }
-        $this->runInsertCommands($conn, $this->createLogForProd());
         $conn->close();
     }
 
@@ -96,18 +95,34 @@ class CopyLogic extends Backend
         $req = $conn->query($sql);
         echo $tableName. "</br>";
 
+        $lastId = 0;
         if ($req->num_rows > 0) {
             $row = $req->fetch_assoc();
-            $lastId = $row["id"];
-        }else {
-            $lastId = "0";
+            $lastId = intval($row["id"]);
         }
-        $values = $this->createColumnWithValuesForCommand($conn, $tableName, $tableContent, $lastId);
+
+        if (strcmp($tableName, "tl_log") == 0) {
+            $this->checkForDeleteFromInTlLogTable($lastId, $conn);
+        }
+
+        $values = $this->createColumnWithValuesForCommand($conn, $tableName, $tableContent);
         return $this->createCommands($values, $tableName);
     }
 
-    private function createColumnWithValuesForCommand(mysqli $conn, string $tableName, array $tableContent,
-                                                      string $lastId) : array
+    private function checkForDeleteFromInTlLogTable(int $lastId, mysqli $conn) : void
+    {
+        $res = $this->Database->prepare("SELECT text from tl_log WHERE id > ". $lastId.
+            " AND text LIKE \"DELETE FROM %\"")
+            ->execute()
+            ->fetchAllAssoc();
+        $deleteStatements = array();
+        foreach ($res as $statement) {
+            $deleteStatements[] = $statement["text"];
+        }
+        $this->runSqlCommandsOnProdDatabase($conn, $deleteStatements);
+    }
+
+    private function createColumnWithValuesForCommand(mysqli $conn, string $tableName, array $tableContent) : array
     {
         $sql = "DESCRIBE ". PROD_DATABASE. ".". $tableName;
         $req = $conn->query($sql);
@@ -132,7 +147,7 @@ class CopyLogic extends Backend
         $index = 0;
         $tableSchemesFields = array();
         $rows = array();
-        $test = array();
+        $columnAndValue = array();
         foreach ($column as $row) {
             if (strpos($tableSchemes[$index]["type"], "varchar") ||
                 strpos($tableSchemes[$index]["type"], "string") ||
@@ -140,26 +155,26 @@ class CopyLogic extends Backend
                 strcmp($tableSchemes[$index]["type"], "char(1)") == 0 ||
                 strpos($tableSchemes[$index]["type"], "text")) {
                 $rows[] = '\''. $row. '\'';
-                $test[] = $tableSchemes[$index]["field"]. " = '". $row. "'";
+                $columnAndValue[] = $tableSchemes[$index]["field"]. " = '". $row. "'";
             }else if (empty($row) && strcmp($tableSchemes[$index]["nullable"], "YES") == 0) {
                 $rows[] = "NULL";
-                $test[] = $tableSchemes[$index]["field"]. " = NULL";
+                $columnAndValue[] = $tableSchemes[$index]["field"]. " = NULL";
             }else if (strcmp($tableSchemes[$index]["type"], "binary(16)") == 0) {
-                // load hex from db and lod it unhexed to prod db
+                // load hex from db and add for upload to prod db
                 $req = $this->Database->prepare("SELECT hex(". $tableSchemes[$index]["field"]. ") FROM ".
                     $tableName. " WHERE id = ". $column["id"])
                     ->execute(1)
                     ->fetchAllAssoc();
                 $rows[] = "UNHEX('". $req[0]["hex(singleSRC)"]. "')";
-                $test[] = $tableSchemes[$index]["field"]. "= UNHEX('". $req[0]["hex(singleSRC)"]. "')";
+                $columnAndValue[] = $tableSchemes[$index]["field"]. "= UNHEX('". $req[0]["hex(singleSRC)"]. "')";
             }else if (strcmp($tableSchemes[$index]["type"], "blob") == 0 ||
                 strcmp($tableSchemes[$index]["type"], "mediumblob") == 0 ||
                 strpos($tableSchemes[$index]["type"], "varbinary")) {
                 $rows[] = "NULL";
-                $test[] = $tableSchemes[$index]["field"]. " = NULL";
+                $columnAndValue[] = $tableSchemes[$index]["field"]. " = NULL";
             }else {
                 $rows[] = $row;
-                $test[] = $tableSchemes[$index]["field"]. " = ". $row;
+                $columnAndValue[] = $tableSchemes[$index]["field"]. " = ". $row;
             }
 
             $tableSchemesFields[] = $tableSchemes[$index]["field"];
@@ -168,9 +183,9 @@ class CopyLogic extends Backend
         $value = implode(", ", $rows);
         $columnName = implode(", ", $tableSchemesFields);
 
-        $a = implode(", ", $test);
+        $updateColumnAndValue = implode(", ", $columnAndValue);
 
-        return array($columnName, $value, $a);
+        return array($columnName, $value, $updateColumnAndValue);
     }
 
     private function createCommands(array $values, string $tableName) : array
@@ -185,13 +200,7 @@ class CopyLogic extends Backend
         return $commandsToBeExecuted;
     }
 
-    private function createLogForProd() : array
-    {
-        return array("INSERT INTO ". PROD_DATABASE. ".tl_log (tstamp, action, username, text, func, browser) VALUES
-        ('". time(). "', 'RELEASE', 'release', 'Released a new version', 'auto release', 'N/A');");
-    }
-
-    private function runInsertCommands(mysqli $conn, array $commandsToBeExecuted) : void
+    private function runSqlCommandsOnProdDatabase(mysqli $conn, array $commandsToBeExecuted) : void
     {
         if ($commandsToBeExecuted != null) {
             foreach ($commandsToBeExecuted as $command) {
