@@ -10,7 +10,7 @@
       "tl_to_be_ignored_too"
     ]
   },
-  "fileserver": {
+  "fileServer": {
     "server": "",
     "port": "",
     "username": "",
