@@ -43,7 +43,7 @@ class DatabaseLogic extends Backend
         return $counter;
     }
 
-    public function updateVersion(int $id, string $version) : void
+    public function updateVersion(string $id, string $version) : void
     {
         $this->Database
             ->prepare("UPDATE tl_release_stages %s WHERE id=". $id)
@@ -69,14 +69,21 @@ class DatabaseLogic extends Backend
     {
         $tables = $this->Database->prepare("SHOW TABLES FROM contao WHERE Tables_in_contao LIKE \"tl_%\"")
             ->execute();
+        $ignoredTables = $this->getIgnoredTables();
         $tableNames = array();
         while ($tables->next()) {
             $tableName = $tables->Tables_in_contao;
-            if (!in_array($tableName, DO_NOT_COPY_TABLES)) {
+            if (!in_array($tableName, $ignoredTables)) {
                 $tableNames[] = $tableName;
             }
         }
         return $tableNames;
+    }
+
+    private function getIgnoredTables() : array
+    {
+        $ioLogic = new IOLogic();
+        return $ioLogic->loadDatabaseIgnoredTablesConfiguration();
     }
 
     public function loadHexById(string $column, string $tableName, string $id) : Result

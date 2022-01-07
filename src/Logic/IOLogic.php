@@ -43,4 +43,11 @@ class IOLogic {
     {
         return $this->loadConfiguration()["database"];
     }
+
+    public function loadDatabaseIgnoredTablesConfiguration() : array
+    {
+        $ignoredTables = $this->loadDatabaseConfiguration()["ignoredTables"];
+        array_push($ignoredTables, "tl_user", "tl_cron_job", "tl_release_stages");
+        return $ignoredTables;
+    }
 }
