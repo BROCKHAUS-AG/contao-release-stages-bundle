@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
-DEFINE("PATH", "/var/www/html/contao/settings/brockhaus-ag/contao-release-stages-bundle/");
+DEFINE("SETTINGS_PATH", "/var/www/html/contao/settings/brockhaus-ag/contao-release-stages-bundle/");
 DEFINE("CONFIG_FILE", "config.json");
 
 class IOLogic {
@@ -36,7 +36,7 @@ class IOLogic {
 
     private function loadConfiguration() : array
     {
-        return $this->loadJsonFileAndDecode(PATH. CONFIG_FILE);
+        return $this->loadJsonFileAndDecode(SETTINGS_PATH. CONFIG_FILE);
     }
 
     public function loadDatabaseConfiguration() : array
