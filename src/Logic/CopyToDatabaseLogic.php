@@ -42,7 +42,7 @@ class CopyToDatabaseLogic extends Backend
     {
         $tables = $this->_databaseLogic->downloadFromDatabase();
 
-        echo "to be inserted into table: </br>";
+        echo "to be inserted into/updated table: </br>";
         foreach ($tables as $table) {
             $tableName = $table[0];
             $tableContent = $table[1];
@@ -156,8 +156,8 @@ class CopyToDatabaseLogic extends Backend
         $commandsToBeExecuted = array();
         foreach ($values as $value) {
             $commandsToBeExecuted[]
-                = 'INSERT INTO '. PROD_DATABASE. '.'. $tableName. ' ('. $value["columnName"]. ') VALUES ('.
-                $value["value"]. ') ON DUPLICATE KEY UPDATE '. $value["updateColumnAndValue"]. ';';
+                = 'INSERT INTO '. $this->_prodDatabaseLogic->prodDatabase. '.'. $tableName. ' ('. $value["columnName"].
+                ') VALUES ('. $value["value"]. ') ON DUPLICATE KEY UPDATE '. $value["updateColumnAndValue"]. ';';
         }
         if ($commandsToBeExecuted == null) return array();
         return $commandsToBeExecuted;

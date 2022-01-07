@@ -20,11 +20,13 @@ class ProdDatabaseLogic
 {
     private IOLogic $_ioLogic;
     private mysqli $_conn;
+    public string $prodDatabase;
 
     public function __construct()
     {
         $this->_ioLogic = new IOLogic();
         $config = $this->getDatabaseConfiguration();
+        $this->prodDatabase = $config["name"];
         $this->_conn = $this->createConnectionToProdDatabase($config["server"], $config["username"],
             $config["password"], $config["name"], $config["port"]);
     }
@@ -54,15 +56,17 @@ class ProdDatabaseLogic
 
     public function getTableSchemes(string $tableName) : array
     {
-        $sql = "DESCRIBE ". PROD_DATABASE. ".". $tableName;
+        $sql = "DESCRIBE ". $this->prodDatabase. ".". $tableName;
         $req = $this->_conn->query($sql);
         $tableSchemes = array();
-        while($tableScheme = $req->fetch_assoc()) {
-            $tableSchemes[] = array(
-                "field" => $tableScheme["Field"],
-                "type" => $tableScheme["Type"],
-                "nullable" => $tableScheme["Null"]
-            );
+        if ($req->num_rows > 0) {
+            while($tableScheme = $req->fetch_assoc()) {
+                $tableSchemes[] = array(
+                    "field" => $tableScheme["Field"],
+                    "type" => $tableScheme["Type"],
+                    "nullable" => $tableScheme["Null"]
+                );
+            }
         }
         return $tableSchemes;
     }
@@ -81,15 +85,14 @@ class ProdDatabaseLogic
 
     public function getLastIdFromTable(string $tableName) : int
     {
-        $sql = "SELECT id FROM ". PROD_DATABASE.$tableName. " ORDER BY id DESC LIMIT 1";
+        $sql = "SELECT id FROM ". $this->prodDatabase. ".". $tableName. " ORDER BY id DESC LIMIT 1";
         $req = $this->_conn->query($sql);
-        echo $tableName. "</br>";
 
-        $lastId = 0;
-        if ($req->num_rows > 0) {
-            $row = $req->fetch_assoc();
-            $lastId = intval($row["id"]);
+        if ($req->num_rows <= 0) {
+            echo "<br/>Es ist ein Fehler aufgetreten :)</br>Fehler: ". $this->_conn->error;
+            die;
         }
-        return $lastId;
+        $row = $req->fetch_assoc();
+        return intval($row["id"]);
     }
 }
