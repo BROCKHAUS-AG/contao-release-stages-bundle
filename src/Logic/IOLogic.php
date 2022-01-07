@@ -50,4 +50,9 @@ class IOLogic {
         array_push($ignoredTables, "tl_user", "tl_cron_job", "tl_release_stages");
         return $ignoredTables;
     }
+
+    public function loadDNSRecords() : array
+    {
+        return $this->loadConfiguration()["dnsRecords"];
+    }
 }

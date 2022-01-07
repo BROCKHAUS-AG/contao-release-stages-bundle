@@ -16,21 +16,17 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
 use Contao\Backend;
 
-DEFINE("PROD_DNS_RECORDS", array(
-    array("alias" => "BROCKHAUS-AG", "dns" => "www.brockhaus-ag.de"),
-    array("alias" => "brockhaus-karriere", "dns" => "www.brockhaus-ag.careers"),
-    array("alias" => "space-it-up", "dns" => "www.spaceitup.de")
-));
-
 class CopyToDatabaseLogic extends Backend
 {
     private DatabaseLogic $_databaseLogic;
     private ProdDatabaseLogic $_prodDatabaseLogic;
+    private IOLogic $_ioLogic;
 
     public function __construct()
     {
         $this->_databaseLogic = new DatabaseLogic();
         $this->_prodDatabaseLogic = new ProdDatabaseLogic();
+        $this->_ioLogic = new IOLogic();
     }
 
     public function copyToDatabase() : void
@@ -138,7 +134,8 @@ class CopyToDatabaseLogic extends Backend
 
     private function changeDNSEntryForProd(string $alias) : string
     {
-        foreach (PROD_DNS_RECORDS as $dnsRecord) {
+        $dnsRecords = $this->_ioLogic->loadDNSRecords();
+        foreach ($dnsRecords as $dnsRecord) {
             if (strcmp($dnsRecord["alias"], $alias) == 0) {
                 return $dnsRecord["dns"];
             }

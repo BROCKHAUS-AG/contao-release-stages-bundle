@@ -6,7 +6,8 @@
     "username": "prodContao",
     "password": "admin1234",
     "ignoredTables": [
-      ""
+      "tl_to_be_ignored",
+      "tl_to_be_ignored_too"
     ]
   },
   "fileserver": {
@@ -14,5 +15,15 @@
     "port": "",
     "username": "",
     "password": ""
-  }
+  },
+  "dnsRecords": [
+    {
+      "alias": "example-site",
+      "dns": "www.example-site.de"
+    },
+    {
+      "alias": "example-site-better",
+      "dns": "www.example-site-better.de"
+    }
+  ]
 }
