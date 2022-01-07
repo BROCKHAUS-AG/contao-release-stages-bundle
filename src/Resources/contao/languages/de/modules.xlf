@@ -15,15 +15,6 @@
                 <source>Create a release.</source>
                 <target>Erstellen Sie ein Release.</target>
             </trans-unit>
-
-            <trans-unit id="MOD.release_stages_settings.0">
-                <source>Settings</source>
-                <target>Einstellungen</target>
-            </trans-unit>
-            <trans-unit id="MOD.release_stages_settings.1">
-                <source>Change settings.</source>
-                <target>Einstellungen ändern.</target>
-            </trans-unit>
         </body>
     </file>
 </xliff>

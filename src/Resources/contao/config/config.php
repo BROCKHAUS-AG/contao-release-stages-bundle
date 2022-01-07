@@ -18,9 +18,6 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\ReleaseStagesModel;
 $GLOBALS['BE_MOD']['release'] = array(
     'release_stages' => array(
         'tables' => array('tl_release_stages')
-    ),
-    'release_stages_settings' => array(
-        'tables' => array('tl_release_stages_settings')
     )
 );
 

@@ -11,13 +11,6 @@
             <trans-unit id="MOD.release_stages.1">
                 <source>Create a release.</source>
             </trans-unit>
-
-            <trans-unit id="MOD.release_stages_settings.0">
-                <source>Settings</source>
-            </trans-unit>
-            <trans-unit id="MOD.release_stages_settings.1">
-                <source>Change settings.</source>
-            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -1,0 +1,15 @@
+{
+  "database": {
+    "server": "192.168.0.2",
+    "name": "prodContao",
+    "port": 3306,
+    "username": "prodContao",
+    "password": "admin1234"
+  },
+  "fileserver": {
+    "server": "",
+    "port": "",
+    "username": "",
+    "password": ""
+  }
+}

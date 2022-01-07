@@ -16,24 +16,36 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
 use mysqli;
 
-DEFINE("PROD_SERVER", "192.168.0.2");
-DEFINE("PROD_DATABASE", "prodContao");
-DEFINE("PROD_USER", "prodContao");
-DEFINE("PROD_USER_PASSWORD", "admin1234");
-
 class ProdDatabaseLogic
 {
+    private IOLogic $_ioLogic;
     private mysqli $_conn;
 
     public function __construct()
     {
-        $this->_conn = $this->createConnectionToProdDatabase(PROD_SERVER, PROD_USER,
-            PROD_USER_PASSWORD, PROD_DATABASE);
+        $this->_ioLogic = new IOLogic();
+        $config = $this->getDatabaseConfiguration();
+        $this->_conn = $this->createConnectionToProdDatabase($config["server"], $config["username"],
+            $config["password"], $config["name"], $config["port"]);
     }
 
-    private function createConnectionToProdDatabase(string $server, string $user, string $password, string $database)
+    private function getDatabaseConfiguration() : array
     {
-        $conn = new mysqli($server, $user, $password, $database);
+        $config = $this->_ioLogic->loadDatabaseConfiguration();
+
+        return array(
+            "server" => $config["server"],
+            "name" => $config["name"],
+            "port" => $config["port"],
+            "username" => $config["username"],
+            "password" => $config["password"]
+        );
+    }
+
+    private function createConnectionToProdDatabase(string $server, string $user, string $password, string $database,
+                                                    int $port)
+    {
+        $conn = new mysqli($server, $user, $password, $database, $port);
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
 use Contao\Backend;
+use Contao\Config;
 use mysqli;
 
 // should never be copied: "tl_release_stages", "tl_contao_bundle_creator", "tl_log", "tl_cron_job", "tl_user"
