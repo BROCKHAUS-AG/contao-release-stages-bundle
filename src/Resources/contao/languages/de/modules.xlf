@@ -1,10 +1,12 @@
 <?xml version="1.0" ?><xliff version="1.1">
-    <file datatype="php" original="src/Resources/contao/languages/de/modules.php" source-language="en" target-language="de">
+    <file datatype="php" original="src/Resources/contao/languages/de/modules.php" source-language="en"
+        target-language="de">
         <body>
             <trans-unit id="MOD.release">
                 <source>Releasing</source>
                 <target>Veröffentlichung</target>
             </trans-unit>
+
             <trans-unit id="MOD.release_stages.0">
                 <source>Release generator</source>
                 <target>Release Generator</target>
@@ -12,6 +14,15 @@
             <trans-unit id="MOD.release_stages.1">
                 <source>Create a release.</source>
                 <target>Erstellen Sie ein Release.</target>
+            </trans-unit>
+
+            <trans-unit id="MOD.release_stages_settings.0">
+                <source>Settings</source>
+                <target>Einstellungen</target>
+            </trans-unit>
+            <trans-unit id="MOD.release_stages_settings.1">
+                <source>Change settings.</source>
+                <target>Einstellungen ändern.</target>
             </trans-unit>
         </body>
     </file>

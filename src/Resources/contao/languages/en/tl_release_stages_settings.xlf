@@ -1,0 +1,85 @@
+<?xml version="1.0" ?><xliff version="1.1">
+    <file datatype="php" original="src/Resources/contao/languages/en/tl_release_stages_settings.php"
+        source-language="en">
+        <body>
+            <trans-unit id="tl_release_stages_settings.prodDatabase">
+                <source>Prod database</source>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages_settings.databaseServer.0">
+                <source>Servername/Server-IP</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages_settings.databaseServer.1">
+                <source>Enter the IP or DNS name of your Prod database server.</source>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages_settings.databaseName.0">
+                <source>Database name</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages_settings.databaseName.1">
+                <source>Enter the prod database name.</source>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages_settings.databasePort.0">
+                <source>Database server port</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages_settings.databasePort.1">
+                <source>Enter the port on which the database server is running.</source>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages_settings.databaseUsername.0">
+                <source>Username</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages_settings.databaseUsername.1">
+                <source>Enter the username from your prod database.</source>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages_settings.ignoredTables.0">
+                <source>Ignored Tables</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages_settings.ignoredTables.1">
+                <source>Enter the tables, which will be ignored.</source>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages_settings.databasePassword.0">
+                <source>Password</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages_settings.databasePassword.1">
+                <source>Enter the password from your prod user.</source>
+            </trans-unit>
+
+
+            <trans-unit id="tl_release_stages_settings.prodFileserver">
+                <source>Prod fileserver</source>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages_settings.fileserver.0">
+                <source>File Servername/Server-IP</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages_settings.fileserver.1">
+                <source>Enter the IP or DNS name from your prod fileserver.</source>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages_settings.fileserverPort.0">
+                <source>Server port</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages_settings.fileserverPort.1">
+                <source>Enter the port on which the prod fileserver is running.</source>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages_settings.fileserverUsername.0">
+                <source>Username</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages_settings.fileserverUsername.1">
+                <source>Enter the username from the prod fileserver.</source>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages_settings.fileserverPassword.0">
+                <source>Password</source>
+            </trans-unit>
+            <trans-unit id="tl_release_stages_settings.fileserverPassword.1">
+                <source>Enter the password from the prod user.</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
