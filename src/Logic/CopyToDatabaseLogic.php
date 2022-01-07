@@ -15,11 +15,6 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
 use Contao\Backend;
-use Contao\Config;
-use mysqli;
-
-// should never be copied: "tl_release_stages", "tl_contao_bundle_creator", "tl_log", "tl_cron_job", "tl_user"
-DEFINE("DO_NOT_COPY_TABLES", array("tl_release_stages", "tl_contao_bundle_creator", "tl_cron_job", "tl_user"));
 
 DEFINE("PROD_DNS_RECORDS", array(
     array("alias" => "BROCKHAUS-AG", "dns" => "www.brockhaus-ag.de"),
