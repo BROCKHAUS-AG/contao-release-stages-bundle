@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Copy\CopyToFTPFileServerLogic;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Copy\CopyToLocalFileServerLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use Contao\Backend;
@@ -49,7 +47,6 @@ class CopyToFileServerLogic extends Backend {
         $files = $loadFromLocalLogic->loadFromLocal();
         $this->createDirectories($files);
         $this->compareAndCopyFiles($files);
-        die;
     }
 
     private function getPathToCopy() : string
