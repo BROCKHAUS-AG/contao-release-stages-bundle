@@ -93,4 +93,11 @@ class DatabaseLogic extends Backend
             $tableName. " WHERE id = ".$id)
             ->execute(1);
     }
+
+    public function checkForDeletedFilesInTlLogTable() : Result
+    {
+        return $this->Database
+            ->prepare("SELECT text FROM tl_log WHERE text LIKE 'File or folder % has been deleted'")
+            ->execute();
+    }
 }

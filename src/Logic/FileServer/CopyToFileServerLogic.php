@@ -14,17 +14,20 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
+use Contao\Backend;
 
 DEFINE("PATH", "/var/www/html/contao/files/");
 DEFINE("PATH_PROD", "/var/www/html/contao/filesProd/");
 
-class CopyToFileServerLogic {
+class CopyToFileServerLogic extends Backend {
     private LoadFromLocalLogic $_loadFromLocalLogic;
+    private DatabaseLogic $_databaseLogic;
 
     public function __construct()
     {
         $this->_loadFromLocalLogic = new LoadFromLocalLogic(PATH, PATH_PROD);
+        $this->_databaseLogic = new DatabaseLogic();
     }
 
     public function copyToFileServer() : void
@@ -53,8 +56,7 @@ class CopyToFileServerLogic {
     {
         if (!@mkdir($directory)) {
             $error = error_get_last();
-            echo "mkdir error: ". $error['message'];
-            die;
+            die("mkdir error: ". $error['message']);
         }
     }
 
@@ -88,6 +90,8 @@ class CopyToFileServerLogic {
         }else {
            $this->copy($file);
         }
+
+        $this->checkForDeletion();
     }
 
     private function checkForUpdate(array $file) : void
@@ -103,6 +107,30 @@ class CopyToFileServerLogic {
             $errors = error_get_last();
             echo "COPY ERROR: ".$errors['type'];
             echo "<br />\n".$errors['message'];
+        }
+    }
+
+    private function checkForDeletion() : void
+    {
+        $res = $this->_databaseLogic->checkForDeletedFilesInTlLogTable()
+            ->fetchAllAssoc();
+        foreach ($res as $file)
+        {
+            $str = explode("&quot;", $file["text"]);
+            $file["text"] = $str[1];
+            $this->deleteFile($file["text"]);
+        }
+    }
+
+    private function deleteFile(string $file) : void
+    {
+        $file = str_replace("files", "", $file);
+        $file = PATH_PROD. $file;
+        if (file_exists($file)) {
+            if (!unlink($file)) {
+                $error = error_get_last();
+                die("Fehler beim Löschen der Datei: \"". $file. "\"</br>rm error: ". $error['message']);
+            }
         }
     }
 }
