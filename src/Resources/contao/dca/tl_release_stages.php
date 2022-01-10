@@ -12,9 +12,9 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\CopyToDatabaseLogic;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\CopyToFileServerLogic;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\DatabaseLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\CopyToDatabaseLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToFileServerLogic;
 use Contao\Backend;
 
 $GLOBALS['TL_DCA']['tl_release_stages'] = array(
