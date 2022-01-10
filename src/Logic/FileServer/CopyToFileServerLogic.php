@@ -33,7 +33,70 @@ class CopyToFileServerLogic {
 
     public function copyToFileServer() : void
     {
-        $filesWithTimestamp = $this->_loadFromLocalLogic->loadFromLocal();
+        $files = $this->_loadFromLocalLogic->loadFromLocal();
+        $this->createDirectories($files);
+        $this->compareAndCopyFiles($files);
         die;
+    }
+
+    private function createDirectories(array $files) : void
+    {
+        foreach ($files as $file)
+        {
+            $directories = $this->getDirectoriesFromFilePath($file["prodPath"]);
+            foreach ($directories as $directory)
+            {
+                if (!is_dir($directory)) {
+                    $this->createDirectory($directory);
+                }
+            }
+        }
+    }
+
+    private function createDirectory(string $directory) : void
+    {
+        if (!@mkdir($directory)) {
+            $error = error_get_last();
+            echo "mkdir error: ". $error['message'];
+            die;
+        }
+    }
+
+    private function getDirectoriesFromFilePath(string $file) : array
+    {
+        $directoriesSeparate = explode("/", $file);
+        array_splice($directoriesSeparate, 0, 1);
+        $directories = array();
+        for ($x = 1; $x != sizeof($directoriesSeparate); $x++) {
+            $directory = "";
+            for ($y = 0; $y != $x; $y++) {
+                $directory .= "/". $directoriesSeparate[$y];
+            }
+            $directories[] = $directory;
+        }
+        return $directories;
+    }
+
+    private function compareAndCopyFiles(array $files) : void
+    {
+        foreach ($files as $file)
+        {
+            $this->compareAndCopyFile($file);
+        }
+    }
+
+    private function compareAndCopyFile(array $file) : void
+    {
+        if (file_exists($file["prodPath"])) {
+            echo "exists</br>";
+        }else {
+            if (!copy($file["path"], $file["prodPath"])) {
+                $errors = error_get_last();
+                echo "COPY ERROR: ".$errors['type'];
+                echo "<br />\n".$errors['message'];
+            }else {
+                echo "created</br>";
+            }
+        }
     }
 }

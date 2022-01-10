@@ -46,8 +46,12 @@ class LoadFromLocalLogic {
         $filesWithTimestamp = array();
         foreach ($files as $file)
         {
-            $futureProdPathFile = $this->changePathToProdPath($file);
-            $filesWithTimestamp[] = array("lastModified" => filemtime($file), "filename" => $futureProdPathFile);
+            $prodPathFile = $this->changePathToProdPath($file);
+            $filesWithTimestamp[] = array(
+                "lastModified" => filemtime($file),
+                "path" => $file,
+                "prodPath" => $prodPathFile
+            );
         }
         return $filesWithTimestamp;
     }
