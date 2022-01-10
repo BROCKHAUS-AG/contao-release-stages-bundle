@@ -12,16 +12,21 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServer;
-
-DEFINE("PATH", "/var/www/html/contao/files/");
+namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
 class LoadFromLocalLogic {
+    private string $_path;
+
+    public function __construct(string $path)
+    {
+        $this->_path = $path;
+    }
+
     public function loadFromLocal() : array
     {
-        $directoriesLayout = glob(PATH. "layout*", GLOB_ONLYDIR);
+        $directoriesLayout = glob($this->_path. "layout*", GLOB_ONLYDIR);
         $directoriesLayout = array_reverse($directoriesLayout);
-        return $this->getFilesWithTimestamp(PATH, $directoriesLayout);
+        return $this->getFilesWithTimestamp($this->_path, $directoriesLayout);
     }
 
     private function getFilesWithTimestamp(string $path, array $directoriesLayout) : array

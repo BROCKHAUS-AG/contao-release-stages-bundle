@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServer\LoadFromLocalLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 
 DEFINE("PATH", "/var/www/html/contao/files/");
@@ -26,7 +25,7 @@ class CopyToFileServerLogic {
 
     public function __construct()
     {
-        $this->_loadFromLocalLogic = new LoadFromLocalLogic();
+        $this->_loadFromLocalLogic = new LoadFromLocalLogic(PATH);
         $ioLogic = new IOLogic();
         $this->config = $ioLogic->loadFileServerConfiguration();
     }
