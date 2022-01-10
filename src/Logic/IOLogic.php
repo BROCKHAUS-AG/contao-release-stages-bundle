@@ -55,4 +55,9 @@ class IOLogic {
     {
         return $this->loadConfiguration()["dnsRecords"];
     }
+
+    public function loadFileServerConfiguration() : array
+    {
+        return $this->loadConfiguration()["fileServer"];
+    }
 }

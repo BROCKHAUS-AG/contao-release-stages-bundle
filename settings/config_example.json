@@ -14,7 +14,8 @@
     "server": "",
     "port": "",
     "username": "",
-    "password": ""
+    "password": "",
+    "ssl_tsl": false
   },
   "dnsRecords": [
     {

@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\CopyToDatabaseLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\CopyToFileServerLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\DatabaseLogic;
 use Contao\Backend;
 
@@ -104,11 +105,13 @@ class tl_release_stages extends Backend
 {
     private DatabaseLogic $_databaseLogic;
     private CopyToDatabaseLogic $_copyToDatabaseLogic;
+    private CopyToFileServerLogic $_copyToFileServerLogic;
 
     public function __construct()
     {
         $this->_databaseLogic = new DatabaseLogic();
         $this->_copyToDatabaseLogic = new CopyToDatabaseLogic();
+        $this->_copyToFileServerLogic = new CopyToFileServerLogic();
     }
 
     public function changeVersionNumber() : void
@@ -150,6 +153,7 @@ class tl_release_stages extends Backend
 
     public function copy() : void
     {
-        $this->_copyToDatabaseLogic->copyToDatabase();
+        //$this->_copyToDatabaseLogic->copyToDatabase();
+        $this->_copyToFileServerLogic->copyToFileServer();
     }
 }
