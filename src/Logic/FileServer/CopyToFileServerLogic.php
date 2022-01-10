@@ -14,28 +14,53 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Copy\CopyToFTPFileServerLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Copy\CopyToLocalFileServerLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use Contao\Backend;
 
 DEFINE("PATH", "/var/www/html/contao/files/");
-DEFINE("PATH_PROD", "/var/www/html/contao/filesProd/");
+
+DEFINE("COPY_TO_LOCAL", "local");
+DEFINE("COPY_TO_FILE_SERVER", "fileServer");
 
 class CopyToFileServerLogic extends Backend {
-    private LoadFromLocalLogic $_loadFromLocalLogic;
+    private IOLogic $_ioLogic;
+    private CopyToLocalFileServerLogic $_copyToLocalFileServerLogic;
+    private CopyToFTPFileServerLogic $_copyToFTPFileServerLogic;
     private DatabaseLogic $_databaseLogic;
+
+    private string $copyTo;
 
     public function __construct()
     {
-        $this->_loadFromLocalLogic = new LoadFromLocalLogic(PATH, PATH_PROD);
+        $this->_ioLogic = new IOLogic();
+        $this->_copyToLocalFileServerLogic = new CopyToLocalFileServerLogic();
+        $this->_copyToFTPFileServerLogic = new CopyToFTPFileServerLogic();
         $this->_databaseLogic = new DatabaseLogic();
     }
 
     public function copyToFileServer() : void
     {
-        $files = $this->_loadFromLocalLogic->loadFromLocal();
+        $this->copyTo = $this->_ioLogic->checkWhereToCopy();
+        $path = $this->getPathToCopy();
+        $loadFromLocalLogic = new LoadFromLocalLogic(PATH, $path);
+        $files = $loadFromLocalLogic->loadFromLocal();
         $this->createDirectories($files);
         $this->compareAndCopyFiles($files);
         die;
+    }
+
+    private function getPathToCopy() : string
+    {
+        if ($this->isToCopyToLocalFileServer()) {
+            return $this->_ioLogic->loadLocalFileServerConfiguration()["contaoProdPath"];
+        }else if ($this->isToCopyToFTPFileServer()) {
+            return PATH;
+        }
+        $this->couldNotFindCopyTo();
+        return "";
     }
 
     private function createDirectories(array $files) : void
@@ -54,9 +79,12 @@ class CopyToFileServerLogic extends Backend {
 
     private function createDirectory(string $directory) : void
     {
-        if (!@mkdir($directory)) {
-            $error = error_get_last();
-            die("mkdir error: ". $error['message']);
+        if ($this->isToCopyToLocalFileServer()) {
+            $this->_copyToLocalFileServerLogic->createDirectory($directory);
+        }else if ($this->isToCopyToFTPFileServer()) {
+            $this->_copyToFTPFileServerLogic->createDirectory($directory);
+        }else {
+            $this->couldNotFindCopyTo();
         }
     }
 
@@ -88,7 +116,13 @@ class CopyToFileServerLogic extends Backend {
         if (file_exists($file["prodPath"])) {
             $this->checkForUpdate($file);
         }else {
-           $this->copy($file);
+            if ($this->isToCopyToLocalFileServer()) {
+                $this->_copyToLocalFileServerLogic->copy($file);
+            }else if ($this->isToCopyToFTPFileServer()) {
+                $this->_copyToFTPFileServerLogic->copy($file);
+            }else {
+                $this->couldNotFindCopyTo();
+            }
         }
 
         $this->checkForDeletion();
@@ -96,17 +130,18 @@ class CopyToFileServerLogic extends Backend {
 
     private function checkForUpdate(array $file) : void
     {
-        if (filemtime($file["prodPath"]) < filemtime($file["path"])) {
-            $this->copy($file);
-        }
-    }
-
-    private function copy(array $file) : void
-    {
-        if (!copy($file["path"], $file["prodPath"])) {
-            $errors = error_get_last();
-            echo "COPY ERROR: ".$errors['type'];
-            echo "<br />\n".$errors['message'];
+        if ($this->isToCopyToLocalFileServer()) {
+            $lastModifiedTime = $this->_copyToLocalFileServerLogic->getLastModifiedTimeFromFile($file["prodPath"]);
+            if ($lastModifiedTime < filemtime($file["path"])) {
+                $this->_copyToLocalFileServerLogic->copy($file);
+            }
+        }else if ($this->isToCopyToFTPFileServer()) {
+            $lastModifiedTime = $this->_copyToFTPFileServerLogic->getLastModifiedTimeFromFile($file["prodPath"]);
+            if ($lastModifiedTime < filemtime($file["path"])) {
+                $this->_copyToFTPFileServerLogic->copy($file);
+            }
+        }else {
+            $this->couldNotFindCopyTo();
         }
     }
 
@@ -124,13 +159,28 @@ class CopyToFileServerLogic extends Backend {
 
     private function deleteFile(string $file) : void
     {
-        $file = str_replace("files", "", $file);
-        $file = PATH_PROD. $file;
-        if (file_exists($file)) {
-            if (!unlink($file)) {
-                $error = error_get_last();
-                die("Fehler beim Löschen der Datei: \"". $file. "\"</br>rm error: ". $error['message']);
-            }
+        if ($this->isToCopyToLocalFileServer()) {
+            $this->_copyToLocalFileServerLogic->delete($file,
+                $this->_ioLogic->loadLocalFileServerConfiguration()["contaoProdPath"]);
+        }else if ($this->isToCopyToFTPFileServer()) {
+            $this->_copyToFTPFileServerLogic->delete($file);
+        }else {
+            $this->couldNotFindCopyTo();
         }
+    }
+
+    private function isToCopyToLocalFileServer() : bool
+    {
+        return strcmp(COPY_TO_LOCAL, $this->copyTo) == 0;
+    }
+
+    private function isToCopyToFTPFileServer() : bool
+    {
+        return strcmp(COPY_TO_FILE_SERVER, $this->copyTo) == 0;
+    }
+
+    private function couldNotFindCopyTo() : void
+    {
+        die("Es konnte kein valider Pfad gefunden werden, um Dateien zu aktualisieren!");
     }
 }

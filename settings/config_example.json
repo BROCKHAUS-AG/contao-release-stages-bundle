@@ -10,12 +10,16 @@
       "tl_to_be_ignored_too"
     ]
   },
+  "copyTo": "local",
   "fileServer": {
     "server": "",
     "port": "",
     "username": "",
     "password": "",
     "ssl_tsl": false
+  },
+  "local": {
+    "contaoProdPath": "/var/www/html/contao/filesProd/"
   },
   "dnsRecords": [
     {

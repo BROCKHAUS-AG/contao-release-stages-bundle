@@ -56,8 +56,18 @@ class IOLogic {
         return $this->loadConfiguration()["dnsRecords"];
     }
 
+    public function checkWhereToCopy() : string
+    {
+        return $this->loadConfiguration()["copyTo"];
+    }
+
     public function loadFileServerConfiguration() : array
     {
         return $this->loadConfiguration()["fileServer"];
+    }
+
+    public function loadLocalFileServerConfiguration() : array
+    {
+        return $this->loadConfiguration()["local"];
     }
 }
