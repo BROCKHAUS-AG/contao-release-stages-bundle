@@ -16,10 +16,12 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
 class LoadFromLocalLogic {
     private string $_path;
+    private string $_prodPath;
 
-    public function __construct(string $path)
+    public function __construct(string $path, string $prodPath)
     {
         $this->_path = $path;
+        $this->_prodPath = $prodPath;
     }
 
     public function loadFromLocal() : array
@@ -44,9 +46,15 @@ class LoadFromLocalLogic {
         $filesWithTimestamp = array();
         foreach ($files as $file)
         {
-            $filesWithTimestamp[] = array("lastModified" => filemtime($file), "filename" => $file);
+            $futureProdPathFile = $this->changePathToProdPath($file);
+            $filesWithTimestamp[] = array("lastModified" => filemtime($file), "filename" => $futureProdPathFile);
         }
         return $filesWithTimestamp;
+    }
+
+    private function changePathToProdPath(string $file) : string
+    {
+        return str_replace($this->_path, $this->_prodPath, $file);
     }
 
     private function loadDirectories(array $directories, array $filesWithTimestamp, array $directoriesLayout) : array
