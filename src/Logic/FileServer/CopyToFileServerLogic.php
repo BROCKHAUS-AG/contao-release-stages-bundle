@@ -129,7 +129,7 @@ class CopyToFileServerLogic extends Backend {
     {
         if ($this->isToCopyToLocalFileServer()) {
             $lastModifiedTime = $this->_copyToLocalFileServerLogic->getLastModifiedTimeFromFile($file["prodPath"]);
-            if ($lastModifiedTime < filemtime($file["path"])) {
+            if ($lastModifiedTime < $this->_copyToLocalFileServerLogic->getLastModifiedTimeFromFile($file["path"])) {
                 $this->_copyToLocalFileServerLogic->copy($file);
             }
         }else if ($this->isToCopyToFTPFileServer()) {

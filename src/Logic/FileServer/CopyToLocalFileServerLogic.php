@@ -25,7 +25,7 @@ class CopyToLocalFileServerLogic {
 
     public function getLastModifiedTimeFromFile(string $file) : int
     {
-        return 0;
+        return filemtime($file);
     }
 
     public function copy(array $file) : void
