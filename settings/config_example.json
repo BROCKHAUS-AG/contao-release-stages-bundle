@@ -1,4 +1,5 @@
 {
+  "contaoPath": "/var/www/html/contao/",
   "database": {
     "server": "192.168.0.2",
     "name": "prodContao",
@@ -10,13 +11,14 @@
       "tl_to_be_ignored_too"
     ]
   },
-  "copyTo": "local",
+  "copyTo": "fileServer",
   "fileServer": {
     "server": "",
     "port": "",
     "username": "",
     "password": "",
-    "ssl_tsl": false
+    "ssl_tsl": false,
+    "path": ""
   },
   "local": {
     "contaoProdPath": "/var/www/html/contao/filesProd/"

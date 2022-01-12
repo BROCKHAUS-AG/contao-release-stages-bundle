@@ -153,7 +153,7 @@ class tl_release_stages extends Backend
 
     public function copy() : void
     {
-        //$this->_copyToDatabaseLogic->copyToDatabase();
+        $this->_copyToDatabaseLogic->copyToDatabase();
         $this->_copyToFileServerLogic->copyToFileServer();
     }
 }

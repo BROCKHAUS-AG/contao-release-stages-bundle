@@ -39,6 +39,16 @@ class IOLogic {
         return $this->loadJsonFileAndDecode(SETTINGS_PATH. CONFIG_FILE);
     }
 
+    private function loadContaoPath() : string
+    {
+        return $this->loadConfiguration()["contaoPath"];
+    }
+
+    public function loadPathToContaoFiles() : string
+    {
+        return $this->loadContaoPath(). "files";
+    }
+
     public function loadDatabaseConfiguration() : array
     {
         return $this->loadConfiguration()["database"];

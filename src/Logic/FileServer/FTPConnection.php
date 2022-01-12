@@ -45,14 +45,14 @@ class FTPConnection {
 
     private function connectToSFTPServer()
     {
-        $sftpConn = ftp_ssl_connect($this->_config["server"], $this->_config["port"])
+        $sftpConn = ftp_ssl_connect($this->_config["server"], intval($this->_config["port"]))
             or die("Verbindung zum SFTP Server \"". $this->_config["server"]. "\" fehlgeschlagen");
         return $sftpConn;
     }
 
     private function connectToFTPServer()
     {
-        $ftpConn = ftp_connect($this->_config["server"], $this->_config["port"])
+        $ftpConn = ftp_connect($this->_config["server"], intval($this->_config["port"]))
             or die("Verbindung zum FTP Server \"". $this->_config["server"]. "\" fehlgeschlagen");
         return $ftpConn;
     }

@@ -18,7 +18,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use Contao\Backend;
 
-DEFINE("PATH", "/var/www/html/contao/files/");
+DEFINE("PATH", "files/");
 
 DEFINE("COPY_TO_LOCAL", "local");
 DEFINE("COPY_TO_FILE_SERVER", "fileServer");
@@ -35,7 +35,8 @@ class CopyToFileServerLogic extends Backend {
     {
         $this->_ioLogic = new IOLogic();
         $this->_copyToLocalFileServerLogic = new CopyToLocalFileServerLogic();
-        $this->_copyToFTPFileServerLogic = new CopyToFTPFileServerLogic();
+        $ftpConnection = new FTPConnection();
+        $this->_copyToFTPFileServerLogic = new CopyToFTPFileServerLogic($ftpConnection->connect());
         $this->_databaseLogic = new DatabaseLogic();
     }
 
@@ -43,10 +44,12 @@ class CopyToFileServerLogic extends Backend {
     {
         $this->copyTo = $this->_ioLogic->checkWhereToCopy();
         $path = $this->getPathToCopy();
-        $loadFromLocalLogic = new LoadFromLocalLogic(PATH, $path);
+        $loadFromLocalLogic = new LoadFromLocalLogic($this->_ioLogic->loadPathToContaoFiles(), $path);
         $files = $loadFromLocalLogic->loadFromLocal();
+
         $this->createDirectories($files);
         $this->compareAndCopyFiles($files);
+        $this->checkForDeletion();
     }
 
     private function getPathToCopy() : string
@@ -54,7 +57,7 @@ class CopyToFileServerLogic extends Backend {
         if ($this->isToCopyToLocalFileServer()) {
             return $this->_ioLogic->loadLocalFileServerConfiguration()["contaoProdPath"];
         }else if ($this->isToCopyToFTPFileServer()) {
-            return PATH;
+            return $this->_ioLogic->loadFileServerConfiguration()["path"];
         }
         $this->couldNotFindCopyTo();
         return "";
@@ -121,8 +124,6 @@ class CopyToFileServerLogic extends Backend {
                 $this->couldNotFindCopyTo();
             }
         }
-
-        $this->checkForDeletion();
     }
 
     private function checkForUpdate(array $file) : void
@@ -134,7 +135,7 @@ class CopyToFileServerLogic extends Backend {
             }
         }else if ($this->isToCopyToFTPFileServer()) {
             $lastModifiedTime = $this->_copyToFTPFileServerLogic->getLastModifiedTimeFromFile($file["prodPath"]);
-            if ($lastModifiedTime < filemtime($file["path"])) {
+            if ($lastModifiedTime < $this->_copyToFTPFileServerLogic->getLastModifiedTimeFromFile($file["prodPath"])) {
                 $this->_copyToFTPFileServerLogic->copy($file);
             }
         }else {
