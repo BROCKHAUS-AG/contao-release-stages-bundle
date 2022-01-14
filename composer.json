@@ -1,11 +1,16 @@
 {
+    "version": "1.0.0",
     "name": "brockhaus-ag/contao-release-stages-bundle",
-    "description": "Release Stages",
+    "description": "Mit dem Contao Release Stages Bundle der BROCKHAUS AG kannst DU ganz einfach Releases erstellen und auf Deiner Prod-Stage hochladen.",
     "keywords": [
         "contao",
         "bundle",
-        "tag 3",
-        "tag 4"
+        "release",
+        "releasing",
+        "stages",
+        "auto",
+        "deployment",
+        "BROCKHAUS AG"
     ],
     "type": "contao-bundle",
     "license": "GPL-3.0-or-later",
@@ -57,6 +62,5 @@
     },
     "extra": {
         "contao-manager-plugin": "BrockhausAg\\ContaoReleaseStagesBundle\\ContaoManager\\Plugin"
-    },
-    "version": "1.0.0"
+    }
 }
