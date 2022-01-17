@@ -78,7 +78,6 @@ class ProdDatabaseLogic
             foreach ($commandsToBeExecuted as $command) {
                 if ($this->_conn->query($command) === FALSE) {
                     echo "<br/>Es ist ein Fehler aufgetreten :)</br>Fehler: ". $this->_conn->error;
-                    die;
                 }
             }
         }
