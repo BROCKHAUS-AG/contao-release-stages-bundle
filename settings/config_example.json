@@ -9,7 +9,8 @@
     "ignoredTables": [
       "tl_to_be_ignored",
       "tl_to_be_ignored_too"
-    ]
+    ],
+    "testStageDatabaseName": "testContao"
   },
   "copyTo": "fileServer",
   "fileServer": {

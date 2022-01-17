@@ -52,9 +52,9 @@ class DatabaseLogic extends Backend
             ->execute(1);
     }
 
-    public function downloadFromDatabase() : array
+    public function downloadFromDatabase(string $testStageDatabaseName) : array
     {
-        $tableNames = $this->getTableNamesFromDatabase();
+        $tableNames = $this->getTableNamesFromDatabase($testStageDatabaseName);
         $table = array();
         foreach ($tableNames as $tableName)
         {
@@ -66,14 +66,15 @@ class DatabaseLogic extends Backend
         return $table;
     }
 
-    private function getTableNamesFromDatabase() : array
+    private function getTableNamesFromDatabase(string $testStageDatabaseName) : array
     {
-        $tables = $this->Database->prepare("SHOW TABLES FROM contao WHERE Tables_in_contao LIKE \"tl_%\"")
+        $tables = $this->Database->prepare("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES ".
+            "WHERE TABLE_SCHEMA = \"". $testStageDatabaseName. "\" AND TABLE_NAME LIKE \"tl_%\";")
             ->execute();
         $ignoredTables = $this->getIgnoredTables();
         $tableNames = array();
         while ($tables->next()) {
-            $tableName = $tables->Tables_in_contao;
+            $tableName = $tables->TABLE_NAME;
             if (!in_array($tableName, $ignoredTables)) {
                 $tableNames[] = $tableName;
             }

@@ -32,7 +32,8 @@ class CopyToDatabaseLogic extends Backend
 
     public function copyToDatabase() : void
     {
-        $tables = $this->_databaseLogic->downloadFromDatabase();
+        $testStageDatabaseName = $this->_ioLogic->loadTestStageDatabaseName();
+        $tables = $this->_databaseLogic->downloadFromDatabase($testStageDatabaseName);
 
         echo "to be inserted into/updated table: </br>";
         foreach ($tables as $table) {

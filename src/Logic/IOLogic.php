@@ -54,6 +54,11 @@ class IOLogic {
         return $this->loadConfiguration()["database"];
     }
 
+    public function loadTestStageDatabaseName() : string
+    {
+        return $this->loadDatabaseConfiguration()["testStageDatabaseName"];
+    }
+
     public function loadDatabaseIgnoredTablesConfiguration() : array
     {
         $ignoredTables = $this->loadDatabaseConfiguration()["ignoredTables"];

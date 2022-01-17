@@ -35,8 +35,6 @@ class CopyToFileServerLogic extends Backend {
     {
         $this->_ioLogic = new IOLogic();
         $this->_copyToLocalFileServerLogic = new CopyToLocalFileServerLogic();
-        $ftpConnection = new FTPConnection();
-        $this->_copyToFTPFileServerLogic = new CopyToFTPFileServerLogic($ftpConnection->connect());
         $this->_databaseLogic = new DatabaseLogic();
     }
 
@@ -54,9 +52,11 @@ class CopyToFileServerLogic extends Backend {
 
     private function getPathToCopy() : string
     {
-        if ($this->isToCopyToLocalFileServer()) {
+       if ($this->isToCopyToLocalFileServer()) {
             return $this->_ioLogic->loadLocalFileServerConfiguration()["contaoProdPath"];
         }else if ($this->isToCopyToFTPFileServer()) {
+            $ftpConnection = new FTPConnection();
+            $this->_copyToFTPFileServerLogic = new CopyToFTPFileServerLogic($ftpConnection->connect());
             return $this->_ioLogic->loadFileServerConfiguration()["path"];
         }
         $this->couldNotFindCopyTo();
