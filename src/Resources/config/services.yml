@@ -1,1 +1,7 @@
 services:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\CopyToFileServerLogic:
+        arguments:
+            - '@logger'
+        public: true
+        calls:
+            - [ setContainer, [ '@Psr\Container\ContainerInterface' ] ]

@@ -18,8 +18,6 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use Contao\Backend;
 
-DEFINE("PATH", "files/");
-
 DEFINE("COPY_TO_LOCAL", "local");
 DEFINE("COPY_TO_FILE_SERVER", "fileServer");
 
@@ -46,8 +44,8 @@ class CopyToFileServerLogic extends Backend {
         $files = $loadFromLocalLogic->loadFromLocal();
 
         $this->createDirectories($files);
-        $this->compareAndCopyFiles($files);
         $this->checkForDeletion();
+        $this->compareAndCopyFiles($files);
     }
 
     private function getPathToCopy() : string
@@ -151,7 +149,8 @@ class CopyToFileServerLogic extends Backend {
         {
             $str = explode("&quot;", $file["text"]);
             $file["text"] = $str[1];
-            $this->deleteFile($file["text"]);
+            $fileName = str_replace("files", "", $file["text"]);
+            $this->deleteFile($fileName);
         }
     }
 
@@ -161,7 +160,7 @@ class CopyToFileServerLogic extends Backend {
             $this->_copyToLocalFileServerLogic->delete($file,
                 $this->_ioLogic->loadLocalFileServerConfiguration()["contaoProdPath"]);
         }else if ($this->isToCopyToFTPFileServer()) {
-            $this->_copyToFTPFileServerLogic->delete($file);
+            $this->_copyToFTPFileServerLogic->delete($file, $this->_ioLogic->loadFileServerConfiguration()["path"]);
         }else {
             $this->couldNotFindCopyTo();
         }
