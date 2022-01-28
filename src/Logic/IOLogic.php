@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
-DEFINE("SETTINGS_PATH", "/var/www/html/contao/settings/brockhaus-ag/contao-release-stages-bundle/");
+DEFINE("SETTINGS_PATH", "/html/contao/settings/brockhaus-ag/contao-release-stages-bundle/");
 DEFINE("CONFIG_FILE", "config.json");
 
 class IOLogic {
