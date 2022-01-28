@@ -26,7 +26,7 @@ class CopyToFTPFileServerLogic {
     {
         if (!$this->checkIfDirectoryExists($directory)) {
             ftp_mkdir($this->_conn, $directory);
-            ftp_chmod($this->_conn, 0777, $directory);
+            ftp_chmod($this->_conn, 0755, $directory);
         }
     }
 
@@ -42,7 +42,7 @@ class CopyToFTPFileServerLogic {
             echo "COPY ERROR: ".$errors['type'];
             echo "<br />\n".$errors['message'];
         }else {
-            ftp_chmod($this->_conn, 0777, $file["prodPath"]);
+            ftp_chmod($this->_conn, 0644, $file["prodPath"]);
         }
     }
 
