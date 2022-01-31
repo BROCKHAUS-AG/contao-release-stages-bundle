@@ -37,12 +37,14 @@ class CopyToFTPFileServerLogic {
 
     public function copy(array $file) : void
     {
-        if (!@ftp_put($this->_conn, $file["prodPath"], $file["path"], FTP_ASCII)) {
-            $errors = error_get_last();
-            echo "COPY ERROR: ".$errors['type'];
-            echo "<br />\n".$errors['message'];
-        }else {
-            ftp_chmod($this->_conn, 0644, $file["prodPath"]);
+        if (!$this->checkIfFileExists($file["prodPath"])) {
+            if (!@ftp_put($this->_conn, $file["prodPath"], $file["path"], FTP_ASCII)) {
+                $errors = error_get_last();
+                echo "COPY ERROR: ".$errors['type'];
+                echo "<br />\n".$errors['message'];
+            }else {
+                ftp_chmod($this->_conn, 0644, $file["prodPath"]);
+            }
         }
     }
 

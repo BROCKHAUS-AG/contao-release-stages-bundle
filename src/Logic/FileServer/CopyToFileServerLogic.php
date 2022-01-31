@@ -46,6 +46,7 @@ class CopyToFileServerLogic extends Backend {
         $this->createDirectories($files);
         $this->checkForDeletion();
         $this->compareAndCopyFiles($files);
+        $this->copyDirectoryToMainDirectoryWithSSHCommand();
     }
 
     private function getPathToCopy() : string
@@ -68,9 +69,7 @@ class CopyToFileServerLogic extends Backend {
             $directories = $this->getDirectoriesFromFilePath($file["prodPath"]);
             foreach ($directories as $directory)
             {
-                if (!is_dir($directory)) {
-                    $this->createDirectory($directory);
-                }
+                $this->createDirectory($directory);
             }
         }
     }
@@ -105,22 +104,19 @@ class CopyToFileServerLogic extends Backend {
     {
         foreach ($files as $file)
         {
+            $this->checkForUpdate($file);
             $this->compareAndCopyFile($file);
         }
     }
 
     private function compareAndCopyFile(array $file) : void
     {
-        if (file_exists($file["prodPath"])) {
-            $this->checkForUpdate($file);
+        if ($this->isToCopyToLocalFileServer()) {
+            $this->_copyToLocalFileServerLogic->copy($file);
+        }else if ($this->isToCopyToFTPFileServer()) {
+            $this->_copyToFTPFileServerLogic->copy($file);
         }else {
-            if ($this->isToCopyToLocalFileServer()) {
-                $this->_copyToLocalFileServerLogic->copy($file);
-            }else if ($this->isToCopyToFTPFileServer()) {
-                $this->_copyToFTPFileServerLogic->copy($file);
-            }else {
-                $this->couldNotFindCopyTo();
-            }
+            $this->couldNotFindCopyTo();
         }
     }
 
@@ -179,5 +175,17 @@ class CopyToFileServerLogic extends Backend {
     private function couldNotFindCopyTo() : void
     {
         die("Es konnte kein valider Pfad gefunden werden, um Dateien zu aktualisieren!");
+    }
+
+    private function copyDirectoryToMainDirectoryWithSSHCommand() : void
+    {
+        if ($this->isToCopyToFTPFileServer()) {
+            $config = $this->_ioLogic->loadFileServerConfiguration();
+            $connection = ssh2_connect($config["server"], 22);
+            ssh2_auth_password($connection, $config["username"], $config["password"]);
+            $stream = ssh2_exec($connection, "bash -r /html/release-stages.sh");
+            stream_set_blocking($stream, true);
+            fclose($stream);
+        }
     }
 }
