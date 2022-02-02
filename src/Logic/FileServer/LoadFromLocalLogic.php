@@ -34,7 +34,7 @@ class LoadFromLocalLogic {
     private function getFilesWithTimestamp(string $path, array $directoriesLayout) : array
     {
         $directories = glob($path. "*", GLOB_ONLYDIR);
-        $files = glob($path. "*.{jpg,webp,png,svg,pdf,mp4}", GLOB_BRACE);
+        $files = glob($path. "*.{jpg,JPG,jpeg,JPEG,webp,WEBP,png,PNG,svg,SVG,pdf,PDF,mp4,MP4}", GLOB_BRACE);
 
         $filesWithTimestamp = $this->loadFiles($files);
 
