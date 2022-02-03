@@ -14,14 +14,18 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+
 class LoadFromLocalLogic {
     private string $_path;
     private string $_prodPath;
+    private IOLogic $_ioLogic;
 
     public function __construct(string $path, string $prodPath)
     {
         $this->_path = $path;
         $this->_prodPath = $prodPath;
+        $this->_ioLogic = new IOLogic();
     }
 
     public function loadFromLocal() : array
@@ -33,8 +37,11 @@ class LoadFromLocalLogic {
 
     private function getFilesWithTimestamp(string $path, array $directoriesLayout) : array
     {
+        $fileFormats = $this->_ioLogic->loadFileFormats();
+        $fileFormatsAsString = implode(",", $fileFormats);
         $directories = glob($path. "*", GLOB_ONLYDIR);
-        $files = glob($path. "*.{jpg,JPG,jpeg,JPEG,webp,WEBP,png,PNG,svg,SVG,pdf,PDF,mp4,MP4}", GLOB_BRACE);
+
+        $files = glob($path. "*.{". $fileFormatsAsString. "}", GLOB_BRACE);
 
         $filesWithTimestamp = $this->loadFiles($files);
 

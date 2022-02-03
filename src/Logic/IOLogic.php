@@ -85,4 +85,9 @@ class IOLogic {
     {
         return $this->loadConfiguration()["local"];
     }
+
+    public function loadFileFormats() : array
+    {
+        return $this->loadConfiguration()["fileFormats"];
+    }
 }
