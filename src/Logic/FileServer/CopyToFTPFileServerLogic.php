@@ -38,14 +38,13 @@ class CopyToFTPFileServerLogic {
     public function copy(array $file) : void
     {
         if (!$this->checkIfFileExists($file["prodPath"])) {
-            if (!@ftp_put($this->_conn, $file["prodPath"], $file["path"], FTP_ASCII)) {
-                $errors = error_get_last();
-                echo "COPY ERROR: ".$errors['type'];
-                echo "<br />\n".$errors['message'];
-            }else {
-                ftp_chmod($this->_conn, 0644, $file["prodPath"]);
-            }
+            $this->put($file);
         }
+    }
+
+    public function update(array $file) : void
+    {
+        $this->put($file);
     }
 
     public function delete(string $file, string $path) : void
@@ -53,6 +52,17 @@ class CopyToFTPFileServerLogic {
         $file = $path. $file;
         if ($this->checkIfFileExists($file)) {
             ftp_delete($this->_conn, $file);
+        }
+    }
+
+    private function put(array $file) : void
+    {
+        if (!@ftp_put($this->_conn, $file["prodPath"], $file["path"], FTP_ASCII)) {
+            $errors = error_get_last();
+            echo "COPY ERROR: ".$errors['type'];
+            echo "<br />\n".$errors['message'];
+        }else {
+            ftp_chmod($this->_conn, 0644, $file["prodPath"]);
         }
     }
 
