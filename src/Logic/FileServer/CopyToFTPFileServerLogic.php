@@ -25,8 +25,8 @@ class CopyToFTPFileServerLogic {
     public function createDirectory(string $directory) : void
     {
         if (!$this->checkIfDirectoryExists($directory)) {
-            ftp_mkdir($this->_conn, $directory);
-            ftp_chmod($this->_conn, 0755, $directory);
+            $this->mkdir($directory);
+            $this->repairDirectoryPermission($directory);
         }
     }
 
@@ -37,14 +37,20 @@ class CopyToFTPFileServerLogic {
 
     public function copy(array $file) : void
     {
-        if (!$this->checkIfFileExists($file["prodPath"])) {
-            $this->put($file);
+        $prodPath = $file["prodPath"];
+        $path = $file["path"];
+        if ($this->checkIfFileExists($prodPath)) return;
+
+        if ($this->put($prodPath, $path)) {
+            $this->repairPermission($prodPath);
+        }else {
+            $this->handleFileCopyError();
         }
     }
 
     public function update(array $file) : void
     {
-        $this->put($file);
+        $this->copy($file);
     }
 
     public function delete(string $file, string $path) : void
@@ -52,17 +58,6 @@ class CopyToFTPFileServerLogic {
         $file = $path. $file;
         if ($this->checkIfFileExists($file)) {
             ftp_delete($this->_conn, $file);
-        }
-    }
-
-    private function put(array $file) : void
-    {
-        if (!@ftp_put($this->_conn, $file["prodPath"], $file["path"], FTP_ASCII)) {
-            $errors = error_get_last();
-            echo "COPY ERROR: ".$errors['type'];
-            echo "<br />\n".$errors['message'];
-        }else {
-            ftp_chmod($this->_conn, 0644, $file["prodPath"]);
         }
     }
 
@@ -79,7 +74,41 @@ class CopyToFTPFileServerLogic {
         $fileName = substr($file, strrpos($file, '/') + 1);
         $path = str_replace($fileName, "", $file);
         $files = ftp_nlist($this->_conn, $path);
-        if (!$files) return false;
+        if (!$files) {
+            return false;
+        }
         return in_array($file, $files);
+    }
+
+    private function mkdir(string $directory) : void
+    {
+        ftp_mkdir($this->_conn, $directory);
+    }
+
+    private function repairDirectoryPermission(string $directory) : void
+    {
+        $this->changePermission($directory, 0755);
+    }
+
+    private function put(string $serverPath, string $path) : bool
+    {
+        return @ftp_put($this->_conn, $serverPath, $path, FTP_ASCII);
+    }
+
+    private function repairPermission(string $prodPath) : void
+    {
+        $this->changePermission($prodPath, 0644);
+    }
+
+    private function handleFileCopyError() : void
+    {
+        $errors = error_get_last();
+        echo "COPY ERROR: " . $errors['type'];
+        echo "<br />\n" . $errors['message'];
+    }
+
+    private function changePermission(string $directory, int $permission) : void
+    {
+        ftp_chmod($this->_conn, $permission, $directory);
     }
 }
