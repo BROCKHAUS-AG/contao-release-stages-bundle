@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\ArrayOfFile;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
 class LoadFromLocalLogic {
     private string $_path;
@@ -28,14 +30,14 @@ class LoadFromLocalLogic {
         $this->_ioLogic = new IOLogic();
     }
 
-    public function loadFromLocal() : array
+    public function loadFromLocal() : ArrayOfFile
     {
         $directoriesLayout = glob($this->_path. "layout*", GLOB_ONLYDIR);
         $directoriesLayout = array_reverse($directoriesLayout);
         return $this->getFilesWithTimestamp($this->_path, $directoriesLayout);
     }
 
-    private function getFilesWithTimestamp(string $path, array $directoriesLayout) : array
+    private function getFilesWithTimestamp(string $path, array $directoriesLayout) : ArrayOfFile
     {
         $fileFormats = $this->_ioLogic->loadFileFormats();
         $fileFormatsAsString = implode(",", $fileFormats);
@@ -48,17 +50,15 @@ class LoadFromLocalLogic {
         return $this->loadDirectories($directories, $filesWithTimestamp, $directoriesLayout);
     }
 
-    private function loadFiles(array $files) : array
+    private function loadFiles(array $files) : ArrayOfFile
     {
         $filesWithTimestamp = array();
         foreach ($files as $file)
         {
             $prodPathFile = $this->changePathToProdPath($file);
-            $filesWithTimestamp[] = array(
-                "lastModified" => filemtime($file),
-                "path" => $file,
-                "prodPath" => $prodPathFile
-            );
+            $filesWithTimestamp = new ArrayOfFile();
+            $file = new File(filemtime($file), $file, $prodPathFile);
+            $filesWithTimestamp->add($file);
         }
         return $filesWithTimestamp;
     }
@@ -68,7 +68,8 @@ class LoadFromLocalLogic {
         return str_replace($this->_path, $this->_prodPath, $file);
     }
 
-    private function loadDirectories(array $directories, array $filesWithTimestamp, array $directoriesLayout) : array
+    private function loadDirectories(array $directories, ArrayOfFile $filesWithTimestamp,
+                                     array $directoriesLayout) : ArrayOfFile
     {
         foreach ($directories as $directory)
         {
@@ -79,12 +80,13 @@ class LoadFromLocalLogic {
         return $filesWithTimestamp;
     }
 
-    private function getFromDirectory(string $directory, array $filesWithTimestamp, array $directoriesLayout) : array
+    private function getFromDirectory(string $directory, ArrayOfFile $filesWithTimestamp,
+                                      array $directoriesLayout) : ArrayOfFile
     {
         $filesFromDirectory = $this->getFilesWithTimestamp($directory. "/", $directoriesLayout);
         foreach ($filesFromDirectory as $fileFromDirectory)
         {
-            $filesWithTimestamp[] = $fileFromDirectory;
+            $filesWithTimestamp->add($fileFromDirectory);
         }
         return $filesWithTimestamp;
     }

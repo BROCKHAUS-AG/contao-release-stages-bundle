@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
+
 class CopyToLocalFileServerLogic {
     public function createDirectory(string $directory) : void
     {
@@ -28,9 +30,9 @@ class CopyToLocalFileServerLogic {
         return filemtime($file);
     }
 
-    public function copy(array $file) : void
+    public function copy(File $file) : void
     {
-        if (!copy($file["path"], $file["prodPath"])) {
+        if (!copy($file->getPath(), $file->getProdPath())) {
             $errors = error_get_last();
             echo "COPY ERROR: ".$errors['type'];
             echo "<br />\n".$errors['message'];

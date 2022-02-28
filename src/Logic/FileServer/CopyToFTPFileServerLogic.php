@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
+
 class CopyToFTPFileServerLogic {
-    private $_conn;
+    private  $_conn;
 
     public function __construct($conn)
     {
@@ -35,11 +37,13 @@ class CopyToFTPFileServerLogic {
         return ftp_mdtm($this->_conn, $file);
     }
 
-    public function copy(array $file) : void
+    public function copy(File $file) : void
     {
-        $prodPath = $file["prodPath"];
-        $path = $file["path"];
-        if ($this->checkIfFileExists($prodPath)) return;
+        $prodPath = $file->getProdPath();
+        $path = $file->getPath();
+        if ($this->checkIfFileExists($prodPath)) {
+            return;
+        }
 
         if ($this->put($prodPath, $path)) {
             $this->repairPermission($prodPath);
@@ -48,7 +52,7 @@ class CopyToFTPFileServerLogic {
         }
     }
 
-    public function update(array $file) : void
+    public function update(File $file) : void
     {
         $this->copy($file);
     }

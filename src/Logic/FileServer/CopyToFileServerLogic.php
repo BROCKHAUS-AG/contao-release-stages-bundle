@@ -16,6 +16,8 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\ArrayOfFile;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use Contao\Backend;
 
 DEFINE("COPY_TO_LOCAL", "local");
@@ -62,11 +64,11 @@ class CopyToFileServerLogic extends Backend {
         return "";
     }
 
-    private function createDirectories(array $files) : void
+    private function createDirectories(ArrayOfFile $files) : void
     {
-        foreach ($files as $file)
+        for ($x = 0; $x != count($files->get()); $x++)
         {
-            $directories = $this->getDirectoriesFromFilePath($file["prodPath"]);
+            $directories = $this->getDirectoriesFromFilePath($files->getByIndex($x)->getPath());
             foreach ($directories as $directory)
             {
                 $this->createDirectory($directory);
@@ -100,16 +102,16 @@ class CopyToFileServerLogic extends Backend {
         return $directories;
     }
 
-    private function compareAndCopyFiles(array $files) : void
+    private function compareAndCopyFiles(ArrayOfFile $files) : void
     {
-        foreach ($files as $file)
+        for ($x = 0; $x != count($files->get()); $x++)
         {
-            $this->checkForUpdate($file);
-            $this->compareAndCopyFile($file);
+            $this->checkForUpdate($files[$x]);
+            $this->compareAndCopyFile($files[$x]);
         }
     }
 
-    private function compareAndCopyFile(array $file) : void
+    private function compareAndCopyFile(File $file) : void
     {
         if ($this->isToCopyToLocalFileServer()) {
             $this->_copyToLocalFileServerLogic->copy($file);
@@ -120,16 +122,16 @@ class CopyToFileServerLogic extends Backend {
         }
     }
 
-    private function checkForUpdate(array $file) : void
+    private function checkForUpdate(File $file) : void
     {
         if ($this->isToCopyToLocalFileServer()) {
-            $lastModifiedTime = $this->_copyToLocalFileServerLogic->getLastModifiedTimeFromFile($file["prodPath"]);
-            if ($lastModifiedTime < $this->_copyToLocalFileServerLogic->getLastModifiedTimeFromFile($file["path"])) {
+            $lastModifiedTime = $this->_copyToLocalFileServerLogic->getLastModifiedTimeFromFile($file->getProdPath());
+            if ($lastModifiedTime < $this->_copyToLocalFileServerLogic->getLastModifiedTimeFromFile($file->getPath())) {
                 $this->_copyToLocalFileServerLogic->copy($file);
             }
         }else if ($this->isToCopyToFTPFileServer()) {
-            $lastModifiedTime = $this->_copyToFTPFileServerLogic->getLastModifiedTimeFromFile($file["prodPath"]);
-            if ($lastModifiedTime < $this->_copyToFTPFileServerLogic->getLastModifiedTimeFromFile($file["prodPath"])) {
+            $lastModifiedTime = $this->_copyToFTPFileServerLogic->getLastModifiedTimeFromFile($file->getProdPath());
+            if ($lastModifiedTime < $this->_copyToFTPFileServerLogic->getLastModifiedTimeFromFile($file->getPath())) {
                 $this->_copyToFTPFileServerLogic->update($file);
             }
         }else {
