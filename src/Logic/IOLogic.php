@@ -18,32 +18,6 @@ DEFINE("SETTINGS_PATH", "/html/contao/settings/brockhaus-ag/contao-release-stage
 DEFINE("CONFIG_FILE", "config.json");
 
 class IOLogic {
-    private function checkIfFileExists(string $file)
-    {
-        if (!file_exists($file)) {
-            $errorMessage = "File: \"". $file. "\" could not be found. Please create it!";
-            echo $errorMessage;
-            exit();
-        }
-    }
-
-    private function loadJsonFileAndDecode(string $file) : ?array
-    {
-        $this->checkIfFileExists($file);
-        $fileContent = file_get_contents($file);
-        return json_decode($fileContent, true);
-    }
-
-    private function loadConfiguration() : array
-    {
-        return $this->loadJsonFileAndDecode(SETTINGS_PATH. CONFIG_FILE);
-    }
-
-    private function loadContaoPath() : string
-    {
-        return $this->loadConfiguration()["contaoPath"];
-    }
-
     public function loadPathToContaoFiles() : string
     {
         return $this->loadContaoPath(). "files";
@@ -89,5 +63,31 @@ class IOLogic {
     public function loadFileFormats() : array
     {
         return $this->loadConfiguration()["fileFormats"];
+    }
+
+    private function checkIfFileExists(string $file)
+    {
+        if (!file_exists($file)) {
+            $errorMessage = "File: \"". $file. "\" could not be found. Please create it!";
+            echo $errorMessage;
+            exit();
+        }
+    }
+
+    private function loadJsonFileAndDecode(string $file) : ?array
+    {
+        $this->checkIfFileExists($file);
+        $fileContent = file_get_contents($file);
+        return json_decode($fileContent, true);
+    }
+
+    private function loadConfiguration() : array
+    {
+        return $this->loadJsonFileAndDecode(SETTINGS_PATH. CONFIG_FILE);
+    }
+
+    private function loadContaoPath() : string
+    {
+        return $this->loadConfiguration()["contaoPath"];
     }
 }
