@@ -44,12 +44,7 @@ class CopyToFTPFileServerLogic {
         if ($this->checkIfFileExists($prodPath)) {
             return;
         }
-
-        if ($this->put($prodPath, $path)) {
-            $this->repairPermission($prodPath);
-        }else {
-            $this->handleFileCopyError();
-        }
+        $this->put($prodPath, $path);
     }
 
     public function update(File $file) : void
@@ -94,9 +89,13 @@ class CopyToFTPFileServerLogic {
         $this->changePermission($directory, 0755);
     }
 
-    private function put(string $serverPath, string $path) : bool
+    private function put(string $serverPath, string $path) : void
     {
-        return @ftp_put($this->_conn, $serverPath, $path, FTP_ASCII);
+        if (@ftp_put($this->_conn, $serverPath, $path, FTP_ASCII)) {
+            $this->repairPermission($serverPath);
+        }else {
+            $this->handleFileCopyError();
+        }
     }
 
     private function repairPermission(string $prodPath) : void
