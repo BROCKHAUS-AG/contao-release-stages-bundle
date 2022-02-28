@@ -16,7 +16,7 @@ class File
         $this->prodPath = $prodPath;
     }
 
-    public function getLastModified() : int
+    public function getLastModifiedTime() : int
     {
         return $this->lastModifiedTime;
     }
