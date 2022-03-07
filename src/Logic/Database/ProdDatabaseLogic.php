@@ -17,6 +17,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use mysqli;
+use Psr\Log\LoggerInterface;
 
 class ProdDatabaseLogic
 {
@@ -24,9 +25,9 @@ class ProdDatabaseLogic
     private mysqli $_conn;
     public string $prodDatabase;
 
-    public function __construct()
+    public function __construct(LoggerInterface $logger)
     {
-        $this->_ioLogic = new IOLogic();
+        $this->_ioLogic = new IOLogic($logger);
         $config = $this->getDatabaseConfiguration();
         $this->prodDatabase = $config->getName();
         $this->_conn = $this->createConnectionToProdDatabase($config);

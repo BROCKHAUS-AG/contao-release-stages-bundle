@@ -1,7 +1,10 @@
 services:
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\CopyToFileServerLogic:
+    BrockhausAg\ContaoReleaseStagesBundles\DataContainer\ContentListener:
+        public: true
+        tags:
+            - { name: 'contao.callback', table: 'tl_release_stages', target: 'config.onload' }
+
+    BrockhausAg\ContaoReleaseStagesBundles\EventListener\CreateReleaseListener:
         arguments:
             - '@logger'
         public: true
-        calls:
-            - [ setContainer, [ '@Psr\Container\ContainerInterface' ] ]

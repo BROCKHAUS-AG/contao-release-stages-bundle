@@ -17,7 +17,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
 class CopyToFTPFileServerLogic {
-    private  $_conn;
+    private $_conn;
 
     public function __construct($conn)
     {

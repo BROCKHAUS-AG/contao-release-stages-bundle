@@ -19,11 +19,13 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\ArrayOfFile;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use Contao\Backend;
+use Psr\Log\LoggerInterface;
 
 DEFINE("COPY_TO_LOCAL", "local");
 DEFINE("COPY_TO_FILE_SERVER", "fileServer");
 
 class CopyToFileServerLogic extends Backend {
+    private LoggerInterface $logger;
     private IOLogic $_ioLogic;
     private CopyToLocalFileServerLogic $_copyToLocalFileServerLogic;
     private CopyToFTPFileServerLogic $_copyToFTPFileServerLogic;
@@ -31,18 +33,21 @@ class CopyToFileServerLogic extends Backend {
 
     private string $copyTo;
 
-    public function __construct()
+    public function __construct(LoggerInterface $logger)
     {
-        $this->_ioLogic = new IOLogic();
+        $this->logger = $logger;
+        $this->_ioLogic = new IOLogic($logger);
         $this->_copyToLocalFileServerLogic = new CopyToLocalFileServerLogic();
-        $this->_databaseLogic = new DatabaseLogic();
+        $this->_databaseLogic = new DatabaseLogic($logger);
+
+        $logger->info("Hello from release stages");
     }
 
     public function copyToFileServer() : void
     {
         $this->copyTo = $this->_ioLogic->checkWhereToCopy();
         $path = $this->getPathToCopy();
-        $loadFromLocalLogic = new LoadFromLocalLogic($this->_ioLogic->loadPathToContaoFiles(), $path);
+        $loadFromLocalLogic = new LoadFromLocalLogic($this->logger, $this->_ioLogic->loadPathToContaoFiles(), $path);
         $files = $loadFromLocalLogic->loadFromLocal();
 
         $this->createDirectories($files);
@@ -56,7 +61,7 @@ class CopyToFileServerLogic extends Backend {
        if ($this->isToCopyToLocalFileServer()) {
             return $this->_ioLogic->loadLocalFileServerConfiguration()->getContaoProdPath();
         }else if ($this->isToCopyToFTPFileServer()) {
-            $ftpConnection = new FTPConnection();
+            $ftpConnection = new FTPConnection($this->logger);
             $this->_copyToFTPFileServerLogic = new CopyToFTPFileServerLogic($ftpConnection->connect());
             return $this->_ioLogic->loadFileServerConfiguration()->getPath();
         }

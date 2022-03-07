@@ -19,16 +19,18 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
+use Psr\Log\LoggerInterface;
 
 DEFINE("SETTINGS_PATH", "/html/contao/settings/brockhaus-ag/contao-release-stages-bundle/");
 DEFINE("CONFIG_FILE", "config.json");
 
 class IOLogic {
-
     private Config $config;
+    private LoggerInterface $logger;
 
-    public function __construct()
+    public function __construct(LoggerInterface $logger)
     {
+        $this->logger = $logger;
         $this->config = $this->loadConfiguration();
     }
 
@@ -90,6 +92,7 @@ class IOLogic {
     {
         if (!file_exists($file)) {
             $errorMessage = "File: \"". $file. "\" could not be found. Please create it!";
+            $this->logger->info("Hello from release stages");
             echo $errorMessage;
             exit();
         }

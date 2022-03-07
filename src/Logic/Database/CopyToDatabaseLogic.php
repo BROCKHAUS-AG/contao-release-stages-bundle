@@ -16,18 +16,21 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use Contao\Backend;
+use Psr\Log\LoggerInterface;
 
 class CopyToDatabaseLogic extends Backend
 {
+    private LoggerInterface $logger;
     private DatabaseLogic $_databaseLogic;
     private ProdDatabaseLogic $_prodDatabaseLogic;
     private IOLogic $_ioLogic;
 
-    public function __construct()
+    public function __construct(LoggerInterface $logger)
     {
-        $this->_databaseLogic = new DatabaseLogic();
-        $this->_prodDatabaseLogic = new ProdDatabaseLogic();
-        $this->_ioLogic = new IOLogic();
+        $this->logger = $logger;
+        $this->_databaseLogic = new DatabaseLogic($logger);
+        $this->_prodDatabaseLogic = new ProdDatabaseLogic($logger);
+        $this->_ioLogic = new IOLogic($logger);
     }
 
     public function copyToDatabase() : void

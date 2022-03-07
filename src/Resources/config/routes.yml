@@ -1,4 +1,0 @@
-# config/routes.yml
-brockhaus_ag_contao_release_stages.controller:
-    resource: ../../../src/Controller
-    type: annotation

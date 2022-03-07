@@ -17,9 +17,19 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use Contao\Backend;
 use Contao\Database\Result;
+use Psr\Log\LoggerInterface;
 
 class DatabaseLogic extends Backend
 {
+    private LoggerInterface $logger;
+    private IOLogic $_ioLogic;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+        $this->_ioLogic = new IOLogic($logger);
+    }
+
     public function getLastRows(int $count, array $columns, string $tableName) : Result
     {
         return $this->Database
@@ -84,8 +94,7 @@ class DatabaseLogic extends Backend
 
     private function getIgnoredTables() : array
     {
-        $ioLogic = new IOLogic();
-        return $ioLogic->loadDatabaseIgnoredTablesConfiguration();
+        return $this->_ioLogic->loadDatabaseIgnoredTablesConfiguration();
     }
 
     public function loadHexById(string $column, string $tableName, string $id) : Result
