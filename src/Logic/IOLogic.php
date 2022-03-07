@@ -14,55 +14,76 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\ArrayOfDNSRecords;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
+
 DEFINE("SETTINGS_PATH", "/html/contao/settings/brockhaus-ag/contao-release-stages-bundle/");
 DEFINE("CONFIG_FILE", "config.json");
 
 class IOLogic {
+
+    private Config $config;
+
+    public function __construct()
+    {
+        $this->config = $this->loadConfiguration();
+    }
+
     public function loadPathToContaoFiles() : string
     {
         return $this->loadContaoPath(). "files";
     }
 
-    public function loadDatabaseConfiguration() : array
+    public function loadDatabaseConfiguration() : Database
     {
-        return $this->loadConfiguration()["database"];
+        return $this->config->getDatabase();
     }
 
     public function loadTestStageDatabaseName() : string
     {
-        return $this->loadDatabaseConfiguration()["testStageDatabaseName"];
+        return $this->config->getDatabase()->getTestStageDatabaseName();
     }
 
     public function loadDatabaseIgnoredTablesConfiguration() : array
     {
-        $ignoredTables = $this->loadDatabaseConfiguration()["ignoredTables"];
+        $ignoredTables = $this->config->getDatabase()->getIgnoredTables();
         array_push($ignoredTables, "tl_user", "tl_cron_job", "tl_release_stages");
         return $ignoredTables;
     }
 
-    public function loadDNSRecords() : array
+    public function loadDNSRecords() : ArrayOfDNSRecords
     {
-        return $this->loadConfiguration()["dnsRecords"];
+        return $this->config->getDnsRecords();
     }
 
     public function checkWhereToCopy() : string
     {
-        return $this->loadConfiguration()["copyTo"];
+        return $this->config->getCopyTo();
     }
 
-    public function loadFileServerConfiguration() : array
+    public function loadFileServerConfiguration() : FileServer
     {
-        return $this->loadConfiguration()["fileServer"];
+        return $this->config->getFileServer();
     }
 
-    public function loadLocalFileServerConfiguration() : array
+    public function loadLocalFileServerConfiguration() : Local
     {
-        return $this->loadConfiguration()["local"];
+        return $this->config->getLocal();
     }
 
     public function loadFileFormats() : array
     {
-        return $this->loadConfiguration()["fileFormats"];
+        return $this->config->getFileFormats();
+    }
+
+    private function loadJsonFileAndDecode(string $file) : Config
+    {
+        $this->checkIfFileExists($file);
+        $fileContent = file_get_contents($file);
+        return json_decode($fileContent, true);
     }
 
     private function checkIfFileExists(string $file)
@@ -74,20 +95,13 @@ class IOLogic {
         }
     }
 
-    private function loadJsonFileAndDecode(string $file) : ?array
-    {
-        $this->checkIfFileExists($file);
-        $fileContent = file_get_contents($file);
-        return json_decode($fileContent, true);
-    }
-
-    private function loadConfiguration() : array
+    private function loadConfiguration() : Config
     {
         return $this->loadJsonFileAndDecode(SETTINGS_PATH. CONFIG_FILE);
     }
 
     private function loadContaoPath() : string
     {
-        return $this->loadConfiguration()["contaoPath"];
+        return $this->config->getContaoPath();
     }
 }
