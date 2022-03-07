@@ -15,19 +15,29 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 
 class FTPConnection {
-    private array $_config;
+    private string $username;
+    private string $password;
+    private string $server;
+    private int $port;
+    private bool $ssl_tsl;
 
     public function __construct()
     {
         $ioLogic = new IOLogic();
-        $this->_config = $ioLogic->loadFileServerConfiguration();
+        $config = $ioLogic->loadFileServerConfiguration();
+        $this->username = $config->getUsername();
+        $this->password = $config->getPassword();
+        $this->server = $config->getServer();
+        $this->port = $config->getPort();
+        $this->ssl_tsl = $config->isSslTsl();
     }
 
     public function connect()
     {
-        if ($this->_config["ssl_tsl"]) {
+        if ($this->ssl_tsl) {
             $conn = $this->connectToSFTPServer();
         }else {
             $conn = $this->connectToFTPServer();
@@ -38,22 +48,22 @@ class FTPConnection {
 
     private function login($conn) : void
     {
-        if (!@ftp_login($conn, $this->_config["username"], $this->_config["password"])) {
+        if (!@ftp_login($conn, $this->username, $this->password)) {
             die("Username oder Passwort ist falsch.");
         }
     }
 
     private function connectToSFTPServer()
     {
-        $sftpConn = ftp_ssl_connect($this->_config["server"], intval($this->_config["port"]))
-            or die("Verbindung zum SFTP Server \"". $this->_config["server"]. "\" fehlgeschlagen");
+        $sftpConn = ftp_ssl_connect($this->server, $this->port)
+            or die("Verbindung zum SFTP Server \"". $this->server. "\" fehlgeschlagen");
         return $sftpConn;
     }
 
     private function connectToFTPServer()
     {
-        $ftpConn = ftp_connect($this->_config["server"], intval($this->_config["port"]))
-            or die("Verbindung zum FTP Server \"". $this->_config["server"]. "\" fehlgeschlagen");
+        $ftpConn = ftp_connect($this->server, $this->port)
+            or die("Verbindung zum FTP Server \"". $this->server. "\" fehlgeschlagen");
         return $ftpConn;
     }
 

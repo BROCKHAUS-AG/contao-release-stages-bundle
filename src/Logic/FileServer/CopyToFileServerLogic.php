@@ -54,11 +54,11 @@ class CopyToFileServerLogic extends Backend {
     private function getPathToCopy() : string
     {
        if ($this->isToCopyToLocalFileServer()) {
-            return $this->_ioLogic->loadLocalFileServerConfiguration()["contaoProdPath"];
+            return $this->_ioLogic->loadLocalFileServerConfiguration()->getContaoProdPath();
         }else if ($this->isToCopyToFTPFileServer()) {
             $ftpConnection = new FTPConnection();
             $this->_copyToFTPFileServerLogic = new CopyToFTPFileServerLogic($ftpConnection->connect());
-            return $this->_ioLogic->loadFileServerConfiguration()["path"];
+            return $this->_ioLogic->loadFileServerConfiguration()->getPath();
         }
         $this->couldNotFindCopyTo();
         return "";
@@ -156,9 +156,9 @@ class CopyToFileServerLogic extends Backend {
     {
         if ($this->isToCopyToLocalFileServer()) {
             $this->_copyToLocalFileServerLogic->delete($file,
-                $this->_ioLogic->loadLocalFileServerConfiguration()["contaoProdPath"]);
+                $this->_ioLogic->loadLocalFileServerConfiguration()->getContaoProdPath());
         }else if ($this->isToCopyToFTPFileServer()) {
-            $this->_copyToFTPFileServerLogic->delete($file, $this->_ioLogic->loadFileServerConfiguration()["path"]);
+            $this->_copyToFTPFileServerLogic->delete($file, $this->_ioLogic->loadFileServerConfiguration()->getPath());
         }else {
             $this->couldNotFindCopyTo();
         }
@@ -183,8 +183,8 @@ class CopyToFileServerLogic extends Backend {
     {
         if ($this->isToCopyToFTPFileServer()) {
             $config = $this->_ioLogic->loadFileServerConfiguration();
-            $connection = ssh2_connect($config["server"], 22);
-            ssh2_auth_password($connection, $config["username"], $config["password"]);
+            $connection = ssh2_connect($config->getServer(), 22);
+            ssh2_auth_password($connection, $config->getUsername(), $config->getPassword());
             $stream = ssh2_exec($connection, "bash -r /html/release-stages.sh");
             stream_set_blocking($stream, true);
             fclose($stream);

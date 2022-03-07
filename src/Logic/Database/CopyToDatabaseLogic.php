@@ -137,9 +137,10 @@ class CopyToDatabaseLogic extends Backend
     private function changeDNSEntryForProd(string $alias) : string
     {
         $dnsRecords = $this->_ioLogic->loadDNSRecords();
-        foreach ($dnsRecords as $dnsRecord) {
-            if (strcmp($dnsRecord["alias"], $alias) == 0) {
-                return $dnsRecord["dns"];
+        for ($x = 0; $x != $dnsRecords->getLength(); $x++) {
+            $dnsRecord = $dnsRecords->getByIndex($x);
+            if (strcmp($dnsRecord->getAlias(), $alias) == 0) {
+                return $dnsRecord->getDns();
             }
         }
         return "";

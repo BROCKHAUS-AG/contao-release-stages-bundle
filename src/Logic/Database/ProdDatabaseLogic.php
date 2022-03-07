@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use mysqli;
 
 class ProdDatabaseLogic
@@ -27,28 +28,19 @@ class ProdDatabaseLogic
     {
         $this->_ioLogic = new IOLogic();
         $config = $this->getDatabaseConfiguration();
-        $this->prodDatabase = $config["name"];
-        $this->_conn = $this->createConnectionToProdDatabase($config["server"], $config["username"],
-            $config["password"], $config["name"], $config["port"]);
+        $this->prodDatabase = $config->getName();
+        $this->_conn = $this->createConnectionToProdDatabase($config);
     }
 
-    private function getDatabaseConfiguration() : array
+    private function getDatabaseConfiguration() : Database
     {
-        $config = $this->_ioLogic->loadDatabaseConfiguration();
-
-        return array(
-            "server" => $config["server"],
-            "name" => $config["name"],
-            "port" => $config["port"],
-            "username" => $config["username"],
-            "password" => $config["password"]
-        );
+        return $this->_ioLogic->loadDatabaseConfiguration();
     }
 
-    private function createConnectionToProdDatabase(string $server, string $user, string $password, string $database,
-                                                    int $port)
+    private function createConnectionToProdDatabase(Database $database)
     {
-        $conn = new mysqli($server, $user, $password, $database, $port);
+        $conn = new mysqli($database->getServer(), $database->getUsername(), $database->getPassword(),
+            $database->getTestStageDatabaseName(), $database->getPort());
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }

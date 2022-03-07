@@ -27,4 +27,9 @@ class ArrayOfDNSRecords
     {
         return $this->dnsRecords[$index];
     }
+
+    public function getLength() : int
+    {
+        return count($this->dnsRecords);
+    }
 }
