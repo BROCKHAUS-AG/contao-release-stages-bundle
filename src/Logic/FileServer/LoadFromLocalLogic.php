@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\ArrayOfFile;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\File;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\ArrayOfFile;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
 class LoadFromLocalLogic {
     private string $_path;
