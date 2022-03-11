@@ -41,7 +41,7 @@ class LoadFromLocalLogic {
         $fileFormatsAsString = implode(",", $fileFormats);
         $directories = glob($path. "*", GLOB_ONLYDIR);
 
-        $files = glob($path. "{@(*.{". $fileFormatsAsString. "}),.@(public)}", GLOB_BRACE);
+        $files = glob($path. "*.{". $fileFormatsAsString. "}", GLOB_BRACE);
 
         $filesWithTimestamp = $this->loadFiles($files);
 
