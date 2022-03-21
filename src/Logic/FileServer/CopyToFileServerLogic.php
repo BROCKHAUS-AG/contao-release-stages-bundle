@@ -63,7 +63,7 @@ class CopyToFileServerLogic extends Backend {
        if ($this->isToCopyToLocalFileServer()) {
             return $this->_ioLogic->loadLocalFileServerConfiguration()->getContaoProdPath();
         }else if ($this->isToCopyToFTPFileServer()) {
-            $ftpConnection = new FTPConnection($this->logger);
+            $ftpConnection = new FTPConnection($this->_ioLogic, $this->logger);
             $this->_copyToFTPFileServerLogic = new CopyToFTPFileServerLogic($ftpConnection->connect());
             return $this->_ioLogic->loadFileServerConfiguration()->getPath();
         }
