@@ -5,33 +5,30 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 
-
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\CopyToDatabaseLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToFileServerLogic;
-use Contao\DataContainer;
 use Psr\Log\LoggerInterface;
 
-class CreateReleaseListener
+class tl_release_stages
 {
-    private CreateReleaseListener $_copyToDatabaseListener;
-
     private DatabaseLogic $_databaseLogic;
     private CopyToDatabaseLogic $_copyToDatabaseLogic;
     private CopyToFileServerLogic $_copyToFileServerLogic;
+    private LoggerInterface $_logger;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(DatabaseLogic $databaseLogic, CopyToDatabaseLogic $copyToDatabaseLogic,
+                                CopyToFileServerLogic $copyToFileServerLogic, LoggerInterface $logger)
     {
-        $this->_databaseLogic = new DatabaseLogic($logger);
-        $this->_copyToDatabaseLogic = new CopyToDatabaseLogic($logger);
-        $this->_copyToFileServerLogic = new CopyToFileServerLogic($logger);
+        $this->_databaseLogic =$databaseLogic;
+        $this->_copyToDatabaseLogic = $copyToDatabaseLogic;
+        $this->_copyToFileServerLogic = $copyToFileServerLogic;
+        $this->_logger = $logger;
     }
 
-    /**
-     * @Callback(table="tl_release_stages", target="config.onsubmit")
-     */
-    public function onSubmitCallback(DataContainer $dc) : void
+    public function onSubmitCallback() : void
     {
+        $this->_logger->info("Create release was started!");
         echo "Hello from callback";
         die;
 

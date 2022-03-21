@@ -24,10 +24,10 @@ class DatabaseLogic extends Backend
     private LoggerInterface $logger;
     private IOLogic $_ioLogic;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(IOLogic $ioLogic, LoggerInterface $logger)
     {
+        $this->_ioLogic = $ioLogic;
         $this->logger = $logger;
-        $this->_ioLogic = new IOLogic($logger);
     }
 
     public function getLastRows(int $count, array $columns, string $tableName) : Result

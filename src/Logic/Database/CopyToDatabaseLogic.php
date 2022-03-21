@@ -25,12 +25,13 @@ class CopyToDatabaseLogic extends Backend
     private ProdDatabaseLogic $_prodDatabaseLogic;
     private IOLogic $_ioLogic;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(DatabaseLogic $databaseLogic, ProdDatabaseLogic $prodDatabaseLogic, IOLogic $ioLogic,
+                                LoggerInterface $logger)
     {
+        $this->_databaseLogic = $databaseLogic;
+        $this->_prodDatabaseLogic = $prodDatabaseLogic;
+        $this->_ioLogic = $ioLogic;
         $this->logger = $logger;
-        $this->_databaseLogic = new DatabaseLogic($logger);
-        $this->_prodDatabaseLogic = new ProdDatabaseLogic($logger);
-        $this->_ioLogic = new IOLogic($logger);
     }
 
     public function copyToDatabase() : void

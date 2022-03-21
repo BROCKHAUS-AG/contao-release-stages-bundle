@@ -26,10 +26,9 @@ class FTPConnection {
     private int $port;
     private bool $ssl_tsl;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(IOLogic $ioLogic, LoggerInterface $logger)
     {
         $this->logger = $logger;
-        $ioLogic = new IOLogic($logger);
         $config = $ioLogic->loadFileServerConfiguration();
         $this->username = $config->getUsername();
         $this->password = $config->getPassword();

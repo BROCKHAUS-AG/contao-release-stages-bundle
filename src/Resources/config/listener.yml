@@ -1,9 +1,3 @@
-# codefog_news_categories.listener.data_container.news
 services:
     _defaults:
         public: true
-
-    brockhaus_ag_contao_release_stages_bundle.listener.data_container.create_release:
-        class: BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\CreateReleaseListener
-        arguments:
-            - "@logger"

@@ -22,12 +22,14 @@ use Psr\Log\LoggerInterface;
 class ProdDatabaseLogic
 {
     private IOLogic $_ioLogic;
+    private LoggerInterface $_logger;
     private mysqli $_conn;
     public string $prodDatabase;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(IOLogic $ioLogic, LoggerInterface $logger)
     {
-        $this->_ioLogic = new IOLogic($logger);
+        $this->_ioLogic = $ioLogic;
+        $this->_logger = $logger;
         $config = $this->getDatabaseConfiguration();
         $this->prodDatabase = $config->getName();
         $this->_conn = $this->createConnectionToProdDatabase($config);

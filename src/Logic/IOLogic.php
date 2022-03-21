@@ -21,15 +21,17 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
 use Psr\Log\LoggerInterface;
 
-DEFINE("SETTINGS_PATH", "/html/contao/settings/brockhaus-ag/contao-release-stages-bundle/");
+DEFINE("SETTINGS_PATH", "/settings/brockhaus-ag/contao-release-stages-bundle/");
 DEFINE("CONFIG_FILE", "config.json");
 
 class IOLogic {
     private Config $config;
     private LoggerInterface $logger;
+    private string $path;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(string $path, LoggerInterface $logger)
     {
+        $this->path = $path. SETTINGS_PATH;
         $this->logger = $logger;
         $this->config = $this->loadConfiguration();
     }

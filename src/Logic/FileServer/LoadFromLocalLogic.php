@@ -25,12 +25,12 @@ class LoadFromLocalLogic {
     private string $_prodPath;
     private IOLogic $_ioLogic;
 
-    public function __construct(LoggerInterface $logger, string $path, string $prodPath)
+    public function __construct(IOLogic $ioLogic, LoggerInterface $logger, string $path, string $prodPath)
     {
         $this->logger = $logger;
         $this->_path = $path;
         $this->_prodPath = $prodPath;
-        $this->_ioLogic = new IOLogic($logger);
+        $this->_ioLogic = $ioLogic;
     }
 
     public function loadFromLocal() : ArrayOfFile
