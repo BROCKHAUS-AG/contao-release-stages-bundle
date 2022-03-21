@@ -10,7 +10,7 @@
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\ReleaseStagesModel;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\ReleaseStagesModel;
 
 /**
  * Backend modules
