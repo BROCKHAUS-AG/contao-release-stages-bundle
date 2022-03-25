@@ -32,7 +32,7 @@ class PluginTest extends ContaoTestCase
      */
     public function testInstantiation(): void
     {
-        $this->assertInstanceOf(Plugin::class, new Plugin());
+        self::assertInstanceOf(Plugin::class, new Plugin());
     }
 
     /**
@@ -45,10 +45,9 @@ class PluginTest extends ContaoTestCase
         /** @var array $bundles */
         $bundles = $plugin->getBundles(new DelegatingParser());
 
-        $this->assertCount(1, $bundles);
-        $this->assertInstanceOf(BundleConfig::class, $bundles[0]);
-        $this->assertSame(BrockhausAgContaoReleaseStagesBundle::class, $bundles[0]->getName());
-        $this->assertSame([ContaoCoreBundle::class], $bundles[0]->getLoadAfter());
+        self::assertCount(1, $bundles);
+        self::assertInstanceOf(BundleConfig::class, $bundles[0]);
+        self::assertSame(BrockhausAgContaoReleaseStagesBundle::class, $bundles[0]->getName());
+        self::assertSame([ContaoCoreBundle::class], $bundles[0]->getLoadAfter());
     }
-
 }
