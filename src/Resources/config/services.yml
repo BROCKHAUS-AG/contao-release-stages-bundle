@@ -34,8 +34,7 @@ services:
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToFileServerLogic:
         arguments:
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToLocalFileServerLogic'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\DatabaseLogic'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
             - '@logger'
 

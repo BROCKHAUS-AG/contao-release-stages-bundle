@@ -33,13 +33,12 @@ class CopyToFileServerLogic extends Backend {
 
     private string $copyTo;
 
-    public function __construct(CopyToLocalFileServerLogic $copyToLocalFileServerLogic, DatabaseLogic $databaseLogic,
-                                IOLogic $ioLogic, LoggerInterface $logger)
+    public function __construct(DatabaseLogic $databaseLogic, IOLogic $ioLogic, LoggerInterface $logger)
     {
-        $this->_copyToLocalFileServerLogic = $copyToLocalFileServerLogic;
         $this->_databaseLogic = $databaseLogic;
         $this->_ioLogic = $ioLogic;
         $this->logger = $logger;
+        $this->_copyToLocalFileServerLogic = new CopyToLocalFileServerLogic();
 
         $logger->info("Hello from release stages");
     }
