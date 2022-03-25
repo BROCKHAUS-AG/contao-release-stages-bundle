@@ -31,7 +31,7 @@ class IOLogic {
 
     public function __construct(string $path, LoggerInterface $logger)
     {
-        $this->path = $path. SETTINGS_PATH;
+        $this->path = $path. SETTINGS_PATH. CONFIG_FILE;
         $this->logger = $logger;
         $this->config = $this->loadConfiguration();
     }
@@ -87,14 +87,15 @@ class IOLogic {
     {
         $this->checkIfFileExists($file);
         $fileContent = file_get_contents($file);
-        return json_decode($fileContent, true);
+        $content = json_decode($fileContent, true);
+        return $config;
     }
 
     private function checkIfFileExists(string $file)
     {
         if (!file_exists($file)) {
             $errorMessage = "File: \"". $file. "\" could not be found. Please create it!";
-            $this->logger->info("Hello from release stages");
+            $this->logger->error($errorMessage);
             echo $errorMessage;
             exit();
         }
@@ -102,7 +103,7 @@ class IOLogic {
 
     private function loadConfiguration() : Config
     {
-        return $this->loadJsonFileAndDecode(SETTINGS_PATH. CONFIG_FILE);
+        return $this->loadJsonFileAndDecode($this->path);
     }
 
     private function loadContaoPath() : string
