@@ -6,7 +6,6 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Model\Config;
 
 class Config
 {
-    private string $contaoPath;
     private Database $database;
     private string $copyTo;
     private FileServer $fileServer;
@@ -14,21 +13,15 @@ class Config
     private ArrayOfDNSRecords $dnsRecords;
     private array $fileFormats;
 
-    public function __construct(string $contaoPath, Database $database, string $copyTo, FileServer $fileServer,
-                                Local $local, ArrayOfDNSRecords $dnsRecords, array $fileFormats)
+    public function __construct(Database $database, string $copyTo, FileServer $fileServer, Local $local,
+                                ArrayOfDNSRecords $dnsRecords, array $fileFormats)
     {
-        $this->contaoPath = $contaoPath;
         $this->database = $database;
         $this->copyTo = $copyTo;
         $this->fileServer = $fileServer;
         $this->local = $local;
         $this->dnsRecords = $dnsRecords;
         $this->fileFormats = $fileFormats;
-    }
-
-    public function getContaoPath(): string
-    {
-        return $this->contaoPath;
     }
 
     public function getDatabase(): Database

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\ArrayOfDNSRecords;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
@@ -27,12 +28,14 @@ DEFINE("CONFIG_FILE", "config.json");
 class IOLogic {
     private Config $config;
     private LoggerInterface $logger;
+    private MapConfig $mapConfig;
     private string $path;
 
     public function __construct(string $path, LoggerInterface $logger)
     {
         $this->path = $path. SETTINGS_PATH. CONFIG_FILE;
         $this->logger = $logger;
+        $this->mapConfig = new MapConfig();
         $this->config = $this->loadConfiguration();
     }
 
@@ -87,8 +90,7 @@ class IOLogic {
     {
         $this->checkIfFileExists($file);
         $fileContent = file_get_contents($file);
-        $content = json_decode($fileContent, true);
-        return $config;
+        return $this->mapConfig->map(json_decode($fileContent));
     }
 
     private function checkIfFileExists(string $file)
@@ -108,6 +110,6 @@ class IOLogic {
 
     private function loadContaoPath() : string
     {
-        return $this->config->getContaoPath();
+        return $this->path;
     }
 }
