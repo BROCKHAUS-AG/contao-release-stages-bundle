@@ -1,5 +1,4 @@
 {
-  "contaoPath": "/var/www/html/contao/",
   "database": {
     "server": "192.168.0.2",
     "name": "prodContao",
