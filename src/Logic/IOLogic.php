@@ -14,27 +14,27 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\ArrayOfDNSRecords;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
-use Psr\Log\LoggerInterface;
 
 DEFINE("SETTINGS_PATH", "/settings/brockhaus-ag/contao-release-stages-bundle/");
 DEFINE("CONFIG_FILE", "config.json");
 
 class IOLogic {
     private Config $config;
-    private LoggerInterface $logger;
+    private Log $log;
     private MapConfig $mapConfig;
     private string $path;
 
-    public function __construct(string $path, LoggerInterface $logger)
+    public function __construct(string $path, Log $log)
     {
         $this->path = $path. SETTINGS_PATH. CONFIG_FILE;
-        $this->logger = $logger;
+        $this->log = $log;
         $this->mapConfig = new MapConfig();
         $this->config = $this->loadConfiguration();
     }
@@ -97,7 +97,7 @@ class IOLogic {
     {
         if (!file_exists($file)) {
             $errorMessage = "File: \"". $file. "\" could not be found. Please create it!";
-            $this->logger->error($errorMessage);
+            $this->log->error($errorMessage);
             echo $errorMessage;
             exit();
         }

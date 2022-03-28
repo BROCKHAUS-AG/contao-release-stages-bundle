@@ -14,22 +14,22 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use mysqli;
-use Psr\Log\LoggerInterface;
 
 class ProdDatabaseLogic
 {
     private IOLogic $_ioLogic;
-    private LoggerInterface $_logger;
+    private Log $_log;
     private mysqli $_conn;
     public string $prodDatabase;
 
-    public function __construct(IOLogic $ioLogic, LoggerInterface $logger)
+    public function __construct(IOLogic $ioLogic, Log $log)
     {
         $this->_ioLogic = $ioLogic;
-        $this->_logger = $logger;
+        $this->_log = $log;
         $config = $this->getDatabaseConfiguration();
         $this->prodDatabase = $config->getName();
         $this->_conn = $this->createConnectionToProdDatabase($config);

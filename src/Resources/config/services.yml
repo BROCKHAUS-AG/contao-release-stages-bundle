@@ -3,48 +3,52 @@ services:
         autoconfigure: true
         public: true
 
+    BrockhausAg\ContaoReleaseStagesBundle\Logger\Log:
+        arguments:
+            - '@logger'
+
     BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic:
         arguments:
             - '%kernel.project_dir%'
-            - '@logger'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\tl_release_stages:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\CopyToDatabaseLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToFileServerLogic'
-            - '@logger'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\CopyToDatabaseLogic:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\ProdDatabaseLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
-            - '@logger'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
-            - '@logger'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\ProdDatabaseLogic:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
-            - '@logger'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToFileServerLogic:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
-            - '@logger'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTPConnection:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
-            - '@logger'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\LoadFromLocalLogic:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
-            - '@logger'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 

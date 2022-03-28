@@ -14,20 +14,20 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use Contao\Backend;
 use Contao\Database\Result;
-use Psr\Log\LoggerInterface;
 
 class DatabaseLogic extends Backend
 {
-    private LoggerInterface $logger;
+    private Log $_log;
     private IOLogic $_ioLogic;
 
-    public function __construct(IOLogic $ioLogic, LoggerInterface $logger)
+    public function __construct(IOLogic $ioLogic, Log $log)
     {
         $this->_ioLogic = $ioLogic;
-        $this->logger = $logger;
+        $this->_log = $log;
     }
 
     public function getLastRows(int $count, array $columns, string $tableName) : Result

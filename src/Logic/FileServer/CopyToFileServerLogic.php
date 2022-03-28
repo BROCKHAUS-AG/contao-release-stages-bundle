@@ -14,18 +14,18 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\ArrayOfFile;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use Contao\Backend;
-use Psr\Log\LoggerInterface;
 
 DEFINE("COPY_TO_LOCAL", "local");
 DEFINE("COPY_TO_FILE_SERVER", "fileServer");
 
 class CopyToFileServerLogic extends Backend {
-    private LoggerInterface $logger;
+    private Log $_log;
     private IOLogic $_ioLogic;
     private CopyToLocalFileServerLogic $_copyToLocalFileServerLogic;
     private CopyToFTPFileServerLogic $_copyToFTPFileServerLogic;
@@ -33,21 +33,19 @@ class CopyToFileServerLogic extends Backend {
 
     private string $copyTo;
 
-    public function __construct(DatabaseLogic $databaseLogic, IOLogic $ioLogic, LoggerInterface $logger)
+    public function __construct(DatabaseLogic $databaseLogic, IOLogic $ioLogic, Log $log)
     {
         $this->_databaseLogic = $databaseLogic;
         $this->_ioLogic = $ioLogic;
-        $this->logger = $logger;
+        $this->_log = $log;
         $this->_copyToLocalFileServerLogic = new CopyToLocalFileServerLogic();
-
-        $logger->info("Hello from release stages");
     }
 
     public function copyToFileServer() : void
     {
         $this->copyTo = $this->_ioLogic->checkWhereToCopy();
         $path = $this->getPathToCopy();
-        $loadFromLocalLogic = new LoadFromLocalLogic($this->_ioLogic, $this->logger,
+        $loadFromLocalLogic = new LoadFromLocalLogic($this->_ioLogic, $this->_log,
             $this->_ioLogic->loadPathToContaoFiles(), $path);
         $files = $loadFromLocalLogic->loadFromLocal();
 
@@ -62,7 +60,7 @@ class CopyToFileServerLogic extends Backend {
        if ($this->isToCopyToLocalFileServer()) {
             return $this->_ioLogic->loadLocalFileServerConfiguration()->getContaoProdPath();
         }else if ($this->isToCopyToFTPFileServer()) {
-            $ftpConnection = new FTPConnection($this->_ioLogic, $this->logger);
+            $ftpConnection = new FTPConnection($this->_ioLogic, $this->_log);
             $this->_copyToFTPFileServerLogic = new CopyToFTPFileServerLogic($ftpConnection->connect());
             return $this->_ioLogic->loadFileServerConfiguration()->getPath();
         }

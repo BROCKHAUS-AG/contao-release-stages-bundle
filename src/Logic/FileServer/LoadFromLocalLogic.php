@@ -14,20 +14,20 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\ArrayOfFile;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
-use Psr\Log\LoggerInterface;
 
 class LoadFromLocalLogic {
-    private LoggerInterface $logger;
+    private Log $_log;
     private string $_path;
     private string $_prodPath;
     private IOLogic $_ioLogic;
 
-    public function __construct(IOLogic $ioLogic, LoggerInterface $logger, string $path, string $prodPath)
+    public function __construct(IOLogic $ioLogic, Log $log, string $path, string $prodPath)
     {
-        $this->logger = $logger;
+        $this->_log = $log;
         $this->_path = $path;
         $this->_prodPath = $prodPath;
         $this->_ioLogic = $ioLogic;
