@@ -6,11 +6,17 @@ services:
     BrockhausAg\ContaoReleaseStagesBundle\Logger\Log:
         arguments:
             - '@logger'
+            -
+    BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig:
+        arguments:
+            - '%kernel.project_dir%'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Mapper\MapConfig'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic:
         arguments:
             - '%kernel.project_dir%'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig'
 
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\tl_release_stages:
         arguments:

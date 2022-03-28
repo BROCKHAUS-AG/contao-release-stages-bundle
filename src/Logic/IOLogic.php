@@ -14,102 +14,75 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
-use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\ArrayOfDNSRecords;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
+use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
 
-DEFINE("SETTINGS_PATH", "/settings/brockhaus-ag/contao-release-stages-bundle/");
-DEFINE("CONFIG_FILE", "config.json");
+DEFINE("SETTINGS_PATH", "/settings/brockhaus-ag/contao-release-stages-bundle");
+DEFINE("CONFIG_FILE", "/config.json");
 
 class IOLogic {
-    private Config $config;
-    private Log $log;
-    private MapConfig $mapConfig;
-    private string $path;
+    private SystemConfig $_systemConfig;
+    private string $_contaoPath;
 
-    public function __construct(string $path, Log $log)
+    public function __construct(string $contaoPath, SystemConfig $systemConfig)
     {
-        $this->path = $path. SETTINGS_PATH. CONFIG_FILE;
-        $this->log = $log;
-        $this->mapConfig = new MapConfig();
-        $this->config = $this->loadConfiguration();
+        $this->_contaoPath = $contaoPath;
+        $this->_systemConfig = $systemConfig;
     }
 
     public function loadPathToContaoFiles() : string
     {
-        return $this->loadContaoPath(). "files";
+        return $this->_contaoPath. "/files";
     }
 
     public function loadDatabaseConfiguration() : Database
     {
-        return $this->config->getDatabase();
+        return $this->getConfig()->getDatabase();
     }
 
     public function loadTestStageDatabaseName() : string
     {
-        return $this->config->getDatabase()->getTestStageDatabaseName();
+        return $this->getConfig()->getDatabase()->getTestStageDatabaseName();
     }
 
     public function loadDatabaseIgnoredTablesConfiguration() : array
     {
-        $ignoredTables = $this->config->getDatabase()->getIgnoredTables();
+        $ignoredTables = $this->getConfig()->getDatabase()->getIgnoredTables();
         array_push($ignoredTables, "tl_user", "tl_cron_job", "tl_release_stages");
         return $ignoredTables;
     }
 
     public function loadDNSRecords() : ArrayOfDNSRecords
     {
-        return $this->config->getDnsRecords();
+        return $this->getConfig()->getDnsRecords();
     }
 
     public function checkWhereToCopy() : string
     {
-        return $this->config->getCopyTo();
+        return $this->getConfig()->getCopyTo();
     }
 
     public function loadFileServerConfiguration() : FileServer
     {
-        return $this->config->getFileServer();
+        return $this->getConfig()->getFileServer();
     }
 
     public function loadLocalFileServerConfiguration() : Local
     {
-        return $this->config->getLocal();
+        return $this->getConfig()->getLocal();
     }
 
     public function loadFileFormats() : array
     {
-        return $this->config->getFileFormats();
+        return $this->getConfig()->getFileFormats();
     }
 
-    private function loadJsonFileAndDecode(string $file) : Config
+    private function getConfig() : Config
     {
-        $this->checkIfFileExists($file);
-        $fileContent = file_get_contents($file);
-        return $this->mapConfig->map(json_decode($fileContent));
-    }
-
-    private function checkIfFileExists(string $file)
-    {
-        if (!file_exists($file)) {
-            $errorMessage = "File: \"". $file. "\" could not be found. Please create it!";
-            $this->log->error($errorMessage);
-            echo $errorMessage;
-            exit();
-        }
-    }
-
-    private function loadConfiguration() : Config
-    {
-        return $this->loadJsonFileAndDecode($this->path);
-    }
-
-    private function loadContaoPath() : string
-    {
-        return $this->path;
+        return $this->_systemConfig->getConfig();
     }
 }

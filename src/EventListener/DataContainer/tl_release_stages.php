@@ -28,10 +28,6 @@ class tl_release_stages
 
     public function onSubmitCallback() : void
     {
-        $this->_log->info("Create release was started!");
-        echo "Hello from callback";
-        die;
-
         $this->changeVersionNumber();
         $this->copy();
     }
@@ -65,11 +61,13 @@ class tl_release_stages
 
     private function createRelease(array $version) : string
     {
+        $this->_log->info("A new release (version )". ($version[1]+1). " has been requested.");
         return $version[0]. ".". intval($version[1]+1);
     }
 
     private function createMajorRelease(array $version) : string
     {
+        $this->_log->info("A new major releases (version )". ($version[0]+1). " has been requested:");
         return intval($version[0]+1). ".0";
     }
 
