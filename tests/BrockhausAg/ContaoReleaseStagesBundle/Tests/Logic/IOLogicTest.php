@@ -92,11 +92,11 @@ class IOLogicTest extends ContaoTestCase
             self::createMock(ArrayOfDNSRecords::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
         $expected = $database->getIgnoredTables();
-        array_push($expected, "tl_user", "tl_cron_job", "tl_release_stage");
+        array_push($expected, "tl_user", "tl_cron_job", "tl_release_stages");
 
         $actual = $ioLogic->loadDatabaseIgnoredTablesConfiguration();
 
-        for ($x = 0; $x != $this->count($expected); $x++) {
+        for ($x = 0; $x != sizeof($expected); $x++) {
             self::assertSame($expected[$x], $actual[$x]);
         }
     }
@@ -113,7 +113,7 @@ class IOLogicTest extends ContaoTestCase
 
         $actual = $ioLogic->loadDNSRecords();
 
-        for ($x = 0; $x != $this->count($expected); $x++) {
+        for ($x = 0; $x != $expected->getLength(); $x++) {
             self::assertSame($expected->getByIndex($x)->getDns(), $actual->getByIndex($x)->getDns());
             self::assertSame($expected->getByIndex($x)->getAlias(), $actual->getByIndex($x)->getAlias());
         }

@@ -50,7 +50,7 @@ class MapArrayOfDNSRecordsTest extends ContaoTestCase
 
         $actual = $mapper->mapArray(json_decode($input));
 
-        for ($x = 0; $x != 2; $x++) {
+        for ($x = 0; $x != $expected->getLength(); $x++) {
             self::assertSame($expected->getByIndex($x)->getAlias(), $actual->getByIndex($x)->getAlias());
             self::assertSame($expected->getByIndex($x)->getDns(), $actual->getByIndex($x)->getDns());
         }

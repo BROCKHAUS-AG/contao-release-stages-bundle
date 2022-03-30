@@ -112,7 +112,7 @@ class MapConfigTest extends ContaoTestCase
         self::assertSame($expectedFileServer->isSslTsl(), $actual->getFileServer()->isSslTsl());
         self::assertSame($expectedFileServer->getPath(), $actual->getFileServer()->getPath());
         self::assertSame($expectedLocal->getContaoProdPath(), $actual->getLocal()->getContaoProdPath());
-        for ($x = 0; $x != 2; $x++) {
+        for ($x = 0; $x != $expectedDNSRecords->getLength(); $x++) {
             self::assertSame($expectedDNSRecords->getByIndex($x)->getAlias(),
                 $actual->getDnsRecords()->getByIndex($x)->getAlias());
             self::assertSame($expectedDNSRecords->getByIndex($x)->getDns(),
