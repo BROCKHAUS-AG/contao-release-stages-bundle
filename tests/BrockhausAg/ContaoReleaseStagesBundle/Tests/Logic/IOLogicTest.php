@@ -132,6 +132,53 @@ class IOLogicTest extends ContaoTestCase
         self::assertSame($expected, $actual);
     }
 
+    public function testLoadFileServerConfiguration(): void
+    {
+        $expected = new FileServer("server", 0, "username", "password", true,
+            "path");
+        $willReturn = new Config(self::createMock(Database::class), "", $expected,
+            self::createMock(Local::class), self::createMock(ArrayOfDNSRecords::class),
+            array());
+        $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
+
+        $actual = $ioLogic->loadFileServerConfiguration();
+
+        self::assertSame($expected->getServer(), $actual->getServer());
+        self::assertSame($expected->getPort(), $actual->getPort());
+        self::assertSame($expected->getUsername(), $actual->getUsername());
+        self::assertSame($expected->getPassword(), $actual->getPassword());
+        self::assertSame($expected->isSslTsl(), $actual->isSslTsl());
+        self::assertSame($expected->getPath(), $actual->getPath());
+    }
+
+    public function testLoadLocalServerConfiguration(): void
+    {
+        $expected = new Local("contaoProdPath");
+        $willReturn = new Config(self::createMock(Database::class), "",
+            self::createMock(FileServer::class), $expected,
+            self::createMock(ArrayOfDNSRecords::class), array());
+        $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
+
+        $actual = $ioLogic->loadLocalFileServerConfiguration();
+
+        self::assertSame($expected->getContaoProdPath(), $actual->getContaoProdPath());
+    }
+
+    public function testLoadFileFormats(): void
+    {
+        $expected = array("a", "b", "c");
+        $willReturn = new Config(self::createMock(Database::class), "",
+            $this->createMock(FileServer::class), self::createMock(Local::class),
+            self::createMock(ArrayOfDNSRecords::class), $expected);
+        $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
+
+        $actual = $ioLogic->loadFileFormats();
+
+        for ($x = 0; $x != count($actual); $x++) {
+            self::assertSame($expected[$x], $actual[$x]);
+        }
+    }
+
     private function createIOLogicInstanceWithConfigMock(Config $willReturn) : IOLogic
     {
         $systemConfigMock = self::createMock(SystemConfig::class);
