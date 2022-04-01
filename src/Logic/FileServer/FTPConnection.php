@@ -46,7 +46,7 @@ class FTPConnection {
         $this->ssl_tsl = $config->isSslTsl();
     }
 
-    public function connect()
+    public function connect(): bool
     {
         if ($this->ssl_tsl) {
             $conn = $this->connectToSFTPServer();
