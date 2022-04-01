@@ -21,6 +21,7 @@ services:
         arguments:
             - '%kernel.project_dir%'
             - '@BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\tl_release_stages:
         arguments:

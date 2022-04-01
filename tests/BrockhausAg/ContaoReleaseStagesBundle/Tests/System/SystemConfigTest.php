@@ -41,14 +41,6 @@ class SystemConfigTest extends ContaoTestCase
         self::assertInstanceOf(SystemConfig::class, $systemConfig);
     }
 
-    public function testLoadConfig_shouldThrowFileNotFoundException(): void
-    {
-        self::expectException(FileNotFoundException::class);
-        $systemConfig = new SystemConfig("", self::createMock(MapConfig::class),
-            self::createMock(Log::class));
-        $systemConfig->loadConfig();
-    }
-
     public function testGetConfig_shouldThrowConfigNotFoundException(): void
     {
         self::expectException(ConfigNotFoundException::class);

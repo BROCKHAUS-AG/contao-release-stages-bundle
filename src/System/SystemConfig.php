@@ -38,20 +38,21 @@ class SystemConfig
 
     /**
      * This function is called from dependency injection while injecting this dependency
-     * @throws FileNotFoundException
      */
     public function loadConfig(): void
     {
         $this->_config = $this->loadJsonFileAndDecode();
     }
 
-    /**
-     * @throws FileNotFoundException
-     */
     public function loadJsonFileAndDecode(): Config
     {
         $file = $this->createPath();
-        $this->checkIfFileExists($file);
+        try {
+            $this->checkIfFileExists($file);
+        } catch (FileNotFoundException $e) {
+            $this->_log->error($e->getMessage());
+            die($e);
+        }
         $fileContent = file_get_contents($file);
         return $this->_mapConfig->map(json_decode($fileContent));
     }
