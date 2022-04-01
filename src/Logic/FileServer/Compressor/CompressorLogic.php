@@ -12,14 +12,14 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\Compressor;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Compressor;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use Exception;
 use Phar;
 use PharData;
 
-class Compressor {
+class CompressorLogic {
     private Log $_log;
 
     public function __construct(Log $log)
