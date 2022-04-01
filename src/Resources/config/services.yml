@@ -3,15 +3,19 @@ services:
         autoconfigure: true
         public: true
 
+    BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig:
+
     BrockhausAg\ContaoReleaseStagesBundle\Logger\Log:
         arguments:
-            - '@logger'
-            -
+        - '@logger'
+
     BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig:
         arguments:
             - '%kernel.project_dir%'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Mapper\MapConfig'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+        calls:
+            - loadConfig: []
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic:
         arguments:

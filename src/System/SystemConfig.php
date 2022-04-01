@@ -18,6 +18,8 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 
+DEFINE("SETTINGS_PATH", "/settings/brockhaus-ag/contao-release-stages-bundle");
+DEFINE("CONFIG_FILE", "/config.json");
 class SystemConfig
 {
     private string $_contaoPath;
@@ -30,15 +32,16 @@ class SystemConfig
         $this->_contaoPath = $contaoPath;
         $this->_log = $log;
         $this->_mapConfig = $mapConfig;
-        $this->loadConfig();
     }
-
-    public function loadConfig() : void
+    /**
+     * This function is called from dependency injection while injecting this dependency
+     */
+    public function loadConfig(): void
     {
         $this->_config = $this->loadJsonFileAndDecode();
     }
 
-    private function loadJsonFileAndDecode() : Config
+    private function loadJsonFileAndDecode(): Config
     {
         $file = $this->createPath();
         $this->checkIfFileExists($file);
@@ -46,7 +49,7 @@ class SystemConfig
         return $this->_mapConfig->map(json_decode($fileContent));
     }
 
-    private function checkIfFileExists(string $file)
+    private function checkIfFileExists(string $file): void
     {
         if (!file_exists($file)) {
             $errorMessage = "File: \"". $file. "\" could not be found. Please create it!";
@@ -55,7 +58,7 @@ class SystemConfig
         }
     }
 
-    private function createPath() : string
+    private function createPath(): string
     {
         return $this->_contaoPath. SETTINGS_PATH. CONFIG_FILE;
     }

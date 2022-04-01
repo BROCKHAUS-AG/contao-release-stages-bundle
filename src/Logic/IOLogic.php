@@ -21,9 +21,6 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
 
-DEFINE("SETTINGS_PATH", "/settings/brockhaus-ag/contao-release-stages-bundle");
-DEFINE("CONFIG_FILE", "/config.json");
-
 class IOLogic {
     private SystemConfig $_systemConfig;
     private string $_contaoPath;
