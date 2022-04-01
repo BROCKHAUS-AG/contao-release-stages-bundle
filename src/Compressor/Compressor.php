@@ -31,13 +31,19 @@ class Compressor {
     {
         try {
             $archive = new PharData($compressedFile);
-            foreach ($files as $file) {
-                $archive->addFile($file);
-            }
+            $archive = $this->addAllFilesToCompressedFile($files, $archive);
             $archive->compress(Phar::GZ);
             $this->_log->info("Successfully saved ". $compressedFile);
         }catch (Exception $e) {
             $this->_log->logErrorAndDie($e->getMessage());
         }
+    }
+
+    private function addAllFilesToCompressedFile(array $files, PharData $archive): PharData
+    {
+        foreach ($files as $file) {
+            $archive->addFile($file);
+        }
+        return $archive;
     }
 }
