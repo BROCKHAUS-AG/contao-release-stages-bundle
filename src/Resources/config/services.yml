@@ -72,3 +72,6 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
+    BrockhausAg\ContaoReleaseStagesBundle\Compressos\Compressos:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
