@@ -16,6 +16,9 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\CopyToFTPFileServerLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPConnection;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Local\CopyToLocalFileServerLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\ArrayOfFile;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
