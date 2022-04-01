@@ -181,7 +181,7 @@ class CopyToFileServerLogic extends Backend {
 
     private function couldNotFindCopyTo() : void
     {
-        $this->_log->logErrorAndDie("Es konnte kein valider Pfad gefunden werden, um Dateien zu aktualisieren!");
+        $this->_log->logErrorAndDie("Could not find a valid path to update files");
     }
 
     private function copyDirectoryToMainDirectoryWithSSHCommand() : void

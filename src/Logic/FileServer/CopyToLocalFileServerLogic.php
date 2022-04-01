@@ -54,7 +54,7 @@ class CopyToLocalFileServerLogic {
         if (file_exists($file)) {
             if (!unlink($file)) {
                 $error = error_get_last();
-                $errorMessage = "Fehler beim Löschen der Datei: \"". $file. "\"</br>rm error: ". $error['message'];
+                $errorMessage = "Failed to delete file: \"". $file. "\"</br>rm error: ". $error['message'];
                 $this->_log->logErrorAndDie($errorMessage);
             }
         }
