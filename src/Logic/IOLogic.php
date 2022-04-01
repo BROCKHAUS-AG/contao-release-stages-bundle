@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\ConfigNotFoundException;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\ArrayOfDNSRecords;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
@@ -36,16 +37,25 @@ class IOLogic {
         return $this->_contaoPath. "/files";
     }
 
+    /**
+     * @throws ConfigNotFoundException
+     */
     public function loadDatabaseConfiguration() : Database
     {
         return $this->getConfig()->getDatabase();
     }
 
+    /**
+     * @throws ConfigNotFoundException
+     */
     public function loadTestStageDatabaseName() : string
     {
         return $this->getConfig()->getDatabase()->getTestStageDatabaseName();
     }
 
+    /**
+     * @throws ConfigNotFoundException
+     */
     public function loadDatabaseIgnoredTablesConfiguration() : array
     {
         $ignoredTables = $this->getConfig()->getDatabase()->getIgnoredTables();
@@ -53,31 +63,49 @@ class IOLogic {
         return $ignoredTables;
     }
 
+    /**
+     * @throws ConfigNotFoundException
+     */
     public function loadDNSRecords() : ArrayOfDNSRecords
     {
         return $this->getConfig()->getDnsRecords();
     }
 
+    /**
+     * @throws ConfigNotFoundException
+     */
     public function checkWhereToCopy() : string
     {
         return $this->getConfig()->getCopyTo();
     }
 
+    /**
+     * @throws ConfigNotFoundException
+     */
     public function loadFileServerConfiguration() : FileServer
     {
         return $this->getConfig()->getFileServer();
     }
 
+    /**
+     * @throws ConfigNotFoundException
+     */
     public function loadLocalFileServerConfiguration() : Local
     {
         return $this->getConfig()->getLocal();
     }
 
+    /**
+     * @throws ConfigNotFoundException
+     */
     public function loadFileFormats() : array
     {
         return $this->getConfig()->getFileFormats();
     }
 
+    /**
+     * @throws ConfigNotFoundException
+     */
     private function getConfig() : Config
     {
         return $this->_systemConfig->getConfig();
