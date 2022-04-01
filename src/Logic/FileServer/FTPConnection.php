@@ -60,7 +60,7 @@ class FTPConnection {
     private function login($conn) : void
     {
         if (!@ftp_login($conn, $this->username, $this->password)) {
-            $this->_log->logErrorAndDie("Username oder Passwort ist falsch.");
+            $this->_log->logErrorAndDie("Username or password is false.");
         }
     }
 
