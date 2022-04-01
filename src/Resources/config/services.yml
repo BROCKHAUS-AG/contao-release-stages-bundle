@@ -46,6 +46,8 @@ services:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+        calls:
+            - setUpDatabaseConnection: []
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToFileServerLogic:
         arguments:

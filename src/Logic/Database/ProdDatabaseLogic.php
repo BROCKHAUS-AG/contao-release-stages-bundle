@@ -30,27 +30,19 @@ class ProdDatabaseLogic
     {
         $this->_ioLogic = $ioLogic;
         $this->_log = $log;
+    }
+
+    /**
+     * This function is called from dependency injection while injecting this dependency
+     */
+    public function setUpDatabaseConnection(): void
+    {
         $config = $this->getDatabaseConfiguration();
         $this->prodDatabase = $config->getName();
         $this->_conn = $this->createConnectionToProdDatabase($config);
     }
 
-    private function getDatabaseConfiguration() : Database
-    {
-        return $this->_ioLogic->loadDatabaseConfiguration();
-    }
-
-    private function createConnectionToProdDatabase(Database $database)
-    {
-        $conn = new mysqli($database->getServer(), $database->getUsername(), $database->getPassword(),
-            $database->getTestStageDatabaseName(), $database->getPort());
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
-        return $conn;
-    }
-
-    public function getTableSchemes(string $tableName) : array
+    public function getTableSchemes(string $tableName): array
     {
         $sql = "DESCRIBE ". $this->prodDatabase. ".". $tableName;
         $req = $this->_conn->query($sql);
@@ -67,27 +59,44 @@ class ProdDatabaseLogic
         return $tableSchemes;
     }
 
-    public function runSqlCommandsOnProdDatabase(array $commandsToBeExecuted) : void
+    public function runSqlCommandsOnProdDatabase(array $commandsToBeExecuted): void
     {
         if ($commandsToBeExecuted != null) {
             foreach ($commandsToBeExecuted as $command) {
                 if ($this->_conn->query($command) === FALSE) {
-                    echo "<br/>Es ist ein Fehler aufgetreten :)</br>Fehler: ". $this->_conn->error;
+                    $this->_log->warning("Something went wrong at running sql commands on prod database: ".
+                        $this->_conn->error);
                 }
             }
         }
     }
 
-    public function getLastIdFromTable(string $tableName) : int
+    public function getLastIdFromTable(string $tableName): int
     {
         $sql = "SELECT id FROM ". $this->prodDatabase. ".". $tableName. " ORDER BY id DESC LIMIT 1";
         $req = $this->_conn->query($sql);
 
         if ($req->num_rows <= 0) {
-            echo "<br/>Es ist ein Fehler aufgetreten :)</br>Fehler: ". $this->_conn->error;
-            die;
+            $this->_log->logErrorAndDie("Something went wrong at running sql commands on prod database: ".
+                $this->_conn->error);
         }
         $row = $req->fetch_assoc();
         return intval($row["id"]);
+    }
+
+    private function getDatabaseConfiguration(): Database
+    {
+        return $this->_ioLogic->loadDatabaseConfiguration();
+    }
+
+    private function createConnectionToProdDatabase(Database $database): mysqli
+    {
+        $conn = new mysqli($database->getServer(), $database->getUsername(), $database->getPassword(),
+            $database->getTestStageDatabaseName(), $database->getPort());
+        if ($conn->connect_error) {
+            $error_message = "Connection failed: " . $conn->connect_error;
+            $this->_log->logErrorAndDie($error_message);
+        }
+        return $conn;
     }
 }
