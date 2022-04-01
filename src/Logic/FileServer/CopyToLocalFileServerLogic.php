@@ -14,9 +14,17 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
 class CopyToLocalFileServerLogic {
+    private Log $_log;
+
+    public function __construct(Log $log)
+    {
+        $this->_log = $log;
+    }
+
     public function createDirectory(string $directory) : void
     {
         if (!@mkdir($directory)) {
@@ -46,7 +54,8 @@ class CopyToLocalFileServerLogic {
         if (file_exists($file)) {
             if (!unlink($file)) {
                 $error = error_get_last();
-                die("Fehler beim Löschen der Datei: \"". $file. "\"</br>rm error: ". $error['message']);
+                $errorMessage = "Fehler beim Löschen der Datei: \"". $file. "\"</br>rm error: ". $error['message'];
+                $this->_log->logErrorAndDie($errorMessage);
             }
         }
     }

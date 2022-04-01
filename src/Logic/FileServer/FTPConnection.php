@@ -18,6 +18,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 
 class FTPConnection {
+    private IOLogic $_ioLogic;
     private Log $_log;
 
     private string $username;
@@ -28,8 +29,16 @@ class FTPConnection {
 
     public function __construct(IOLogic $ioLogic, Log $log)
     {
+        $this->_ioLogic = $ioLogic;
         $this->_log = $log;
-        $config = $ioLogic->loadFileServerConfiguration();
+    }
+
+    /**
+     * This function is called from dependency injection while injecting this dependency
+     */
+    public function setUpFTPConfig(): void
+    {
+        $config = $this->_ioLogic->loadFileServerConfiguration();
         $this->username = $config->getUsername();
         $this->password = $config->getPassword();
         $this->server = $config->getServer();
@@ -51,21 +60,21 @@ class FTPConnection {
     private function login($conn) : void
     {
         if (!@ftp_login($conn, $this->username, $this->password)) {
-            die("Username oder Passwort ist falsch.");
+            $this->_log->logErrorAndDie("Username oder Passwort ist falsch.");
         }
     }
 
-    private function connectToSFTPServer()
+    private function connectToSFTPServer(): bool
     {
         $sftpConn = ftp_ssl_connect($this->server, $this->port)
-            or die("Verbindung zum SFTP Server \"". $this->server. "\" fehlgeschlagen");
+            or $this->_log->logErrorAndDie("Connection to SFTP Server \"". $this->server. "\" failed");
         return $sftpConn;
     }
 
-    private function connectToFTPServer()
+    private function connectToFTPServer(): bool
     {
         $ftpConn = ftp_connect($this->server, $this->port)
-            or die("Verbindung zum FTP Server \"". $this->server. "\" fehlgeschlagen");
+            or $this->_log->logErrorAndDie("Connection to FTP Server \"". $this->server. "\" failed");
         return $ftpConn;
     }
 

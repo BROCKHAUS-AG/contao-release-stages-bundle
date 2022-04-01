@@ -33,12 +33,13 @@ class CopyToFileServerLogic extends Backend {
 
     private string $copyTo;
 
-    public function __construct(DatabaseLogic $databaseLogic, IOLogic $ioLogic, Log $log)
+    public function __construct(DatabaseLogic $databaseLogic, IOLogic $ioLogic,
+                                CopyToLocalFileServerLogic $copyToLocalFileServerLogic, Log $log)
     {
         $this->_databaseLogic = $databaseLogic;
         $this->_ioLogic = $ioLogic;
         $this->_log = $log;
-        $this->_copyToLocalFileServerLogic = new CopyToLocalFileServerLogic();
+        $this->_copyToLocalFileServerLogic = $copyToLocalFileServerLogic;
     }
 
     public function copyToFileServer() : void
@@ -180,7 +181,7 @@ class CopyToFileServerLogic extends Backend {
 
     private function couldNotFindCopyTo() : void
     {
-        die("Es konnte kein valider Pfad gefunden werden, um Dateien zu aktualisieren!");
+        $this->_log->logErrorAndDie("Es konnte kein valider Pfad gefunden werden, um Dateien zu aktualisieren!");
     }
 
     private function copyDirectoryToMainDirectoryWithSSHCommand() : void

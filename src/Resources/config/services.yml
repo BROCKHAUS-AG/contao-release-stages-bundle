@@ -53,12 +53,19 @@ services:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToLocalFileServerLogic'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToLocalFileServerLogic:
+        arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTPConnection:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+        calls:
+            - setUpFTPConfig: []
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\LoadFromLocalLogic:
         arguments:
