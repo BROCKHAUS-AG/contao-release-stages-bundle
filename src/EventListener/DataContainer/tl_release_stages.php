@@ -32,7 +32,7 @@ class tl_release_stages
         $this->copy();
     }
 
-    public function changeVersionNumber() : void
+    private function changeVersionNumber() : void
     {
         $release_stages = $this->_databaseLogic->getLastRows(2, array("id", "version", "kindOfRelease"),
             "tl_release_stages");
@@ -71,7 +71,7 @@ class tl_release_stages
         return intval($version[0]+1). ".0";
     }
 
-    public function copy() : void
+    private function copy() : void
     {
         $this->_copyToDatabaseLogic->copyToDatabase();
         $this->_copyToFileServerLogic->copyToFileServer();
