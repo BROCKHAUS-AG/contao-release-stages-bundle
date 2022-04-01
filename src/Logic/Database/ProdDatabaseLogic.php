@@ -86,7 +86,7 @@ class ProdDatabaseLogic
 
     private function getDatabaseConfiguration(): Database
     {
-        return $this->_ioLogic->loadDatabaseConfiguration();
+        return $this->_ioLogic->getDatabaseConfiguration();
     }
 
     private function createConnectionToProdDatabase(Database $database): mysqli

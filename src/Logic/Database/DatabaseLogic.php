@@ -94,7 +94,7 @@ class DatabaseLogic extends Backend
 
     private function getIgnoredTables() : array
     {
-        return $this->_ioLogic->loadDatabaseIgnoredTablesConfiguration();
+        return $this->_ioLogic->getDatabaseIgnoredTablesConfiguration();
     }
 
     public function loadHexById(string $column, string $tableName, string $id) : Result

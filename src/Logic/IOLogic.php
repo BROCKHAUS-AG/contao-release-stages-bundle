@@ -35,49 +35,49 @@ class IOLogic {
         $this->_log = $log;
     }
 
-    public function loadPathToContaoFiles() : string
+    public function getPathToContaoFiles() : string
     {
         return $this->_contaoPath. "/files";
     }
 
-    public function loadDatabaseConfiguration() : Database
+    public function getDatabaseConfiguration() : Database
     {
         return $this->getConfig()->getDatabase();
     }
 
-    public function loadTestStageDatabaseName() : string
+    public function getTestStageDatabaseName() : string
     {
         return $this->getConfig()->getDatabase()->getTestStageDatabaseName();
     }
 
-    public function loadDatabaseIgnoredTablesConfiguration() : array
+    public function getDatabaseIgnoredTablesConfiguration() : array
     {
         $ignoredTables = $this->getConfig()->getDatabase()->getIgnoredTables();
         array_push($ignoredTables, "tl_user", "tl_cron_job", "tl_release_stages");
         return $ignoredTables;
     }
 
-    public function loadDNSRecords() : ArrayOfDNSRecords
+    public function getDNSRecords() : ArrayOfDNSRecords
     {
         return $this->getConfig()->getDnsRecords();
     }
 
-    public function checkWhereToCopy() : string
+    public function getWhereToCopy() : string
     {
         return $this->getConfig()->getCopyTo();
     }
 
-    public function loadFileServerConfiguration() : FileServer
+    public function getFileServerConfiguration() : FileServer
     {
         return $this->getConfig()->getFileServer();
     }
 
-    public function loadLocalFileServerConfiguration() : Local
+    public function getLocalFileServerConfiguration() : Local
     {
         return $this->getConfig()->getLocal();
     }
 
-    public function loadFileFormats() : array
+    public function getFileFormats() : array
     {
         return $this->getConfig()->getFileFormats();
     }

@@ -38,7 +38,7 @@ class FTPConnection {
      */
     public function setUpFTPConfig(): void
     {
-        $config = $this->_ioLogic->loadFileServerConfiguration();
+        $config = $this->_ioLogic->getFileServerConfiguration();
         $this->username = $config->getUsername();
         $this->password = $config->getPassword();
         $this->server = $config->getServer();

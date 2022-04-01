@@ -20,7 +20,7 @@ class tl_release_stages
     public function __construct(DatabaseLogic $databaseLogic, CopyToDatabaseLogic $copyToDatabaseLogic,
                                 CopyToFileServerLogic $copyToFileServerLogic, Log $log)
     {
-        $this->_databaseLogic =$databaseLogic;
+        $this->_databaseLogic = $databaseLogic;
         $this->_copyToDatabaseLogic = $copyToDatabaseLogic;
         $this->_copyToFileServerLogic = $copyToFileServerLogic;
         $this->_log = $log;

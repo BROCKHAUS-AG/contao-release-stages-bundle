@@ -47,10 +47,10 @@ class CopyToFileServerLogic extends Backend {
 
     public function copyToFileServer() : void
     {
-        $this->copyTo = $this->_ioLogic->checkWhereToCopy();
+        $this->copyTo = $this->_ioLogic->getWhereToCopy();
         $path = $this->getPathToCopy();
         $loadFromLocalLogic = new LoadFromLocalLogic($this->_ioLogic, $this->_log,
-            $this->_ioLogic->loadPathToContaoFiles(), $path);
+            $this->_ioLogic->getPathToContaoFiles(), $path);
         $files = $loadFromLocalLogic->loadFromLocal();
 
         $this->createDirectories($files);
@@ -62,11 +62,11 @@ class CopyToFileServerLogic extends Backend {
     private function getPathToCopy() : string
     {
        if ($this->isToCopyToLocalFileServer()) {
-            return $this->_ioLogic->loadLocalFileServerConfiguration()->getContaoProdPath();
+            return $this->_ioLogic->getLocalFileServerConfiguration()->getContaoProdPath();
         }else if ($this->isToCopyToFTPFileServer()) {
             $ftpConnection = new FTPConnection($this->_ioLogic, $this->_log);
             $this->_copyToFTPFileServerLogic = new CopyToFTPFileServerLogic($ftpConnection->connect());
-            return $this->_ioLogic->loadFileServerConfiguration()->getPath();
+            return $this->_ioLogic->getFileServerConfiguration()->getPath();
         }
         $this->couldNotFindCopyTo();
         return "";
@@ -164,9 +164,9 @@ class CopyToFileServerLogic extends Backend {
     {
         if ($this->isToCopyToLocalFileServer()) {
             $this->_copyToLocalFileServerLogic->delete($file,
-                $this->_ioLogic->loadLocalFileServerConfiguration()->getContaoProdPath());
+                $this->_ioLogic->getLocalFileServerConfiguration()->getContaoProdPath());
         }else if ($this->isToCopyToFTPFileServer()) {
-            $this->_copyToFTPFileServerLogic->delete($file, $this->_ioLogic->loadFileServerConfiguration()->getPath());
+            $this->_copyToFTPFileServerLogic->delete($file, $this->_ioLogic->getFileServerConfiguration()->getPath());
         }else {
             $this->couldNotFindCopyTo();
         }
@@ -190,7 +190,7 @@ class CopyToFileServerLogic extends Backend {
     private function copyDirectoryToMainDirectoryWithSSHCommand() : void
     {
         if ($this->isToCopyToFTPFileServer()) {
-            $config = $this->_ioLogic->loadFileServerConfiguration();
+            $config = $this->_ioLogic->getFileServerConfiguration();
             $connection = ssh2_connect($config->getServer(), 22);
             ssh2_auth_password($connection, $config->getUsername(), $config->getPassword());
             $stream = ssh2_exec($connection, "bash -r /html/release-stages.sh");

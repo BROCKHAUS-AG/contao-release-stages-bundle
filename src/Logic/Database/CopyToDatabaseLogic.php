@@ -36,7 +36,7 @@ class CopyToDatabaseLogic extends Backend
 
     public function copyToDatabase() : void
     {
-        $testStageDatabaseName = $this->_ioLogic->loadTestStageDatabaseName();
+        $testStageDatabaseName = $this->_ioLogic->getTestStageDatabaseName();
         $tables = $this->_databaseLogic->downloadFromDatabase($testStageDatabaseName);
 
         echo "to be inserted into/updated table: </br>";
@@ -140,7 +140,7 @@ class CopyToDatabaseLogic extends Backend
 
     private function changeDNSEntryForProd(string $alias) : string
     {
-        $dnsRecords = $this->_ioLogic->loadDNSRecords();
+        $dnsRecords = $this->_ioLogic->getDNSRecords();
         for ($x = 0; $x != $dnsRecords->getLength(); $x++) {
             $dnsRecord = $dnsRecords->getByIndex($x);
             if (strcmp($dnsRecord->getAlias(), $alias) == 0) {

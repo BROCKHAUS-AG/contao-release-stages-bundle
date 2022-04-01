@@ -39,18 +39,18 @@ class IOLogicTest extends ContaoTestCase
     }
 
 
-    public function testLoadContaoPath(): void
+    public function testGetContaoPath(): void
     {
         $expected = "test/files";
         $systemConfigMock = self::createMock(SystemConfig::class);
         $ioLogic = new IOLogic("test", $systemConfigMock, self::createMock(Log::class));
 
-        $actual = $ioLogic->loadPathToContaoFiles();
+        $actual = $ioLogic->getPathToContaoFiles();
 
         self::assertSame($expected, $actual);
     }
 
-    public function testLoadDatabaseConfiguration(): void
+    public function testGetDatabaseConfiguration(): void
     {
         $expected = new Database("server", "name", 0, "username", "password", array(),
             "testStageDatabaseName");
@@ -59,7 +59,7 @@ class IOLogicTest extends ContaoTestCase
             self::createMock(ArrayOfDNSRecords::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
-        $actual = $ioLogic->loadDatabaseConfiguration();
+        $actual = $ioLogic->getDatabaseConfiguration();
 
         self::assertSame($expected->getServer(), $actual->getServer());
         self::assertSame($expected->getName(), $actual->getName());
@@ -70,7 +70,7 @@ class IOLogicTest extends ContaoTestCase
         self::assertSame($expected->getTestStageDatabaseName(), $actual->getTestStageDatabaseName());
     }
 
-    public function testLoadTestStageDatabaseName(): void
+    public function testGetTestStageDatabaseName(): void
     {
         $database = new Database("server", "name", 0, "username", "password", array(),
             "testStageDatabaseName");
@@ -80,12 +80,12 @@ class IOLogicTest extends ContaoTestCase
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
         $expected = $database->getTestStageDatabaseName();
 
-        $actual = $ioLogic->loadTestStageDatabaseName();
+        $actual = $ioLogic->getTestStageDatabaseName();
 
         self::assertSame($expected, $actual);
     }
 
-    public function testLoadDatabaseIgnoredTablesConfiguration(): void
+    public function testGetDatabaseIgnoredTablesConfiguration(): void
     {
         $database = new Database("server", "name", 0, "username", "password",
             array("a", "b"), "testStageDatabaseName");
@@ -96,14 +96,14 @@ class IOLogicTest extends ContaoTestCase
         $expected = $database->getIgnoredTables();
         array_push($expected, "tl_user", "tl_cron_job", "tl_release_stages");
 
-        $actual = $ioLogic->loadDatabaseIgnoredTablesConfiguration();
+        $actual = $ioLogic->getDatabaseIgnoredTablesConfiguration();
 
         for ($x = 0; $x != sizeof($expected); $x++) {
             self::assertSame($expected[$x], $actual[$x]);
         }
     }
 
-    public function testLoadDNSRecords(): void
+    public function testGetDNSRecords(): void
     {
         $expected = new ArrayOfDNSRecords();
         $expected->add(new DNSRecord("a", "b"));
@@ -113,7 +113,7 @@ class IOLogicTest extends ContaoTestCase
             $expected, array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
-        $actual = $ioLogic->loadDNSRecords();
+        $actual = $ioLogic->getDNSRecords();
 
         for ($x = 0; $x != $expected->getLength(); $x++) {
             self::assertSame($expected->getByIndex($x)->getDns(), $actual->getByIndex($x)->getDns());
@@ -121,7 +121,7 @@ class IOLogicTest extends ContaoTestCase
         }
     }
 
-    public function testCheckWhereToCopy(): void
+    public function testGetWhereToCopy(): void
     {
         $expected = "test";
         $willReturn = new Config(self::createMock(Database::class), $expected,
@@ -129,12 +129,12 @@ class IOLogicTest extends ContaoTestCase
             self::createMock(ArrayOfDNSRecords::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
-        $actual = $ioLogic->checkWhereToCopy();
+        $actual = $ioLogic->getWhereToCopy();
 
         self::assertSame($expected, $actual);
     }
 
-    public function testLoadFileServerConfiguration(): void
+    public function testGetFileServerConfiguration(): void
     {
         $expected = new FileServer("server", 0, "username", "password", true,
             "path");
@@ -143,7 +143,7 @@ class IOLogicTest extends ContaoTestCase
             array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
-        $actual = $ioLogic->loadFileServerConfiguration();
+        $actual = $ioLogic->getFileServerConfiguration();
 
         self::assertSame($expected->getServer(), $actual->getServer());
         self::assertSame($expected->getPort(), $actual->getPort());
@@ -153,7 +153,7 @@ class IOLogicTest extends ContaoTestCase
         self::assertSame($expected->getPath(), $actual->getPath());
     }
 
-    public function testLoadLocalServerConfiguration(): void
+    public function testGetLocalServerConfiguration(): void
     {
         $expected = new Local("contaoProdPath");
         $willReturn = new Config(self::createMock(Database::class), "",
@@ -161,12 +161,12 @@ class IOLogicTest extends ContaoTestCase
             self::createMock(ArrayOfDNSRecords::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
-        $actual = $ioLogic->loadLocalFileServerConfiguration();
+        $actual = $ioLogic->getLocalFileServerConfiguration();
 
         self::assertSame($expected->getContaoProdPath(), $actual->getContaoProdPath());
     }
 
-    public function testLoadFileFormats(): void
+    public function testGetFileFormats(): void
     {
         $expected = array("a", "b", "c");
         $willReturn = new Config(self::createMock(Database::class), "",
@@ -174,7 +174,7 @@ class IOLogicTest extends ContaoTestCase
             self::createMock(ArrayOfDNSRecords::class), $expected);
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
-        $actual = $ioLogic->loadFileFormats();
+        $actual = $ioLogic->getFileFormats();
 
         for ($x = 0; $x != count($actual); $x++) {
             self::assertSame($expected[$x], $actual[$x]);

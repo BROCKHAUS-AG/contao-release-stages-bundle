@@ -42,7 +42,7 @@ class LoadFromLocalLogic {
 
     private function getFilesWithTimestamp(string $path, array $directoriesLayout) : ArrayOfFile
     {
-        $fileFormats = $this->_ioLogic->loadFileFormats();
+        $fileFormats = $this->_ioLogic->getFileFormats();
         $fileFormatsAsString = implode(",", $fileFormats);
         $directories = glob($path. "*", GLOB_ONLYDIR);
 
