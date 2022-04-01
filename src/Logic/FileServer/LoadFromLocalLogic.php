@@ -20,10 +20,10 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\ArrayOfFile;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
 class LoadFromLocalLogic {
-    private Log $_log;
-    private string $_path;
-    private string $_prodPath;
     private IOLogic $_ioLogic;
+    private Log $_log;
+    protected string $_path;
+    protected string $_prodPath;
 
     public function __construct(IOLogic $ioLogic, Log $log, string $path, string $prodPath)
     {
@@ -55,15 +55,19 @@ class LoadFromLocalLogic {
 
     private function loadFiles(array $files) : ArrayOfFile
     {
-        $filesWithTimestamp = array();
+        $filesWithTimestamp = new ArrayOfFile();
         foreach ($files as $file)
         {
             $prodPathFile = $this->changePathToProdPath($file);
-            $filesWithTimestamp = new ArrayOfFile();
-            $file = new File(filemtime($file), $file, $prodPathFile);
+            $file = new File($this->getTimestampFromFile($file), $file, $prodPathFile);
             $filesWithTimestamp->add($file);
         }
         return $filesWithTimestamp;
+    }
+
+    public function getTimestampFromFile(string $file): int
+    {
+        return filemtime($file);
     }
 
     private function changePathToProdPath(string $file) : string
