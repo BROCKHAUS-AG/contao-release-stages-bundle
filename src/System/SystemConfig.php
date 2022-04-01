@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\System;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\ConfigNotFoundException;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileNotFoundException;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
@@ -25,7 +27,7 @@ class SystemConfig
     private string $_contaoPath;
     private Log $_log;
     private MapConfig $_mapConfig;
-    private Config $_config;
+    protected Config $_config;
 
     public function __construct(string $contaoPath, MapConfig $mapConfig, Log $log)
     {
@@ -33,15 +35,20 @@ class SystemConfig
         $this->_log = $log;
         $this->_mapConfig = $mapConfig;
     }
+
     /**
      * This function is called from dependency injection while injecting this dependency
+     * @throws FileNotFoundException
      */
     public function loadConfig(): void
     {
         $this->_config = $this->loadJsonFileAndDecode();
     }
 
-    private function loadJsonFileAndDecode(): Config
+    /**
+     * @throws FileNotFoundException
+     */
+    public function loadJsonFileAndDecode(): Config
     {
         $file = $this->createPath();
         $this->checkIfFileExists($file);
@@ -49,12 +56,15 @@ class SystemConfig
         return $this->_mapConfig->map(json_decode($fileContent));
     }
 
+    /**
+     * @throws FileNotFoundException
+     */
     private function checkIfFileExists(string $file): void
     {
         if (!file_exists($file)) {
             $errorMessage = "File: \"". $file. "\" could not be found. Please create it!";
             $this->_log->error($errorMessage);
-            exit($errorMessage);
+            throw new FileNotFoundException($errorMessage);
         }
     }
 
@@ -63,8 +73,15 @@ class SystemConfig
         return $this->_contaoPath. SETTINGS_PATH. CONFIG_FILE;
     }
 
+    /**
+     * @throws ConfigNotFoundException
+     */
     public function getConfig(): Config
     {
+        if (!isset($this->_config)) {
+            throw new ConfigNotFoundException("Could not get config. Config was maybe not instantiated from
+                config file");
+        }
         return $this->_config;
     }
 }
