@@ -26,8 +26,6 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
 use Contao\TestCase\ContaoTestCase;
-use Psr\Log\LoggerInterface;
-use Reflection;
 use ReflectionClass;
 
 /**
