@@ -41,8 +41,8 @@ class CopyToFileServerLogic extends Backend {
     {
         $this->_databaseLogic = $databaseLogic;
         $this->_ioLogic = $ioLogic;
-        $this->_log = $log;
         $this->_copyToLocalFileServerLogic = $copyToLocalFileServerLogic;
+        $this->_log = $log;
     }
 
     public function copyToFileServer() : void

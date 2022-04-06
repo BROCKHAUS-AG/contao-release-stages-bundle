@@ -27,10 +27,10 @@ class LoadFromLocalLogic {
 
     public function __construct(IOLogic $ioLogic, Log $log, string $path, string $prodPath)
     {
+        $this->_ioLogic = $ioLogic;
         $this->_log = $log;
         $this->_path = $path;
         $this->_prodPath = $prodPath;
-        $this->_ioLogic = $ioLogic;
     }
 
     public function loadFromLocal() : ArrayOfFile
