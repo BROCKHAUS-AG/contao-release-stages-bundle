@@ -17,6 +17,11 @@ services:
         calls:
             - loadConfig: []
 
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\VersioningLogic:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+
     BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic:
         arguments:
             - '%kernel.project_dir%'
@@ -25,10 +30,9 @@ services:
 
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\tl_release_stages:
         arguments:
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\VersioningLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\CopyToDatabaseLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToFileServerLogic'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\CopyToDatabaseLogic:
         arguments:

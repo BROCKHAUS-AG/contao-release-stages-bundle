@@ -1,0 +1,71 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of contao-release-stages-bundle.
+ *
+ * (c) BROCKHAUS AG 2022 <info@brockhaus-ag.de>
+ * @license GPL-3.0-or-later
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
+ */
+
+namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning;
+
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
+use Exception;
+use Phar;
+use PharData;
+
+class VersioningLogic {
+    private DatabaseLogic $_databaseLogic;
+    private Log $_log;
+
+    public function __construct(DatabaseLogic $databaseLogic, Log $log)
+    {
+        $this->_databaseLogic = $databaseLogic;
+        $this->_log = $log;
+    }
+
+    public function changeVersionNumber() : void
+    {
+        $release_stages = $this->_databaseLogic->getLastRows(2, array("id", "version", "kindOfRelease"),
+            "tl_release_stages");
+        $actualId = $release_stages->id;
+        $kindOfRelease = $release_stages->kindOfRelease;
+
+        $counter = $this->_databaseLogic->countRows($release_stages);
+        $oldVersion = $release_stages->version;
+
+        $newVersion = $this->createVersion($counter, $oldVersion, $kindOfRelease);
+
+        $this->_databaseLogic->updateVersion($actualId, $newVersion);
+    }
+
+    private function createVersion(int $counter, string $oldVersion, string $kindOfRelease) : string
+    {
+        if ($counter > 0) {
+            $version = explode(".", $oldVersion);
+            if (strcmp($kindOfRelease, "release") == 0) {
+                return $this->createRelease($version);
+            }
+            return $this->createMajorRelease($version);
+        }
+        return "1.0";
+    }
+
+    private function createRelease(array $version) : string
+    {
+        $this->_log->info("A new release (version )". ($version[1]+1). " has been requested.");
+        return $version[0]. ".". intval($version[1]+1);
+    }
+
+    private function createMajorRelease(array $version) : string
+    {
+        $this->_log->info("A new major releases (version )". ($version[0]+1). " has been requested:");
+        return intval($version[0]+1). ".0";
+    }
+}

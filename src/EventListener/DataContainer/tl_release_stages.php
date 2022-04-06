@@ -5,70 +5,28 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\CopyToDatabaseLogic;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToFileServerLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\VersioningLogic;
 
 class tl_release_stages
 {
-    private DatabaseLogic $_databaseLogic;
+    private VersioningLogic $_versioningLogic;
     private CopyToDatabaseLogic $_copyToDatabaseLogic;
     private CopyToFileServerLogic $_copyToFileServerLogic;
-    private Log $_log;
 
-    public function __construct(DatabaseLogic $databaseLogic, CopyToDatabaseLogic $copyToDatabaseLogic,
-                                CopyToFileServerLogic $copyToFileServerLogic, Log $log)
+    public function __construct(VersioningLogic $versioningLogic, CopyToDatabaseLogic $copyToDatabaseLogic,
+                                CopyToFileServerLogic $copyToFileServerLogic)
     {
-        $this->_databaseLogic = $databaseLogic;
+        $this->_versioningLogic = $versioningLogic;
         $this->_copyToDatabaseLogic = $copyToDatabaseLogic;
         $this->_copyToFileServerLogic = $copyToFileServerLogic;
-        $this->_log = $log;
     }
 
     public function onSubmitCallback() : void
     {
-        $this->changeVersionNumber();
+        $this->_versioningLogic->changeVersionNumber();
         $this->copy();
-    }
-
-    private function changeVersionNumber() : void
-    {
-        $release_stages = $this->_databaseLogic->getLastRows(2, array("id", "version", "kindOfRelease"),
-            "tl_release_stages");
-        $actualId = $release_stages->id;
-        $kindOfRelease = $release_stages->kindOfRelease;
-
-        $counter = $this->_databaseLogic->countRows($release_stages);
-        $oldVersion = $release_stages->version;
-
-        $newVersion = $this->createVersion($counter, $oldVersion, $kindOfRelease);
-
-        $this->_databaseLogic->updateVersion($actualId, $newVersion);
-    }
-
-    private function createVersion(int $counter, string $oldVersion, string $kindOfRelease) : string
-    {
-        if ($counter > 0) {
-            $version = explode(".", $oldVersion);
-            if (strcmp($kindOfRelease, "release") == 0) {
-                return $this->createRelease($version);
-            }
-            return $this->createMajorRelease($version);
-        }
-        return "1.0";
-    }
-
-    private function createRelease(array $version) : string
-    {
-        $this->_log->info("A new release (version )". ($version[1]+1). " has been requested.");
-        return $version[0]. ".". intval($version[1]+1);
-    }
-
-    private function createMajorRelease(array $version) : string
-    {
-        $this->_log->info("A new major releases (version )". ($version[0]+1). " has been requested:");
-        return intval($version[0]+1). ".0";
     }
 
     private function copy() : void
