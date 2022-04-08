@@ -16,8 +16,10 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
 use Contao\Backend;
 use Contao\Database\Result;
+use Exception;
 
 class DatabaseLogic extends Backend
 {
@@ -38,6 +40,21 @@ class DatabaseLogic extends Backend
             ->execute();
     }
 
+    /**
+     * @throws Exception
+     */
+    public function getLatestReleaseVersion(): Version
+    {
+        $result = $this->Database
+            ->prepare("SELECT id, verion, kindOfRelease FROM tl_release_stages ORDER BY id DESC LIMIT 2")
+            ->execute();
+        if ($result->numRows == 0) {
+            throw new Exception("no entry found");
+        }
+
+        return new Version($result->id, $result->kindOfRelease, $result->version);
+    }
+
     public function getLastRowsWithWhereStatement(array $columns, string $tableName, string $whereStatement) : Result
     {
         return $this->Database->prepare("SELECT ". implode(", ", $columns). " FROM ". $tableName.
@@ -54,7 +71,7 @@ class DatabaseLogic extends Backend
         return $counter;
     }
 
-    public function updateVersion(string $id, string $version) : void
+    public function updateVersion(int $id, string $version) : void
     {
         $this->Database
             ->prepare("UPDATE tl_release_stages %s WHERE id=". $id)

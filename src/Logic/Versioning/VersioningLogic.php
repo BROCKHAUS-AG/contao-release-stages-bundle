@@ -16,9 +16,8 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
 use Exception;
-use Phar;
-use PharData;
 
 class VersioningLogic {
     private DatabaseLogic $_databaseLogic;
@@ -30,31 +29,36 @@ class VersioningLogic {
         $this->_log = $log;
     }
 
-    public function changeVersionNumber() : void
+    public function setNewVersionAutomatically(): void
     {
-        $release_stages = $this->_databaseLogic->getLastRows(2, array("id", "version", "kindOfRelease"),
-            "tl_release_stages");
-        $actualId = $release_stages->id;
-        $kindOfRelease = $release_stages->kindOfRelease;
-
-        $counter = $this->_databaseLogic->countRows($release_stages);
-        $oldVersion = $release_stages->version;
-
-        $newVersion = $this->createVersion($counter, $oldVersion, $kindOfRelease);
-
-        $this->_databaseLogic->updateVersion($actualId, $newVersion);
+        try {
+            $latestVersion = $this->_databaseLogic->getLatestReleaseVersion();
+        } catch (Exception $e) {
+            $latestVersion = $this->createDummyVersion();
+        }
+        die($latestVersion);
+        $this->createAndUpdateToNewVersion($latestVersion);
     }
 
-    private function createVersion(int $counter, string $oldVersion, string $kindOfRelease) : string
+    private function createDummyVersion(): Version
     {
-        if ($counter > 0) {
-            $version = explode(".", $oldVersion);
-            if (strcmp($kindOfRelease, "release") == 0) {
-                return $this->createRelease($version);
-            }
-            return $this->createMajorRelease($version);
+        return new Version(0, "release", "1.0");
+    }
+
+    private function createAndUpdateToNewVersion(Version $latestVersion)
+    {
+        $versionNumber = $this->createVersionNumber($latestVersion);
+        $this->_databaseLogic->updateVersion($latestVersion->getId()+1, $versionNumber);
+    }
+
+
+    private function createVersionNumber(Version $oldVersion) : string
+    {
+        $version = explode(".", $oldVersion->getVersion());
+        if (strcmp($oldVersion->getKindOfRelease(), "release") == 0) {
+            return $this->createRelease($version);
         }
-        return "1.0";
+        return $this->createMajorRelease($version);
     }
 
     private function createRelease(array $version) : string

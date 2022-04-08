@@ -57,14 +57,14 @@ services:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToLocalFileServerLogic'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Local\CopyToLocalFileServerLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToLocalFileServerLogic:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Local\CopyToLocalFileServerLogic:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTPConnection:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPConnection:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
