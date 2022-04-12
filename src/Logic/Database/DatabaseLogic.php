@@ -79,46 +79,69 @@ class DatabaseLogic
 
     /**
      * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
      */
-    public function downloadFromDatabase() : array
+    public function getFullTableInformation() : array
     {
         $tableNames = $this->getTableNamesFromDatabase();
+        return $this->getTableInformationByTableNames($tableNames);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    private function getTableNamesFromDatabase() : array
+    {
+        $testStageDatabaseName = $this->_dbConnection->getDatabase();
+
+        $tables = $this->_dbConnection
+            ->createQueryBuilder()
+            ->select("TABLE_NAME")
+            ->from("INFORMATION_SCHEMA.TABLES")
+            ->where("TABLE_SCHEMA = :tableSchema")
+            ->andWhere("TABLE_NAME LIKE \"tl_%\"")
+            ->setParameter("tableSchema", $testStageDatabaseName)
+            ->execute()
+            ->fetchAllAssociative();
+
+        $ignoredTables = $this->getIgnoredTables();
+        return $this->filterTables($tables, $ignoredTables);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    private function getTableInformationByTableNames(array $tableNames): array
+    {
         $table = array();
         foreach ($tableNames as $tableName)
         {
             $tableContent = $this->_dbConnection
-                ->executeQuery("SELECT * FROM ?", [$tableName]);
+                ->prepare("SELECT * FROM ". $tableName)
+                ->executeQuery()
+                ->fetchAllAssociative();
             $table[] = array($tableName, $tableContent);
         }
         return $table;
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
-    private function getTableNamesFromDatabase() : array
+    private function getIgnoredTables() : array
     {
-        $testStageDatabaseName = $this->_dbConnection->getDatabase();
-        $tables = $this->_dbConnection
-            ->executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = \"?\"
-                                                   AND TABLE_NAME LIKE \"tl_%\"", [$testStageDatabaseName]);
-        $ignoredTables = $this->getIgnoredTables();
-        $tableNames = array();
+        return $this->_ioLogic->getDatabaseIgnoredTablesConfiguration();
+    }
 
-        var_dump();
-        die;
-        while ($tables->next()) {
-            $tableName = $tables->TABLE_NAME;
+    private function filterTables(array $tables, array $ignoredTables): array
+    {
+        $tableNames = array();
+        foreach ($tables as $table) {
+            $tableName = $table["TABLE_NAME"];
             if (!in_array($tableName, $ignoredTables)) {
                 $tableNames[] = $tableName;
             }
         }
         return $tableNames;
-    }
-
-    private function getIgnoredTables() : array
-    {
-        return $this->_ioLogic->getDatabaseIgnoredTablesConfiguration();
     }
 
     /**

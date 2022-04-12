@@ -16,6 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use Doctrine\DBAL\Exception;
 
 class DatabaseCopierLogic
 {
@@ -33,9 +34,13 @@ class DatabaseCopierLogic
         $this->_log = $log;
     }
 
+    /**
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
     public function copy() : void
     {
-        $tables = $this->_databaseLogic->downloadFromDatabase();
+        $tables = $this->_databaseLogic->getFullTableInformation();
 
         echo "to be inserted into/updated table: </br>";
         foreach ($tables as $table) {
