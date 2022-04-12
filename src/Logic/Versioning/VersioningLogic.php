@@ -29,6 +29,10 @@ class VersioningLogic {
         $this->_log = $log;
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function setNewVersionAutomatically(): void
     {
         try {
@@ -36,7 +40,6 @@ class VersioningLogic {
         } catch (Exception $e) {
             $latestVersion = $this->createDummyVersion();
         }
-        die($latestVersion);
         $this->createAndUpdateToNewVersion($latestVersion);
     }
 
@@ -45,6 +48,9 @@ class VersioningLogic {
         return new Version(0, "release", "1.0");
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
     private function createAndUpdateToNewVersion(Version $latestVersion)
     {
         $versionNumber = $this->createVersionNumber($latestVersion);

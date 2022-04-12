@@ -17,6 +17,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\CopyToDatabaseLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToFileServerLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\VersioningLogic;
+use Doctrine\DBAL\Exception;
 
 class ReleaseStagesEventListener
 {
@@ -32,6 +33,10 @@ class ReleaseStagesEventListener
         $this->_copyToFileServerLogic = $copyToFileServerLogic;
     }
 
+    /**
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
     public function onSubmitCallback() : void
     {
         $this->_versioningLogic->setNewVersionAutomatically();

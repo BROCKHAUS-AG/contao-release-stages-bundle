@@ -16,81 +16,91 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
-use Contao\Database;
-use Contao\Database\Result;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
 use Exception;
 
 class DatabaseLogic
 {
-    private Database $_database;
+    private Connection $_dbConnection;
     private IOLogic $_ioLogic;
 
-    public function __construct(Database $database, IOLogic $ioLogic)
+    public function __construct(Connection $dbConnection, IOLogic $ioLogic)
     {
-        $this->_database = $database;
+        $this->_dbConnection = $dbConnection;
         $this->_ioLogic = $ioLogic;
     }
 
     /**
      * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
      */
     public function getLatestReleaseVersion(): Version
     {
-        $result = $this->_database
-            ->prepare("SELECT id, version, kindOfRelease FROM tl_release_stages ORDER BY id DESC LIMIT 2")
-            ->execute();
-        if ($result->numRows == 0) {
+        $result = $this->_dbConnection->createQueryBuilder()
+            ->select("id", "version", "kindOfRelease")
+            ->from("tl_release_stages")
+            ->orderBy("id", "DESC")
+            ->setMaxResults(2)
+            ->execute()
+            ->fetchAllAssociative();
+
+        if ($result[1] == NULL || $result[1]["version"] == NULL) {
             throw new Exception("no entry found");
         }
 
-        return new Version(intval($result->id), $result->kindOfRelease, $result->version);
+        $latestVersion = $result[1];
+        return new Version(intval($latestVersion["id"]), $latestVersion["kindOfRelease"], $latestVersion["version"]);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function getLastRowsWithWhereStatement(array $columns, string $tableName, string $whereStatement) : Result
     {
-        return $this->_database->prepare("SELECT ". implode(", ", $columns). " FROM ". $tableName.
-            " WHERE ". $whereStatement)
-            ->execute();
+        return $this->_dbConnection
+            ->executeQuery("SELECT ". implode(", ", $columns). " FROM ". $tableName.
+                " WHERE ". $whereStatement);
     }
 
-    public function countRows($toCount) : int
-    {
-        $counter = 0;
-        while ($toCount->next()) {
-            $counter++;
-        }
-        return $counter;
-    }
-
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function updateVersion(int $id, string $version) : void
     {
-        $this->_database
-            ->prepare("UPDATE tl_release_stages %s WHERE id=%d")
-            ->set(array("version" => $version, "id" => $id))
-            ->execute(1);
+        $this->_dbConnection
+            ->executeQuery("UPDATE tl_release_stages SET version = ? WHERE id = ?", [$version, $id]);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function downloadFromDatabase(string $testStageDatabaseName) : array
     {
         $tableNames = $this->getTableNamesFromDatabase($testStageDatabaseName);
         $table = array();
         foreach ($tableNames as $tableName)
         {
-            $tableContent = $this->_database->prepare("SELECT * FROM ". $tableName)
-                ->execute()
-                ->fetchAllAssoc();
+            $tableContent = $this->_dbConnection
+                ->executeQuery("SELECT * FROM ?", [$tableName]);
             $table[] = array($tableName, $tableContent);
         }
         return $table;
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
     private function getTableNamesFromDatabase(string $testStageDatabaseName) : array
     {
-        $tables = $this->_database->prepare("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES ".
-            "WHERE TABLE_SCHEMA = \"". $testStageDatabaseName. "\" AND TABLE_NAME LIKE \"tl_%\";")
-            ->execute();
+        $tables = $this->_dbConnection
+            ->executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = \"?\"
+                                                   AND TABLE_NAME LIKE \"tl_%\"", [$testStageDatabaseName]);
         $ignoredTables = $this->getIgnoredTables();
         $tableNames = array();
+
+        var_dump();
+        die;
         while ($tables->next()) {
             $tableName = $tables->TABLE_NAME;
             if (!in_array($tableName, $ignoredTables)) {
@@ -105,17 +115,21 @@ class DatabaseLogic
         return $this->_ioLogic->getDatabaseIgnoredTablesConfiguration();
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function loadHexById(string $column, string $tableName, string $id) : Result
     {
-        return $this->_database->prepare("SELECT hex(". $column. ") FROM ".
-            $tableName. " WHERE id = ".$id)
-            ->execute(1);
+        return $this->_dbConnection
+            ->executeQuery("SELECT hex(?) FROM ? WHERE id = ?", [$column, $tableName, $id]);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function checkForDeletedFilesInTlLogTable() : Result
     {
-        return $this->_database
-            ->prepare("SELECT text FROM tl_log WHERE text LIKE 'File or folder % has been deleted'")
-            ->execute();
+        return $this->_dbConnection
+            ->executeQuery("SELECT text FROM tl_log WHERE text LIKE 'File or folder % has been deleted'");
     }
 }
