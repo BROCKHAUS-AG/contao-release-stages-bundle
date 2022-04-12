@@ -45,7 +45,7 @@ class VersioningLogic {
 
     private function createDummyVersion(): Version
     {
-        return new Version(0, "release", "1.0");
+        return new Version(0, "majorRelease", "0.0");
     }
 
     /**
@@ -54,28 +54,30 @@ class VersioningLogic {
     private function createAndUpdateToNewVersion(Version $latestVersion)
     {
         $versionNumber = $this->createVersionNumber($latestVersion);
-        $this->_databaseLogic->updateVersion($latestVersion->getId()+1, $versionNumber);
+        $this->_databaseLogic->updateVersion($versionNumber);
     }
 
 
-    private function createVersionNumber(Version $oldVersion) : string
+    private function createVersionNumber(Version $latestVersion) : string
     {
-        $version = explode(".", $oldVersion->getVersion());
-        if (strcmp($oldVersion->getKindOfRelease(), "release") == 0) {
-            return $this->createRelease($version);
+        $splitVersion = explode(".", $latestVersion->getVersion());
+        if (strcmp($latestVersion->getKindOfRelease(), "release") != 0) {
+            return $this->createRelease($splitVersion);
         }
-        return $this->createMajorRelease($version);
+        return $this->createMajorRelease($splitVersion);
     }
 
     private function createRelease(array $version) : string
     {
-        $this->_log->info("A new release (version )". ($version[1]+1). " has been requested.");
-        return $version[0]. ".". intval($version[1]+1);
+        $newVersion = $version[0]. ".". intval($version[1]+1);
+        $this->_log->info("A new release (version ". $newVersion. ") has been requested.");
+        return $newVersion;
     }
 
     private function createMajorRelease(array $version) : string
     {
-        $this->_log->info("A new major releases (version )". ($version[0]+1). " has been requested:");
-        return intval($version[0]+1). ".0";
+        $newVersion = intval($version[0]+1). ".0";
+        $this->_log->info("A new major releases (version ". $newVersion. ") has been requested:");
+        return $newVersion;
     }
 }

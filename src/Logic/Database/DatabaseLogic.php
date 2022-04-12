@@ -56,20 +56,25 @@ class DatabaseLogic
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getLastRowsWithWhereStatement(array $columns, string $tableName, string $whereStatement) : Result
+    public function updateVersion(string $version) : void
     {
-        return $this->_dbConnection
-            ->executeQuery("SELECT ". implode(", ", $columns). " FROM ". $tableName.
-                " WHERE ". $whereStatement);
+        $this->_dbConnection
+            ->createQueryBuilder()
+            ->update("tl_release_stages")
+            ->set("version", ":version")
+            ->where("version = \"None\"")
+            ->setParameter("version", $version)
+            ->execute();
     }
 
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    public function updateVersion(int $id, string $version) : void
+    public function getLastRowsWithWhereStatement(array $columns, string $tableName, string $whereStatement) : Result
     {
-        $this->_dbConnection
-            ->executeQuery("UPDATE tl_release_stages SET version = ? WHERE id = ?", [$version, $id]);
+        return $this->_dbConnection
+            ->executeQuery("SELECT ". implode(", ", $columns). " FROM ". $tableName.
+                " WHERE ". $whereStatement);
     }
 
     /**
