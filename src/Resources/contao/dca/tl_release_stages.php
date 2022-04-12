@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-use BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\tl_release_stages;
+use BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStagesEventListener;
 
 $GLOBALS['TL_DCA']['tl_release_stages'] = array(
     'config' => array(
@@ -24,7 +24,7 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
             )
         ),
         'onsubmit_callback' => array(
-            array(tl_release_stages::class, 'onSubmitCallback'),
+            array(ReleaseStagesEventListener::class, 'onSubmitCallback'),
         )
     ),
     'list' => array(

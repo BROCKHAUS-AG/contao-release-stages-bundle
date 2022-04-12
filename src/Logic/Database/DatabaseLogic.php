@@ -14,30 +14,21 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
-use Contao\Backend;
+use Contao\Database;
 use Contao\Database\Result;
 use Exception;
 
-class DatabaseLogic extends Backend
+class DatabaseLogic
 {
-    private Log $_log;
+    private Database $_database;
     private IOLogic $_ioLogic;
 
-    public function __construct(IOLogic $ioLogic, Log $log)
+    public function __construct(Database $database, IOLogic $ioLogic)
     {
+        $this->_database = $database;
         $this->_ioLogic = $ioLogic;
-        $this->_log = $log;
-    }
-
-    public function getLastRows(int $count, array $columns, string $tableName) : Result
-    {
-        return $this->Database
-            ->prepare("SELECT ". implode(", ", $columns). " FROM ". $tableName.
-                " ORDER BY id DESC LIMIT ". $count)
-            ->execute();
     }
 
     /**
@@ -45,19 +36,19 @@ class DatabaseLogic extends Backend
      */
     public function getLatestReleaseVersion(): Version
     {
-        $result = $this->Database
-            ->prepare("SELECT id, verion, kindOfRelease FROM tl_release_stages ORDER BY id DESC LIMIT 2")
+        $result = $this->_database
+            ->prepare("SELECT id, version, kindOfRelease FROM tl_release_stages ORDER BY id DESC LIMIT 2")
             ->execute();
         if ($result->numRows == 0) {
             throw new Exception("no entry found");
         }
 
-        return new Version($result->id, $result->kindOfRelease, $result->version);
+        return new Version(intval($result->id), $result->kindOfRelease, $result->version);
     }
 
     public function getLastRowsWithWhereStatement(array $columns, string $tableName, string $whereStatement) : Result
     {
-        return $this->Database->prepare("SELECT ". implode(", ", $columns). " FROM ". $tableName.
+        return $this->_database->prepare("SELECT ". implode(", ", $columns). " FROM ". $tableName.
             " WHERE ". $whereStatement)
             ->execute();
     }
@@ -73,9 +64,9 @@ class DatabaseLogic extends Backend
 
     public function updateVersion(int $id, string $version) : void
     {
-        $this->Database
-            ->prepare("UPDATE tl_release_stages %s WHERE id=". $id)
-            ->set(array("version" => $version))
+        $this->_database
+            ->prepare("UPDATE tl_release_stages %s WHERE id=%d")
+            ->set(array("version" => $version, "id" => $id))
             ->execute(1);
     }
 
@@ -85,7 +76,7 @@ class DatabaseLogic extends Backend
         $table = array();
         foreach ($tableNames as $tableName)
         {
-            $tableContent = $this->Database->prepare("SELECT * FROM ". $tableName)
+            $tableContent = $this->_database->prepare("SELECT * FROM ". $tableName)
                 ->execute()
                 ->fetchAllAssoc();
             $table[] = array($tableName, $tableContent);
@@ -95,7 +86,7 @@ class DatabaseLogic extends Backend
 
     private function getTableNamesFromDatabase(string $testStageDatabaseName) : array
     {
-        $tables = $this->Database->prepare("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES ".
+        $tables = $this->_database->prepare("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES ".
             "WHERE TABLE_SCHEMA = \"". $testStageDatabaseName. "\" AND TABLE_NAME LIKE \"tl_%\";")
             ->execute();
         $ignoredTables = $this->getIgnoredTables();
@@ -116,14 +107,14 @@ class DatabaseLogic extends Backend
 
     public function loadHexById(string $column, string $tableName, string $id) : Result
     {
-        return $this->Database->prepare("SELECT hex(". $column. ") FROM ".
+        return $this->_database->prepare("SELECT hex(". $column. ") FROM ".
             $tableName. " WHERE id = ".$id)
             ->execute(1);
     }
 
     public function checkForDeletedFilesInTlLogTable() : Result
     {
-        return $this->Database
+        return $this->_database
             ->prepare("SELECT text FROM tl_log WHERE text LIKE 'File or folder % has been deleted'")
             ->execute();
     }

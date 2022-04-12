@@ -18,7 +18,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\CopyToDatabaseLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToFileServerLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\VersioningLogic;
 
-class tl_release_stages
+class ReleaseStagesEventListener
 {
     private VersioningLogic $_versioningLogic;
     private CopyToDatabaseLogic $_copyToDatabaseLogic;

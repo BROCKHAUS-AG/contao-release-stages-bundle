@@ -28,7 +28,7 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
-    BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\tl_release_stages:
+    BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStagesEventListener:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\VersioningLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\CopyToDatabaseLogic'
@@ -43,8 +43,8 @@ services:
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic:
         arguments:
+            - '@database_connection'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\ProdDatabaseLogic:
         arguments:
