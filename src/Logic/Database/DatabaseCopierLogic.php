@@ -16,6 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
 use Doctrine\DBAL\Exception;
 
 class DatabaseCopierLogic
@@ -38,16 +39,12 @@ class DatabaseCopierLogic
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
-    public function copy() : void
+    public function copy(): void
     {
-        $tables = $this->_databaseLogic->getFullTableInformation();
+        $tableInformation = $this->_databaseLogic->getFullTableInformation();
 
-        echo "to be inserted into/updated table: </br>";
-        foreach ($tables as $table) {
-            $tableName = $table[0];
-            $tableContent = $table[1];
-            echo $tableName. "</br>";
-            $commandsToBeExecuted = $this->create($tableName, $tableContent);
+        foreach ($tableInformation->get() as $table) {
+            $commandsToBeExecuted = $this->createCommandsToBeExecuted($table);
             $this->_prodDatabaseLogic->runSqlCommandsOnProdDatabase($commandsToBeExecuted);
         }
 
@@ -55,39 +52,38 @@ class DatabaseCopierLogic
         $this->checkForDeleteFromInTlLogTable($lastId);
     }
 
-    private function create(string $tableName, array $tableContent) : array
+    private function createCommandsToBeExecuted(TableInformation $tableInformation): array
     {
-        $values = $this->createColumnWithValuesForCommand($tableName, $tableContent);
-        return $this->createCommands($values, $tableName);
+        $values = $this->createColumnWithValuesForCommand($tableInformation);
+        return $this->createCommandsWithValueForTable($values, $tableInformation->getName());
     }
 
-    private function checkForDeleteFromInTlLogTable(int $lastId) : void
+    private function createColumnWithValuesForCommand(TableInformation $tableInformation): array
     {
-        $whereStatement = "id > ". $lastId. " AND text LIKE \"DELETE FROM %\"";
-        $res = $this->_databaseLogic->getLastRowsWithWhereStatement(array("text"), "tl_log", $whereStatement)
-            ->fetchAllAssoc();
-
-        $deleteStatements = array();
-        foreach ($res as $statement) {
-            $deleteStatements[] = $statement["text"];
-        }
-        $this->_prodDatabaseLogic->runSqlCommandsOnProdDatabase($deleteStatements);
-    }
-
-    private function createColumnWithValuesForCommand(string $tableName, array $tableContent) : array
-    {
-        $tableSchemes = $this->_prodDatabaseLogic->getTableSchemes($tableName);
+        $tableSchemes = $this->_prodDatabaseLogic->getTableSchemes($tableInformation->getName());
         $values = array();
-        foreach ($tableContent as $column) {
-            if (strcmp($tableName, "tl_page") == 0 && strcmp($column["type"], "root") == 0) {
+        foreach ($tableInformation->getContent() as $column) {
+            if (strcmp($tableInformation->getName(), "tl_page") == 0 && strcmp($column["type"], "root") == 0) {
                 $column["dns"] = $this->changeDNSEntryForProd($column["alias"]);
             }
-            $values[] = $this->createColumnWithValueForCommand($column, $tableSchemes, $tableName);
+            $values[] = $this->createColumnWithValueForCommand($column, $tableSchemes, $tableInformation->getName());
         }
         return $values;
     }
 
-    private function createColumnWithValueForCommand(array $column, array $tableSchemes, string $tableName) : array
+    private function changeDNSEntryForProd(string $alias): string
+    {
+        $dnsRecords = $this->_ioLogic->getDNSRecords();
+        for ($x = 0; $x != $dnsRecords->getLength(); $x++) {
+            $dnsRecord = $dnsRecords->getByIndex($x);
+            if (strcmp($dnsRecord->getAlias(), $alias) == 0) {
+                return $dnsRecord->getDns();
+            }
+        }
+        return "";
+    }
+
+    private function createColumnWithValueForCommand(array $column, array $tableSchemes, string $tableName): array
     {
         $index = 0;
         $tableSchemeFields = array();
@@ -128,7 +124,32 @@ class DatabaseCopierLogic
         return $this->createReturnValue($rows, $tableSchemeFields, $columnAndValue);
     }
 
-    private function createReturnValue(array $rows, array $tableSchemeFields, array $columnAndValue) : array
+    private function createCommandsWithValueForTable(array $values, string $tableName): array
+    {
+        $commandsToBeExecuted = array();
+        foreach ($values as $value) {
+            $commandsToBeExecuted[]
+                = 'INSERT INTO '. $this->_prodDatabaseLogic->prodDatabase. '.'. $tableName. ' ('. $value["columnName"].
+                ') VALUES ('. $value["value"]. ') ON DUPLICATE KEY UPDATE '. $value["updateColumnAndValue"]. ';';
+        }
+        if ($commandsToBeExecuted == null) return array();
+        return $commandsToBeExecuted;
+    }
+
+    private function checkForDeleteFromInTlLogTable(int $lastId): void
+    {
+        $whereStatement = "id > ". $lastId. " AND text LIKE \"DELETE FROM %\"";
+        $res = $this->_databaseLogic->getLastRowsWithWhereStatement(array("text"), "tl_log", $whereStatement)
+            ->fetchAllAssoc();
+
+        $deleteStatements = array();
+        foreach ($res as $statement) {
+            $deleteStatements[] = $statement["text"];
+        }
+        $this->_prodDatabaseLogic->runSqlCommandsOnProdDatabase($deleteStatements);
+    }
+
+    private function createReturnValue(array $rows, array $tableSchemeFields, array $columnAndValue): array
     {
         $value = implode(", ", $rows);
         $columnName = implode(", ", $tableSchemeFields);
@@ -139,29 +160,5 @@ class DatabaseCopierLogic
             "value" => $value,
             "updateColumnAndValue" => $updateColumnAndValue
         );
-    }
-
-    private function changeDNSEntryForProd(string $alias) : string
-    {
-        $dnsRecords = $this->_ioLogic->getDNSRecords();
-        for ($x = 0; $x != $dnsRecords->getLength(); $x++) {
-            $dnsRecord = $dnsRecords->getByIndex($x);
-            if (strcmp($dnsRecord->getAlias(), $alias) == 0) {
-                return $dnsRecord->getDns();
-            }
-        }
-        return "";
-    }
-
-    private function createCommands(array $values, string $tableName) : array
-    {
-        $commandsToBeExecuted = array();
-        foreach ($values as $value) {
-            $commandsToBeExecuted[]
-                = 'INSERT INTO '. $this->_prodDatabaseLogic->prodDatabase. '.'. $tableName. ' ('. $value["columnName"].
-                ') VALUES ('. $value["value"]. ') ON DUPLICATE KEY UPDATE '. $value["updateColumnAndValue"]. ';';
-        }
-        if ($commandsToBeExecuted == null) return array();
-        return $commandsToBeExecuted;
     }
 }

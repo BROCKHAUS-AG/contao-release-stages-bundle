@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\ArrayOfTableInformation;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
@@ -81,7 +83,7 @@ class DatabaseLogic
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
-    public function getFullTableInformation() : array
+    public function getFullTableInformation(): ArrayOfTableInformation
     {
         $tableNames = $this->getTableNamesFromDatabase();
         return $this->getTableInformationByTableNames($tableNames);
@@ -113,18 +115,18 @@ class DatabaseLogic
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
-    private function getTableInformationByTableNames(array $tableNames): array
+    private function getTableInformationByTableNames(array $tableNames): ArrayOfTableInformation
     {
-        $table = array();
+        $tableInformation = new ArrayOfTableInformation();
         foreach ($tableNames as $tableName)
         {
             $tableContent = $this->_dbConnection
                 ->prepare("SELECT * FROM ". $tableName)
                 ->executeQuery()
                 ->fetchAllAssociative();
-            $table[] = array($tableName, $tableContent);
+            $tableInformation->add(new TableInformation($tableName, $tableContent));
         }
-        return $table;
+        return $tableInformation;
     }
 
     private function getIgnoredTables() : array
