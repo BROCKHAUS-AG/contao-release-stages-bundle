@@ -16,9 +16,8 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
-use Contao\Backend;
 
-class CopyToDatabaseLogic extends Backend
+class DatabaseCopierLogic
 {
     private Log $_log;
     private DatabaseLogic $_databaseLogic;
@@ -34,7 +33,7 @@ class CopyToDatabaseLogic extends Backend
         $this->_log = $log;
     }
 
-    public function copyToDatabase() : void
+    public function copy() : void
     {
         $testStageDatabaseName = $this->_ioLogic->getTestStageDatabaseName();
         $tables = $this->_databaseLogic->downloadFromDatabase($testStageDatabaseName);

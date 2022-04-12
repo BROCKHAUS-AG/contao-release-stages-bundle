@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic\FileServer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\LoadFromLocalLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\LocalLoaderLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\ArrayOfFile;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\ArrayOfDNSRecords;
@@ -38,8 +38,8 @@ class LoadFromLocalLogicTest extends ContaoTestCase
 {
     public function testInstantiation(): void
     {
-        $loadFromLocalMock = self::createMock(LoadFromLocalLogic::class);
-        self::assertInstanceOf(LoadFromLocalLogic::class, $loadFromLocalMock);
+        $loadFromLocalMock = self::createMock(LocalLoaderLogic::class);
+        self::assertInstanceOf(LocalLoaderLogic::class, $loadFromLocalMock);
     }
 
     /**
@@ -50,10 +50,10 @@ class LoadFromLocalLogicTest extends ContaoTestCase
         $expected = "test/prodPath/hello";
         $input = "test/path/hello";
 
-        $class = new ReflectionClass(LoadFromLocalLogic::class);
+        $class = new ReflectionClass(LocalLoaderLogic::class);
         $method = $class->getMethod("changePathToProdPath");
         $method->setAccessible(true);
-        $loadFromLocalMock = new LoadFromLocalLogic(self::createMock(IOLogic::class),
+        $loadFromLocalMock = new LocalLoaderLogic(self::createMock(IOLogic::class),
             self::createMock(Log::class), "path", "prodPath");
 
         $actual = $method->invokeArgs($loadFromLocalMock, [$input]);
@@ -71,7 +71,7 @@ class LoadFromLocalLogicTest extends ContaoTestCase
         $expected->add(new File(0, $files[0], "prodPath/test/a.a"));
         $expected->add(new File(0, $files[1], "prodPath/test/a.b"));
 
-        $loadFromLocalMock = self::createMock(LoadFromLocalLogic::class);
+        $loadFromLocalMock = self::createMock(LocalLoaderLogic::class);
         $reflection = new ReflectionClass($loadFromLocalMock);
         $reflection_property = $reflection->getProperty("_path");
         $reflection_property->setAccessible(true);
@@ -79,7 +79,7 @@ class LoadFromLocalLogicTest extends ContaoTestCase
         $reflection_property = $reflection->getProperty("_prodPath");
         $reflection_property->setAccessible(true);
         $reflection_property->setValue($loadFromLocalMock, "prodPath");
-        $class = new ReflectionClass(LoadFromLocalLogic::class);
+        $class = new ReflectionClass(LocalLoaderLogic::class);
         $method = $class->getMethod("loadFiles");
         $method->setAccessible(true);
 

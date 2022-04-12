@@ -19,7 +19,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\ArrayOfFile;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
-class LoadFromLocalLogic {
+class LocalLoaderLogic {
     private IOLogic $_ioLogic;
     private Log $_log;
     protected string $_path;

@@ -14,23 +14,23 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\CopyToDatabaseLogic;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToFileServerLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopierLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServerCopierLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\VersioningLogic;
 use Doctrine\DBAL\Exception;
 
 class ReleaseStagesEventListener
 {
     private VersioningLogic $_versioningLogic;
-    private CopyToDatabaseLogic $_copyToDatabaseLogic;
-    private CopyToFileServerLogic $_copyToFileServerLogic;
+    private DatabaseCopierLogic $_databaseCopierLogic;
+    private FileServerCopierLogic $_fileServerCopierLogic;
 
-    public function __construct(VersioningLogic $versioningLogic, CopyToDatabaseLogic $copyToDatabaseLogic,
-                                CopyToFileServerLogic $copyToFileServerLogic)
+    public function __construct(VersioningLogic $versioningLogic, DatabaseCopierLogic $databaseCopierLogic,
+                                FileServerCopierLogic $fileServerCopierLogic)
     {
         $this->_versioningLogic = $versioningLogic;
-        $this->_copyToDatabaseLogic = $copyToDatabaseLogic;
-        $this->_copyToFileServerLogic = $copyToFileServerLogic;
+        $this->_databaseCopierLogic = $databaseCopierLogic;
+        $this->_fileServerCopierLogic = $fileServerCopierLogic;
     }
 
     /**
@@ -40,7 +40,7 @@ class ReleaseStagesEventListener
     public function onSubmitCallback() : void
     {
         $this->_versioningLogic->setNewVersionAutomatically();
-        $this->_copyToDatabaseLogic->copyToDatabase();
-        $this->_copyToFileServerLogic->copyToFileServer();
+        $this->_databaseCopierLogic->copy();
+        $this->_fileServerCopierLogic->copy();
     }
 }
