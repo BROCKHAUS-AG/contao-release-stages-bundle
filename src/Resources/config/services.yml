@@ -48,6 +48,7 @@ services:
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\ProdDatabaseLogic:
         arguments:
+            - '@database_connection'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
         calls:

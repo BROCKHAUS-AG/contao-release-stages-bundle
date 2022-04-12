@@ -17,17 +17,20 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
+use Doctrine\DBAL\Connection;
 use mysqli;
 
 class ProdDatabaseLogic
 {
+    private Connection $_dbConnection;
     private IOLogic $_ioLogic;
     private Log $_log;
     private mysqli $_conn;
     public string $prodDatabase;
 
-    public function __construct(IOLogic $ioLogic, Log $log)
+    public function __construct(Connection $dbConnection, IOLogic $ioLogic, Log $log)
     {
+        $this->_dbConnection = $dbConnection;
         $this->_ioLogic = $ioLogic;
         $this->_log = $log;
     }
@@ -92,7 +95,7 @@ class ProdDatabaseLogic
     private function createConnectionToProdDatabase(Database $database): mysqli
     {
         $conn = new mysqli($database->getServer(), $database->getUsername(), $database->getPassword(),
-            $database->getTestStageDatabaseName(), $database->getPort());
+            $this->_dbConnection->getDatabase(), $database->getPort());
         if ($conn->connect_error) {
             $error_message = "Connection failed: " . $conn->connect_error;
             $this->_log->logErrorAndDie($error_message);
