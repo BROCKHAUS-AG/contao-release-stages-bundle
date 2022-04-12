@@ -41,6 +41,6 @@ class ReleaseStagesEventListener
     {
         $this->_versioningLogic->setNewVersionAutomatically();
         $this->_databaseCopierLogic->copy();
-        $this->_fileServerCopierLogic->copy();
+        // $this->_fileServerCopierLogic->copy();
     }
 }

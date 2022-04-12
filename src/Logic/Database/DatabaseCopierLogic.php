@@ -35,8 +35,7 @@ class DatabaseCopierLogic
 
     public function copy() : void
     {
-        $testStageDatabaseName = $this->_ioLogic->getTestStageDatabaseName();
-        $tables = $this->_databaseLogic->downloadFromDatabase($testStageDatabaseName);
+        $tables = $this->_databaseLogic->downloadFromDatabase();
 
         echo "to be inserted into/updated table: </br>";
         foreach ($tables as $table) {

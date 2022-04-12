@@ -45,11 +45,6 @@ class IOLogic {
         return $this->getConfig()->getDatabase();
     }
 
-    public function getTestStageDatabaseName() : string
-    {
-        return $this->getConfig()->getDatabase()->getTestStageDatabaseName();
-    }
-
     public function getDatabaseIgnoredTablesConfiguration() : array
     {
         $ignoredTables = $this->getConfig()->getDatabase()->getIgnoredTables();

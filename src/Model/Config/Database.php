@@ -12,10 +12,9 @@ class Database
     private string $username;
     private string $password;
     private array $ignoredTables;
-    private string $testStageDatabaseName;
 
     public function __construct(string $server, string $name, int $port, string $username, string $password,
-                                array $ignoredTables, string $testStageDatabaseName)
+                                array $ignoredTables)
     {
         $this->server = $server;
         $this->name = $name;
@@ -23,7 +22,6 @@ class Database
         $this->username = $username;
         $this->password = $password;
         $this->ignoredTables = $ignoredTables;
-        $this->testStageDatabaseName = $testStageDatabaseName;
     }
 
     public function getServer(): string
@@ -54,10 +52,5 @@ class Database
     public function getIgnoredTables(): array
     {
         return $this->ignoredTables;
-    }
-
-    public function getTestStageDatabaseName(): string
-    {
-        return $this->testStageDatabaseName;
     }
 }

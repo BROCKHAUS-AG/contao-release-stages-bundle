@@ -40,11 +40,10 @@ class MapDatabaseTest extends ContaoTestCase
             "ignoredTables": [
                 "tl_to_be_ignored",
                 "tl_to_be_ignored_too"
-            ],
-            "testStageDatabaseName": "testContao"
+            ]
         }';
         $expected = new Database("192.168.0.2", "prodContao", 3306, "prodContao",
-            "admin1234", array("tl_to_be_ignored", "tl_to_be_ignored_too"), "testContao");
+            "admin1234", array("tl_to_be_ignored", "tl_to_be_ignored_too"));
         $mapper = new MapDatabase();
 
         $actual = $mapper->map(json_decode($input));
@@ -54,6 +53,5 @@ class MapDatabaseTest extends ContaoTestCase
         self::assertSame($expected->getPort(), $actual->getPort());
         self::assertSame($expected->getPassword(), $actual->getPassword());
         self::assertSame($expected->getIgnoredTables(), $actual->getIgnoredTables());
-        self::assertSame($expected->getTestStageDatabaseName(), $actual->getTestStageDatabaseName());
     }
 }

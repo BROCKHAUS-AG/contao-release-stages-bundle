@@ -51,14 +51,13 @@ class SystemConfigTest extends ContaoTestCase
 
     /**
      * @throws ConfigNotFoundException
-     * @throws FileNotFoundException
      */
     public function testGetConfig_shouldReturnConfig(): void
     {
         $systemConfig = new SystemConfig("", self::createMock(MapConfig::class),
             self::createMock(Log::class));
         $expectedDatabase = new Database("192.168.0.2", "prodContao", 3306, "prodContao",
-            "admin1234", array("tl_to_be_ignored", "tl_to_be_ignored_too"), "testContao");
+            "admin1234", array("tl_to_be_ignored", "tl_to_be_ignored_too"));
         $expectedFileServer = new FileServer("192.168.178.23", 1234, "admin", "admin1234",
             false, "test");
         $expectedLocal = new Local("test");
@@ -81,8 +80,6 @@ class SystemConfigTest extends ContaoTestCase
         self::assertSame($expectedDatabase->getUsername(), $actual->getDatabase()->getUsername());
         self::assertSame($expectedDatabase->getPassword(), $actual->getDatabase()->getPassword());
         self::assertSame($expectedDatabase->getIgnoredTables(), $actual->getDatabase()->getIgnoredTables());
-        self::assertSame($expectedDatabase->getTestStageDatabaseName(),
-            $actual->getDatabase()->getTestStageDatabaseName());
         self::assertSame($expected->getCopyTo(), $actual->getCopyTo());
         self::assertSame($expectedFileServer->getServer(), $actual->getFileServer()->getServer());
         self::assertSame($expectedFileServer->getPort(), $actual->getFileServer()->getPort());

@@ -67,22 +67,6 @@ class IOLogicTest extends ContaoTestCase
         self::assertSame($expected->getUsername(), $actual->getUsername());
         self::assertSame($expected->getPassword(), $actual->getPassword());
         self::assertSame($expected->getIgnoredTables(), $actual->getIgnoredTables());
-        self::assertSame($expected->getTestStageDatabaseName(), $actual->getTestStageDatabaseName());
-    }
-
-    public function testGetTestStageDatabaseName(): void
-    {
-        $database = new Database("server", "name", 0, "username", "password", array(),
-            "testStageDatabaseName");
-        $willReturn = new Config($database, "", self::createMock(FileServer::class),
-            self::createMock(Local::class),
-            self::createMock(ArrayOfDNSRecords::class), array());
-        $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
-        $expected = $database->getTestStageDatabaseName();
-
-        $actual = $ioLogic->getTestStageDatabaseName();
-
-        self::assertSame($expected, $actual);
     }
 
     public function testGetDatabaseIgnoredTablesConfiguration(): void

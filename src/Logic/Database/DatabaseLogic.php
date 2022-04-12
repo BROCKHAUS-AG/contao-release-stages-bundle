@@ -80,9 +80,9 @@ class DatabaseLogic
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    public function downloadFromDatabase(string $testStageDatabaseName) : array
+    public function downloadFromDatabase() : array
     {
-        $tableNames = $this->getTableNamesFromDatabase($testStageDatabaseName);
+        $tableNames = $this->getTableNamesFromDatabase();
         $table = array();
         foreach ($tableNames as $tableName)
         {
@@ -96,8 +96,9 @@ class DatabaseLogic
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    private function getTableNamesFromDatabase(string $testStageDatabaseName) : array
+    private function getTableNamesFromDatabase() : array
     {
+        $testStageDatabaseName = $this->_dbConnection->getDatabase();
         $tables = $this->_dbConnection
             ->executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = \"?\"
                                                    AND TABLE_NAME LIKE \"tl_%\"", [$testStageDatabaseName]);

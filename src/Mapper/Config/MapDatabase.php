@@ -18,8 +18,7 @@ class MapDatabase extends Map {
             $data->port,
             $data->username,
             $data->password,
-            $data->ignoredTables,
-            $data->testStageDatabaseName
+            $data->ignoredTables
         );
     }
 }

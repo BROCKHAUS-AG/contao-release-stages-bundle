@@ -49,8 +49,7 @@ class MapConfigTest extends ContaoTestCase
                 "ignoredTables": [
                   "tl_to_be_ignored",
                   "tl_to_be_ignored_too"
-                ],
-                "testStageDatabaseName": "testContao"
+                ]
               },
               "copyTo": "fileServer",
               "fileServer": {
@@ -83,7 +82,7 @@ class MapConfigTest extends ContaoTestCase
         ';
 
         $expectedDatabase = new Database("192.168.0.2", "prodContao", 3306, "prodContao",
-            "admin1234", array("tl_to_be_ignored", "tl_to_be_ignored_too"), "testContao");
+            "admin1234", array("tl_to_be_ignored", "tl_to_be_ignored_too"));
         $expectedFileServer = new FileServer("192.168.178.23", 1234, "admin", "admin1234",
             false, "test");
         $expectedLocal = new Local("test");
@@ -102,8 +101,6 @@ class MapConfigTest extends ContaoTestCase
         self::assertSame($expectedDatabase->getUsername(), $actual->getDatabase()->getUsername());
         self::assertSame($expectedDatabase->getPassword(), $actual->getDatabase()->getPassword());
         self::assertSame($expectedDatabase->getIgnoredTables(), $actual->getDatabase()->getIgnoredTables());
-        self::assertSame($expectedDatabase->getTestStageDatabaseName(),
-            $actual->getDatabase()->getTestStageDatabaseName());
         self::assertSame($expected->getCopyTo(), $actual->getCopyTo());
         self::assertSame($expectedFileServer->getServer(), $actual->getFileServer()->getServer());
         self::assertSame($expectedFileServer->getPort(), $actual->getFileServer()->getPort());
