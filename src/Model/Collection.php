@@ -29,7 +29,8 @@ abstract class Collection
      */
     public function remove(int $index): void
     {
-        unset($this->items[$index]);
+        array_splice($this->items, $index, 1);
+        //unset($this->items[$index]);
     }
 
     /**
