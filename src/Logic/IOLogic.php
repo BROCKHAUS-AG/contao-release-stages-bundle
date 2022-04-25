@@ -16,7 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\ConfigNotFoundException;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\ArrayOfDNSRecords;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
@@ -52,7 +52,7 @@ class IOLogic {
         return $ignoredTables;
     }
 
-    public function getDNSRecords() : ArrayOfDNSRecords
+    public function getDNSRecords() : DNSRecordCollection
     {
         return $this->getConfig()->getDnsRecords();
     }

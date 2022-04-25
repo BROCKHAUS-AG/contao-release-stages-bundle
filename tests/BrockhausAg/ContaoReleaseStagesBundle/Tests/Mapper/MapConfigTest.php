@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\ArrayOfDNSRecords;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecord;
@@ -86,7 +86,7 @@ class MapConfigTest extends ContaoTestCase
         $expectedFileServer = new FileServer("192.168.178.23", 1234, "admin", "admin1234",
             false, "test");
         $expectedLocal = new Local("test");
-        $expectedDNSRecords = new ArrayOfDNSRecords();
+        $expectedDNSRecords = new DNSRecordCollection();
         $expectedDNSRecords->add(new DNSRecord("example-site", "www.example-site.de"));
         $expectedDNSRecords->add(new DNSRecord("example-site-better", "www.example-site-better.de"));
         $expected = new Config($expectedDatabase, "fileServer", $expectedFileServer, $expectedLocal,

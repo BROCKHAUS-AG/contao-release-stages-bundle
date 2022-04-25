@@ -20,7 +20,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FileServerCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Local\LocalFileServerCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\ArrayOfFile;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use Contao\Backend;
 
@@ -72,7 +72,7 @@ class FileServerCopierLogic extends Backend {
         return "";
     }
 
-    private function createDirectories(ArrayOfFile $files) : void
+    private function createDirectories(FileCollection $files) : void
     {
         for ($x = 0; $x != count($files->get()); $x++)
         {
@@ -110,7 +110,7 @@ class FileServerCopierLogic extends Backend {
         return $directories;
     }
 
-    private function compareAndCopyFiles(ArrayOfFile $files) : void
+    private function compareAndCopyFiles(FileCollection $files) : void
     {
         for ($x = 0; $x != count($files->get()); $x++)
         {

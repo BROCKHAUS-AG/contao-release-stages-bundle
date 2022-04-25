@@ -48,26 +48,37 @@ class DatabaseCopierLogic
             $this->_prodDatabaseLogic->runSqlCommandsOnProdDatabase($commandsToBeExecuted);
         }
 
-        $lastId = $this->_prodDatabaseLogic->getLastIdFromTable("tl_log");
+        $lastId = $this->_prodDatabaseLogic->getLastIdFromTlLogTable();
+        die($lastId);
         $this->checkForDeleteFromInTlLogTable($lastId);
     }
 
+    /**
+     * @throws Exception
+     */
     private function createCommandsToBeExecuted(TableInformation $tableInformation): array
     {
         $values = $this->createColumnWithValuesForCommand($tableInformation);
         return $this->createCommandsWithValueForTable($values, $tableInformation->getName());
     }
 
+    /**
+     * @throws Exception
+     */
     private function createColumnWithValuesForCommand(TableInformation $tableInformation): array
     {
         $tableSchemes = $this->_prodDatabaseLogic->getTableSchemes($tableInformation->getName());
         $values = array();
+        echo "test";
         foreach ($tableInformation->getContent() as $column) {
             if (strcmp($tableInformation->getName(), "tl_page") == 0 && strcmp($column["type"], "root") == 0) {
                 $column["dns"] = $this->changeDNSEntryForProd($column["alias"]);
             }
             $values[] = $this->createColumnWithValueForCommand($column, $tableSchemes, $tableInformation->getName());
         }
+        echo "test1";
+        var_dump($values);
+        die;
         return $values;
     }
 
@@ -83,6 +94,9 @@ class DatabaseCopierLogic
         return "";
     }
 
+    /**
+     * @throws Exception
+     */
     private function createColumnWithValueForCommand(array $column, array $tableSchemes, string $tableName): array
     {
         $index = 0;
@@ -129,13 +143,16 @@ class DatabaseCopierLogic
         $commandsToBeExecuted = array();
         foreach ($values as $value) {
             $commandsToBeExecuted[]
-                = 'INSERT INTO '. $this->_prodDatabaseLogic->prodDatabase. '.'. $tableName. ' ('. $value["columnName"].
+                = 'INSERT INTO '. $this->_prodDatabaseLogic->_prodDatabaseName. '.'. $tableName. ' ('. $value["columnName"].
                 ') VALUES ('. $value["value"]. ') ON DUPLICATE KEY UPDATE '. $value["updateColumnAndValue"]. ';';
         }
         if ($commandsToBeExecuted == null) return array();
         return $commandsToBeExecuted;
     }
 
+    /**
+     * @throws Exception
+     */
     private function checkForDeleteFromInTlLogTable(int $lastId): void
     {
         $whereStatement = "id > ". $lastId. " AND text LIKE \"DELETE FROM %\"";

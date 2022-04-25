@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\ArrayOfTableInformation;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
 use Doctrine\DBAL\Connection;
@@ -83,7 +83,7 @@ class DatabaseLogic
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
-    public function getFullTableInformation(): ArrayOfTableInformation
+    public function getFullTableInformation(): TableInformationCollection
     {
         $tableNames = $this->getTableNamesFromDatabase();
         return $this->getTableInformationByTableNames($tableNames);
@@ -107,7 +107,7 @@ class DatabaseLogic
             ->execute()
             ->fetchAllAssociative();
 
-        $ignoredTables = $this->getIgnoredTables();
+        $ignoredTables = $this->getIgnoredTablesFromConfigurationFile();
         return $this->filterTables($tables, $ignoredTables);
     }
 
@@ -115,9 +115,9 @@ class DatabaseLogic
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
-    private function getTableInformationByTableNames(array $tableNames): ArrayOfTableInformation
+    private function getTableInformationByTableNames(array $tableNames): TableInformationCollection
     {
-        $tableInformation = new ArrayOfTableInformation();
+        $tableInformation = new TableInformationCollection();
         foreach ($tableNames as $tableName)
         {
             $tableContent = $this->_dbConnection
@@ -129,7 +129,7 @@ class DatabaseLogic
         return $tableInformation;
     }
 
-    private function getIgnoredTables() : array
+    private function getIgnoredTablesFromConfigurationFile() : array
     {
         return $this->_ioLogic->getDatabaseIgnoredTablesConfiguration();
     }

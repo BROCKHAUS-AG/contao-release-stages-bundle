@@ -15,7 +15,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\ArrayOfDNSRecords;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecord;
@@ -56,7 +56,7 @@ class IOLogicTest extends ContaoTestCase
             "testStageDatabaseName");
         $willReturn = new Config($expected, "", self::createMock(FileServer::class),
             self::createMock(Local::class),
-            self::createMock(ArrayOfDNSRecords::class), array());
+            self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
         $actual = $ioLogic->getDatabaseConfiguration();
@@ -75,7 +75,7 @@ class IOLogicTest extends ContaoTestCase
             array("a", "b"), "testStageDatabaseName");
         $willReturn = new Config($database, "", self::createMock(FileServer::class),
             self::createMock(Local::class),
-            self::createMock(ArrayOfDNSRecords::class), array());
+            self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
         $expected = $database->getIgnoredTables();
         array_push($expected, "tl_user", "tl_cron_job", "tl_release_stages");
@@ -89,7 +89,7 @@ class IOLogicTest extends ContaoTestCase
 
     public function testGetDNSRecords(): void
     {
-        $expected = new ArrayOfDNSRecords();
+        $expected = new DNSRecordCollection();
         $expected->add(new DNSRecord("a", "b"));
         $expected->add(new DNSRecord("c", "d"));
         $willReturn = new Config(self::createMock(Database::class), "",
@@ -110,7 +110,7 @@ class IOLogicTest extends ContaoTestCase
         $expected = "test";
         $willReturn = new Config(self::createMock(Database::class), $expected,
             self::createMock(FileServer::class), self::createMock(Local::class),
-            self::createMock(ArrayOfDNSRecords::class), array());
+            self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
         $actual = $ioLogic->getWhereToCopy();
@@ -123,7 +123,7 @@ class IOLogicTest extends ContaoTestCase
         $expected = new FileServer("server", 0, "username", "password", true,
             "path");
         $willReturn = new Config(self::createMock(Database::class), "", $expected,
-            self::createMock(Local::class), self::createMock(ArrayOfDNSRecords::class),
+            self::createMock(Local::class), self::createMock(DNSRecordCollection::class),
             array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
@@ -142,7 +142,7 @@ class IOLogicTest extends ContaoTestCase
         $expected = new Local("contaoProdPath");
         $willReturn = new Config(self::createMock(Database::class), "",
             self::createMock(FileServer::class), $expected,
-            self::createMock(ArrayOfDNSRecords::class), array());
+            self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
         $actual = $ioLogic->getLocalFileServerConfiguration();
@@ -155,7 +155,7 @@ class IOLogicTest extends ContaoTestCase
         $expected = array("a", "b", "c");
         $willReturn = new Config(self::createMock(Database::class), "",
             $this->createMock(FileServer::class), self::createMock(Local::class),
-            self::createMock(ArrayOfDNSRecords::class), $expected);
+            self::createMock(DNSRecordCollection::class), $expected);
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
         $actual = $ioLogic->getFileFormats();

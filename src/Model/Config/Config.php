@@ -10,11 +10,11 @@ class Config
     private string $copyTo;
     private FileServer $fileServer;
     private Local $local;
-    private ArrayOfDNSRecords $dnsRecords;
+    private DNSRecordCollection $dnsRecords;
     private array $fileFormats;
 
-    public function __construct(Database $database, string $copyTo, FileServer $fileServer, Local $local,
-                                ArrayOfDNSRecords $dnsRecords, array $fileFormats)
+    public function __construct(Database            $database, string $copyTo, FileServer $fileServer, Local $local,
+                                DNSRecordCollection $dnsRecords, array $fileFormats)
     {
         $this->database = $database;
         $this->copyTo = $copyTo;
@@ -44,7 +44,7 @@ class Config
         return $this->local;
     }
 
-    public function getDnsRecords(): ArrayOfDNSRecords
+    public function getDnsRecords(): DNSRecordCollection
     {
         return $this->dnsRecords;
     }

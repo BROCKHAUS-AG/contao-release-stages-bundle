@@ -18,19 +18,19 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use Doctrine\DBAL\Connection;
-use mysqli;
+use PDO;
 
 class ProdDatabaseLogic
 {
-    private Connection $_dbConnection;
+    private Connection $_prodDatabaseConnection;
     private IOLogic $_ioLogic;
     private Log $_log;
-    private mysqli $_conn;
-    public string $prodDatabase;
+    private PDO $_conn;
+    public string $_prodDatabaseName;
 
-    public function __construct(Connection $dbConnection, IOLogic $ioLogic, Log $log)
+    public function __construct(Connection $prodDatabaseConnection, IOLogic $ioLogic, Log $log)
     {
-        $this->_dbConnection = $dbConnection;
+        $this->_prodDatabaseConnection = $prodDatabaseConnection;
         $this->_ioLogic = $ioLogic;
         $this->_log = $log;
     }
@@ -41,17 +41,19 @@ class ProdDatabaseLogic
     public function setUpDatabaseConnection(): void
     {
         $config = $this->getDatabaseConfiguration();
-        $this->prodDatabase = $config->getName();
+        $this->_prodDatabaseName = $config->getName();
         $this->_conn = $this->createConnectionToProdDatabase($config);
     }
 
     public function getTableSchemes(string $tableName): array
     {
-        $sql = "DESCRIBE ". $this->prodDatabase. ".". $tableName;
-        $req = $this->_conn->query($sql);
+        $table = $this->_prodDatabaseName. ".". $tableName;
+        $statement = $this->_conn->prepare("DESCRIBE ?");
+        $statement->execute(array($table));
+
         $tableSchemes = array();
-        if ($req->num_rows > 0) {
-            while($tableScheme = $req->fetch_assoc()) {
+        if ($statement->rowCount() > 0) {
+            while($tableScheme = $statement->fetch()) {
                 $tableSchemes[] = array(
                     "field" => $tableScheme["Field"],
                     "type" => $tableScheme["Type"],
@@ -67,24 +69,26 @@ class ProdDatabaseLogic
         if ($commandsToBeExecuted != null) {
             foreach ($commandsToBeExecuted as $command) {
                 if ($this->_conn->query($command) === FALSE) {
-                    $this->_log->warning("Something went wrong at running sql commands on prod database: ".
-                        $this->_conn->error);
+                    $this->_log->warning("Something went wrong at running sql commands on prod database: Error-Code: ".
+                        $this->_conn->errorCode());
                 }
             }
         }
     }
 
-    public function getLastIdFromTable(string $tableName): int
+    public function getLastIdFromTlLogTable(): int
     {
-        $sql = "SELECT id FROM ". $this->prodDatabase. ".". $tableName. " ORDER BY id DESC LIMIT 1";
-        $req = $this->_conn->query($sql);
+        $table = $this->_prodDatabaseName. ".tl_log";
+        $statement = $this->_conn
+            ->prepare("SELECT id FROM ? ORDER BY id DESC LIMIT 1");
+        $statement->execute(array($table));
+        $result = $statement->fetch();
 
-        if ($req->num_rows <= 0) {
-            $this->_log->logErrorAndDie("Something went wrong at running sql commands on prod database: ".
-                $this->_conn->error);
+        if ($statement->rowCount() <= 0) {
+            $this->_log->logErrorAndDie("Something went wrong at running sql commands on prod database: Error-Code: ".
+                $this->_conn->errorCode());
         }
-        $row = $req->fetch_assoc();
-        return intval($row["id"]);
+        return intval($result["id"]);
     }
 
     private function getDatabaseConfiguration(): Database
@@ -92,14 +96,15 @@ class ProdDatabaseLogic
         return $this->_ioLogic->getDatabaseConfiguration();
     }
 
-    private function createConnectionToProdDatabase(Database $database): mysqli
+    private function createConnectionToProdDatabase(Database $database): PDO
     {
-        $conn = new mysqli($database->getServer(), $database->getUsername(), $database->getPassword(),
-            $this->_dbConnection->getDatabase(), $database->getPort());
-        if ($conn->connect_error) {
-            $error_message = "Connection failed: " . $conn->connect_error;
-            $this->_log->logErrorAndDie($error_message);
-        }
-        return $conn;
+        $connectionString = $this->createConnectionString($database);
+        return new PDO($connectionString, $database->getUsername(), $database->getPassword());
+    }
+
+    private function createConnectionString(Database $database): string
+    {
+        return sprintf( "mysql:host=%s;dbname=%s;port=%d", $database->getServer(), $database->getName(),
+            $database->getPort());
     }
 }

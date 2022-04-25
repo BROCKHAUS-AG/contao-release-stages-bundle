@@ -16,8 +16,8 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\LocalLoaderLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\ArrayOfFile;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\ArrayOfDNSRecords;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
@@ -67,7 +67,7 @@ class LoadFromLocalLogicTest extends ContaoTestCase
     public function testLoadFiles(): void
     {
         $files = array("path/test/a.a", "path/test/a.b");
-        $expected = new ArrayOfFile();
+        $expected = new FileCollection();
         $expected->add(new File(0, $files[0], "prodPath/test/a.a"));
         $expected->add(new File(0, $files[1], "prodPath/test/a.b"));
 

@@ -15,7 +15,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapArrayOfDNSRecords;
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapDatabase;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\ArrayOfDNSRecords;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecord;
 use Contao\TestCase\ContaoTestCase;
 
@@ -43,7 +43,7 @@ class MapArrayOfDNSRecordsTest extends ContaoTestCase
               "dns": "www.example-site-better.de"
             }
         ]';
-        $expected = new ArrayOfDNSRecords();
+        $expected = new DNSRecordCollection();
         $expected->add(new DNSRecord("example-site", "www.example-site.de"));
         $expected->add(new DNSRecord("example-site-better", "www.example-site-better.de"));
         $mapper = new MapArrayOfDNSRecords();
