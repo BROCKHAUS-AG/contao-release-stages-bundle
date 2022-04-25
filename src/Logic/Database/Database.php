@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
@@ -22,15 +22,15 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Exception;
 
-class DatabaseLogic
+class Database
 {
     private Connection $_dbConnection;
-    private IOLogic $_ioLogic;
+    private IO $_io;
 
-    public function __construct(Connection $dbConnection, IOLogic $ioLogic)
+    public function __construct(Connection $dbConnection, IO $io)
     {
         $this->_dbConnection = $dbConnection;
-        $this->_ioLogic = $ioLogic;
+        $this->_io = $io;
     }
 
     /**
@@ -131,7 +131,7 @@ class DatabaseLogic
 
     private function getIgnoredTablesFromConfigurationFile() : array
     {
-        return $this->_ioLogic->getDatabaseIgnoredTablesConfiguration();
+        return $this->_io->getDatabaseIgnoredTablesConfiguration();
     }
 
     private function filterTables(array $tables, array $ignoredTables): array

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
@@ -34,7 +35,7 @@ class IOLogicTest extends ContaoTestCase
     public function testInstantiation(): void
     {
         $systemConfigMock = self::createMock(SystemConfig::class);
-        self::assertInstanceOf(IOLogic::class, new IOLogic("", $systemConfigMock,
+        self::assertInstanceOf(IO::class, new IO("", $systemConfigMock,
             self::createMock(Log::class)));
     }
 
@@ -43,7 +44,7 @@ class IOLogicTest extends ContaoTestCase
     {
         $expected = "test/files";
         $systemConfigMock = self::createMock(SystemConfig::class);
-        $ioLogic = new IOLogic("test", $systemConfigMock, self::createMock(Log::class));
+        $ioLogic = new IO("test", $systemConfigMock, self::createMock(Log::class));
 
         $actual = $ioLogic->getPathToContaoFiles();
 
@@ -165,10 +166,10 @@ class IOLogicTest extends ContaoTestCase
         }
     }
 
-    private function createIOLogicInstanceWithConfigMock(Config $willReturn) : IOLogic
+    private function createIOLogicInstanceWithConfigMock(Config $willReturn) : IO
     {
         $systemConfigMock = self::createMock(SystemConfig::class);
         $systemConfigMock->method("getConfig")->willReturn($willReturn);
-        return new IOLogic("test", $systemConfigMock, self::createMock(Log::class));
+        return new IO("test", $systemConfigMock, self::createMock(Log::class));
     }
 }

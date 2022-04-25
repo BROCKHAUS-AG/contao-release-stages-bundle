@@ -15,10 +15,10 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 
 class FTPConnection {
-    private IOLogic $_ioLogic;
+    private IO $_ioLogic;
     private Log $_log;
 
     private string $username;
@@ -27,7 +27,7 @@ class FTPConnection {
     private int $port;
     private bool $ssl_tsl;
 
-    public function __construct(IOLogic $ioLogic, Log $log)
+    public function __construct(IO $ioLogic, Log $log)
     {
         $this->_ioLogic = $ioLogic;
         $this->_log = $log;

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic\Database;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use Contao\TestCase\ContaoTestCase;
 use Doctrine\DBAL\Connection;
 use ReflectionClass;
@@ -29,9 +29,9 @@ class DatabaseTest extends ContaoTestCase
 {
     public function testInstantiation(): void
     {
-        $databaseLogicMock = new DatabaseLogic(self::createMock(Connection::class),
-            self::createMock(IOLogic::class));
-        self::assertInstanceOf(DatabaseLogic::class, $databaseLogicMock);
+        $databaseLogicMock = new Database(self::createMock(Connection::class),
+            self::createMock(IO::class));
+        self::assertInstanceOf(Database::class, $databaseLogicMock);
     }
 
     /**
@@ -45,7 +45,7 @@ class DatabaseTest extends ContaoTestCase
 
         $expected = array("test2", "b");
 
-        $databaseLogic = self::createMock(DatabaseLogic::class);
+        $databaseLogic = self::createMock(Database::class);
         $reflection = new ReflectionClass($databaseLogic);
         $reflectionMethod = $reflection->getMethod("filterTables");
         $reflectionMethod->setAccessible(true);

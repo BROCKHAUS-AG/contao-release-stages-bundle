@@ -15,19 +15,19 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
 use Doctrine\DBAL\Exception;
 
-class DatabaseCopierLogic
+class DatabaseCopier
 {
     private Log $_log;
-    private DatabaseLogic $_databaseLogic;
-    private ProdDatabaseLogic $_prodDatabaseLogic;
-    private IOLogic $_ioLogic;
+    private Database $_databaseLogic;
+    private ProdDatabase $_prodDatabaseLogic;
+    private IO $_ioLogic;
 
-    public function __construct(DatabaseLogic $databaseLogic, ProdDatabaseLogic $prodDatabaseLogic, IOLogic $ioLogic,
-                                Log $log)
+    public function __construct(Database $databaseLogic, ProdDatabase $prodDatabaseLogic, IO $ioLogic,
+                                Log      $log)
     {
         $this->_databaseLogic = $databaseLogic;
         $this->_prodDatabaseLogic = $prodDatabaseLogic;

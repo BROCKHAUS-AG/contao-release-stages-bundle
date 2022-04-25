@@ -15,11 +15,11 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FileServerCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Local\LocalFileServerCopier;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use Contao\Backend;
@@ -27,16 +27,16 @@ use Contao\Backend;
 DEFINE("COPY_TO_LOCAL", "local");
 DEFINE("COPY_TO_FILE_SERVER", "fileServer");
 
-class FileServerCopierLogic extends Backend {
+class FileServerCopier extends Backend {
     private Log $_log;
-    private IOLogic $_ioLogic;
+    private IO $_ioLogic;
     private LocalFileServerCopier $_localFileServerCopierLogic;
     private FileServerCopier $_fileServerCopierLogic;
-    private DatabaseLogic $_databaseLogic;
+    private Database $_databaseLogic;
 
     private string $copyTo;
 
-    public function __construct(DatabaseLogic $databaseLogic, IOLogic $ioLogic,
+    public function __construct(Database              $databaseLogic, IO $ioLogic,
                                 LocalFileServerCopier $localFileServerCopierLogic, Log $log)
     {
         $this->_databaseLogic = $databaseLogic;
@@ -49,7 +49,7 @@ class FileServerCopierLogic extends Backend {
     {
         $this->copyTo = $this->_ioLogic->getWhereToCopy();
         $path = $this->getPathToCopy();
-        $loadFromLocalLogic = new LocalLoaderLogic($this->_ioLogic, $this->_log,
+        $loadFromLocalLogic = new LocalLoader($this->_ioLogic, $this->_log,
             $this->_ioLogic->getPathToContaoFiles(), $path);
         $files = $loadFromLocalLogic->loadFromLocal();
 

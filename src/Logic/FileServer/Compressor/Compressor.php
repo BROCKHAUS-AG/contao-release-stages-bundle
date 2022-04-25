@@ -19,7 +19,7 @@ use Exception;
 use Phar;
 use PharData;
 
-class CompressorLogic {
+class Compressor {
     private Log $_log;
 
     public function __construct(Log $log)

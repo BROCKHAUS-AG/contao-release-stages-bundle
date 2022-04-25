@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\ConfigNotFoundException;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\ConfigNotFound;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
@@ -23,7 +23,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
 
-class IOLogic {
+class IO {
     private string $_contaoPath;
     private SystemConfig $_systemConfig;
     private Log $_log;
@@ -81,7 +81,7 @@ class IOLogic {
     {
         try {
             return $this->_systemConfig->getConfig();
-        } catch (ConfigNotFoundException $e) {
+        } catch (ConfigNotFound $e) {
             $this->_log->error($e->getMessage());
             die($e->getMessage());
         }

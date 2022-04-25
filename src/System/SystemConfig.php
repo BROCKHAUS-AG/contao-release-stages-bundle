@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\System;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\ConfigNotFoundException;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileNotFoundException;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\ConfigNotFound;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileNotFound;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
@@ -49,7 +49,7 @@ class SystemConfig
         $file = $this->createPath();
         try {
             $this->checkIfFileExists($file);
-        } catch (FileNotFoundException $e) {
+        } catch (FileNotFound $e) {
             $this->_log->error($e->getMessage());
             die($e);
         }
@@ -58,14 +58,14 @@ class SystemConfig
     }
 
     /**
-     * @throws FileNotFoundException
+     * @throws FileNotFound
      */
     private function checkIfFileExists(string $file): void
     {
         if (!file_exists($file)) {
             $errorMessage = "File: \"". $file. "\" could not be found. Please create it!";
             $this->_log->error($errorMessage);
-            throw new FileNotFoundException($errorMessage);
+            throw new FileNotFound($errorMessage);
         }
     }
 
@@ -75,12 +75,12 @@ class SystemConfig
     }
 
     /**
-     * @throws ConfigNotFoundException
+     * @throws ConfigNotFound
      */
     public function getConfig(): Config
     {
         if (!isset($this->_config)) {
-            throw new ConfigNotFoundException("Could not get config. Config was maybe not instantiated from
+            throw new ConfigNotFound("Could not get config. Config was maybe not instantiated from
                 config file");
         }
         return $this->_config;

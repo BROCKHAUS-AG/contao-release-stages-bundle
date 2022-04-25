@@ -16,7 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Exception;
 
 use Exception;
 
-class ConfigNotFoundException extends Exception
+class FileNotFound extends Exception
 {
     public function __construct($message = "", $code = 0)
     {

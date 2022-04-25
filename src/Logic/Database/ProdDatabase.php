@@ -15,20 +15,20 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use Doctrine\DBAL\Connection;
 use PDO;
 
-class ProdDatabaseLogic
+class ProdDatabase
 {
     private Connection $_prodDatabaseConnection;
-    private IOLogic $_ioLogic;
+    private IO $_ioLogic;
     private Log $_log;
     private PDO $_conn;
     public string $_prodDatabaseName;
 
-    public function __construct(Connection $prodDatabaseConnection, IOLogic $ioLogic, Log $log)
+    public function __construct(Connection $prodDatabaseConnection, IO $ioLogic, Log $log)
     {
         $this->_prodDatabaseConnection = $prodDatabaseConnection;
         $this->_ioLogic = $ioLogic;

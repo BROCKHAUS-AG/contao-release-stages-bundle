@@ -15,15 +15,15 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
 use Exception;
 
-class VersioningLogic {
-    private DatabaseLogic $_databaseLogic;
+class Versioning {
+    private Database $_databaseLogic;
     private Log $_log;
 
-    public function __construct(DatabaseLogic $databaseLogic, Log $log)
+    public function __construct(Database $databaseLogic, Log $log)
     {
         $this->_databaseLogic = $databaseLogic;
         $this->_log = $log;
