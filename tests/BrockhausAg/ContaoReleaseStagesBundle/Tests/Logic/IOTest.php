@@ -26,11 +26,11 @@ use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
 use Contao\TestCase\ContaoTestCase;
 
 /**
- * Class IOLogicTest
+ * Class IOTest
  *
  * @package BrockhausAg\ContaoReleaseStagesBundle\Logic\
  */
-class IOLogicTest extends ContaoTestCase
+class IOTest extends ContaoTestCase
 {
     public function testInstantiation(): void
     {

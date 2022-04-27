@@ -21,7 +21,7 @@ use ReflectionClass;
 use ReflectionException;
 
 /**
- * Class IOLogicTest
+ * Class IOTest
  *
  * @package BrockhausAg\ContaoReleaseStagesBundle\Logic\
  */

@@ -15,28 +15,19 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic\FileServer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\LocalLoader;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\LocalLoaderLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
-use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
 use Contao\TestCase\ContaoTestCase;
 use ReflectionClass;
 use ReflectionException;
-use ReflectionMethod;
 
 /**
- * Class LoadFromLocalLogicTest
+ * Class LocalLoaderTest
  *
  * @package BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\
  */
-class LoadFromLocalLogicTest extends ContaoTestCase
+class LocalLoaderTest extends ContaoTestCase
 {
     public function testInstantiation(): void
     {
