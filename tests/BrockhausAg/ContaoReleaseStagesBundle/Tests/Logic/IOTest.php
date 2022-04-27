@@ -15,7 +15,6 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IOLogic;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
