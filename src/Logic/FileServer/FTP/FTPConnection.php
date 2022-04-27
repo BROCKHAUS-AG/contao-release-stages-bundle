@@ -18,7 +18,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 
 class FTPConnection {
-    private IO $_ioLogic;
+    private IO $_io;
     private Log $_log;
 
     private string $username;
@@ -27,9 +27,9 @@ class FTPConnection {
     private int $port;
     private bool $ssl_tsl;
 
-    public function __construct(IO $ioLogic, Log $log)
+    public function __construct(IO $io, Log $log)
     {
-        $this->_ioLogic = $ioLogic;
+        $this->_io = $io;
         $this->_log = $log;
     }
 
@@ -38,7 +38,7 @@ class FTPConnection {
      */
     public function setUpFTPConfig(): void
     {
-        $config = $this->_ioLogic->getFileServerConfiguration();
+        $config = $this->_io->getFileServerConfiguration();
         $this->username = $config->getUsername();
         $this->password = $config->getPassword();
         $this->server = $config->getServer();

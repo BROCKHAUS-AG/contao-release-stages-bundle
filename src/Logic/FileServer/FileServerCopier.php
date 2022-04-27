@@ -16,7 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FileServerCopier;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPFileServerCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Local\LocalFileServerCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
@@ -29,28 +29,27 @@ DEFINE("COPY_TO_FILE_SERVER", "fileServer");
 
 class FileServerCopier extends Backend {
     private Log $_log;
-    private IO $_ioLogic;
-    private LocalFileServerCopier $_localFileServerCopierLogic;
-    private FileServerCopier $_fileServerCopierLogic;
-    private Database $_databaseLogic;
+    private IO $_io;
+    private LocalFileServerCopier $_localFileServerCopier;
+    private FTPFileServerCopier $_ftpFileServerCopier;
+    private Database $_database;
 
     private string $copyTo;
 
-    public function __construct(Database              $databaseLogic, IO $ioLogic,
-                                LocalFileServerCopier $localFileServerCopierLogic, Log $log)
+    public function __construct(Database $database, IO $io, LocalFileServerCopier $localFileServerCopier, Log $log)
     {
-        $this->_databaseLogic = $databaseLogic;
-        $this->_ioLogic = $ioLogic;
-        $this->_localFileServerCopierLogic = $localFileServerCopierLogic;
+        $this->_database = $database;
+        $this->_io = $io;
+        $this->_localFileServerCopier = $localFileServerCopier;
         $this->_log = $log;
     }
 
     public function copy() : void
     {
-        $this->copyTo = $this->_ioLogic->getWhereToCopy();
+        $this->copyTo = $this->_io->getWhereToCopy();
         $path = $this->getPathToCopy();
-        $loadFromLocalLogic = new LocalLoader($this->_ioLogic, $this->_log,
-            $this->_ioLogic->getPathToContaoFiles(), $path);
+        $loadFromLocalLogic = new LocalLoader($this->_io, $this->_log,
+            $this->_io->getPathToContaoFiles(), $path);
         $files = $loadFromLocalLogic->loadFromLocal();
 
         $this->createDirectories($files);
@@ -62,11 +61,11 @@ class FileServerCopier extends Backend {
     private function getPathToCopy() : string
     {
        if ($this->isToCopyToLocalFileServer()) {
-            return $this->_ioLogic->getLocalFileServerConfiguration()->getContaoProdPath();
+            return $this->_io->getLocalFileServerConfiguration()->getContaoProdPath();
         }else if ($this->isToCopyToFTPFileServer()) {
-            $ftpConnection = new FTPConnection($this->_ioLogic, $this->_log);
-            $this->_fileServerCopierLogic = new FileServerCopier($ftpConnection->connect());
-            return $this->_ioLogic->getFileServerConfiguration()->getPath();
+            $ftpConnection = new FTPConnection($this->_io, $this->_log);
+            $this->_ftpFileServerCopier = new FTPFileServerCopier($ftpConnection->connect());
+            return $this->_io->getFileServerConfiguration()->getPath();
         }
         $this->couldNotFindCopyTo();
         return "";
@@ -87,9 +86,9 @@ class FileServerCopier extends Backend {
     private function createDirectory(string $directory) : void
     {
         if ($this->isToCopyToLocalFileServer()) {
-            $this->_localFileServerCopierLogic->createDirectory($directory);
+            $this->_localFileServerCopier->createDirectory($directory);
         }else if ($this->isToCopyToFTPFileServer()) {
-            $this->_fileServerCopierLogic->createDirectory($directory);
+            $this->_ftpFileServerCopier->createDirectory($directory);
         }else {
             $this->couldNotFindCopyTo();
         }
@@ -122,9 +121,9 @@ class FileServerCopier extends Backend {
     private function compareAndCopyFile(File $file) : void
     {
         if ($this->isToCopyToLocalFileServer()) {
-            $this->_localFileServerCopierLogic->copy($file);
+            $this->_localFileServerCopier->copy($file);
         }else if ($this->isToCopyToFTPFileServer()) {
-            $this->_fileServerCopierLogic->copy($file);
+            $this->_ftpFileServerCopier->copy($file);
         }else {
             $this->couldNotFindCopyTo();
         }
@@ -133,14 +132,14 @@ class FileServerCopier extends Backend {
     private function checkForUpdate(File $file) : void
     {
         if ($this->isToCopyToLocalFileServer()) {
-            $lastModifiedTime = $this->_localFileServerCopierLogic->getLastModifiedTimeFromFile($file->getProdPath());
-            if ($lastModifiedTime < $this->_localFileServerCopierLogic->getLastModifiedTimeFromFile($file->getPath())) {
-                $this->_localFileServerCopierLogic->copy($file);
+            $lastModifiedTime = $this->_localFileServerCopier->getLastModifiedTimeFromFile($file->getProdPath());
+            if ($lastModifiedTime < $this->_localFileServerCopier->getLastModifiedTimeFromFile($file->getPath())) {
+                $this->_localFileServerCopier->copy($file);
             }
         }else if ($this->isToCopyToFTPFileServer()) {
-            $lastModifiedTime = $this->_fileServerCopierLogic->getLastModifiedTimeFromFile($file->getProdPath());
-            if ($lastModifiedTime < $this->_fileServerCopierLogic->getLastModifiedTimeFromFile($file->getPath())) {
-                $this->_fileServerCopierLogic->update($file);
+            $lastModifiedTime = $this->_ftpFileServerCopier->getLastModifiedTimeFromFile($file->getProdPath());
+            if ($lastModifiedTime < $this->_ftpFileServerCopier->getLastModifiedTimeFromFile($file->getPath())) {
+                $this->_ftpFileServerCopier->update($file);
             }
         }else {
             $this->couldNotFindCopyTo();
@@ -149,7 +148,7 @@ class FileServerCopier extends Backend {
 
     private function checkForDeletion() : void
     {
-        $res = $this->_databaseLogic->checkForDeletedFilesInTlLogTable()
+        $res = $this->_database->checkForDeletedFilesInTlLogTable()
             ->fetchAllAssoc();
         foreach ($res as $file)
         {
@@ -163,10 +162,10 @@ class FileServerCopier extends Backend {
     private function deleteFile(string $file) : void
     {
         if ($this->isToCopyToLocalFileServer()) {
-            $this->_localFileServerCopierLogic->delete($file,
-                $this->_ioLogic->getLocalFileServerConfiguration()->getContaoProdPath());
+            $this->_localFileServerCopier->delete($file,
+                $this->_io->getLocalFileServerConfiguration()->getContaoProdPath());
         }else if ($this->isToCopyToFTPFileServer()) {
-            $this->_fileServerCopierLogic->delete($file, $this->_ioLogic->getFileServerConfiguration()->getPath());
+            $this->_ftpFileServerCopier->delete($file, $this->_io->getFileServerConfiguration()->getPath());
         }else {
             $this->couldNotFindCopyTo();
         }
@@ -190,7 +189,7 @@ class FileServerCopier extends Backend {
     private function copyDirectoryToMainDirectoryWithSSHCommand() : void
     {
         if ($this->isToCopyToFTPFileServer()) {
-            $config = $this->_ioLogic->getFileServerConfiguration();
+            $config = $this->_io->getFileServerConfiguration();
             $connection = ssh2_connect($config->getServer(), 22);
             ssh2_auth_password($connection, $config->getUsername(), $config->getPassword());
             $stream = ssh2_exec($connection, "bash -r /html/release-stages.sh");

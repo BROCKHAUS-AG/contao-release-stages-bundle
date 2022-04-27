@@ -20,12 +20,12 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
 use Exception;
 
 class Versioning {
-    private Database $_databaseLogic;
+    private Database $database;
     private Log $_log;
 
-    public function __construct(Database $databaseLogic, Log $log)
+    public function __construct(Database $database, Log $log)
     {
-        $this->_databaseLogic = $databaseLogic;
+        $this->database = $database;
         $this->_log = $log;
     }
 
@@ -36,7 +36,7 @@ class Versioning {
     public function setNewVersionAutomatically(): void
     {
         try {
-            $latestVersion = $this->_databaseLogic->getLatestReleaseVersion();
+            $latestVersion = $this->database->getLatestReleaseVersion();
         } catch (Exception $e) {
             $latestVersion = $this->createDummyVersion();
         }
@@ -54,7 +54,7 @@ class Versioning {
     private function createAndUpdateToNewVersion(Version $latestVersion)
     {
         $versionNumber = $this->createVersionNumber($latestVersion);
-        $this->_databaseLogic->updateVersion($versionNumber);
+        $this->database->updateVersion($versionNumber);
     }
 
 
