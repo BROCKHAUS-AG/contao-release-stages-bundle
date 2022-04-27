@@ -10,7 +10,7 @@
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-use BrockhausAg\ContaoReleaseStagesBundle\Model\ReleaseStagesModel;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\ReleaseStages;
 
 /**
  * Backend modules
@@ -24,4 +24,4 @@ $GLOBALS['BE_MOD']['release'] = array(
 /**
  * Models
  */
-$GLOBALS['TL_MODELS']['tl_release_stages'] = ReleaseStagesModel::class;
+$GLOBALS['TL_MODELS']['tl_release_stages'] = ReleaseStages::class;

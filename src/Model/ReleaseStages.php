@@ -17,11 +17,11 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Model;
 use Contao\Model;
 
 /**
- * Class ReleaseStagesModel
+ * Class ReleaseStages
  *
  * @package BrockhausAg\ContaoReleaseStagesBundle\Model
  */
-class ReleaseStagesModel extends Model
+class ReleaseStages extends Model
 {
     protected static $strTable = 'tl_release_stages';
 

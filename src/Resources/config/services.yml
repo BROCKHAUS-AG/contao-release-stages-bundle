@@ -37,7 +37,7 @@ services:
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\ProdDatabase'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseProd'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
@@ -46,7 +46,7 @@ services:
             - '@database_connection'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\ProdDatabase:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseProd:
         arguments:
             - '@database_connection'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
@@ -58,10 +58,10 @@ services:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Local\LocalFileServerCopier'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Local\FileServerLocalCopier'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Local\LocalFileServerCopier:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Local\FileServerLocalCopier:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 

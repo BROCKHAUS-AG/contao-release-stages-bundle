@@ -17,7 +17,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Local;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
-class LocalFileServerCopier {
+class FileServerLocalCopier {
     private Log $_log;
 
     public function __construct(Log $log)

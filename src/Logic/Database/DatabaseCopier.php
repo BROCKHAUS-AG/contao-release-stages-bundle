@@ -23,10 +23,10 @@ class DatabaseCopier
 {
     private Log $_log;
     private Database $_databaseLogic;
-    private ProdDatabase $_prodDatabaseLogic;
+    private DatabaseProd $_prodDatabaseLogic;
     private IO $_ioLogic;
 
-    public function __construct(Database $databaseLogic, ProdDatabase $prodDatabaseLogic, IO $ioLogic,
+    public function __construct(Database $databaseLogic, DatabaseProd $prodDatabaseLogic, IO $ioLogic,
                                 Log      $log)
     {
         $this->_databaseLogic = $databaseLogic;
@@ -71,7 +71,8 @@ class DatabaseCopier
         $values = array();
         echo "test";
         foreach ($tableInformation->getContent() as $column) {
-            if (strcmp($tableInformation->getName(), "tl_page") == 0 && strcmp($column["type"], "root") == 0) {
+            if (strcmp($tableInformation->getName(), "tl_page") == 0 &&
+                strcmp($column["type"], "root") == 0) {
                 $column["dns"] = $this->changeDNSEntryForProd($column["alias"]);
             }
             $values[] = $this->createColumnWithValueForCommand($column, $tableSchemes, $tableInformation->getName());

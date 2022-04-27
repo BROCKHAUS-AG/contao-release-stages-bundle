@@ -20,7 +20,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use Doctrine\DBAL\Connection;
 use PDO;
 
-class ProdDatabase
+class DatabaseProd
 {
     private Connection $_prodDatabaseConnection;
     private IO $_ioLogic;
