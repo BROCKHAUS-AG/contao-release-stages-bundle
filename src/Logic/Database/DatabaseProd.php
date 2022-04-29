@@ -14,23 +14,21 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
-use Doctrine\DBAL\Connection;
 use PDO;
 
 class DatabaseProd
 {
-    private Connection $_prodDatabaseConnection;
     private IO $_ioLogic;
     private Log $_log;
     private PDO $_conn;
     public string $_prodDatabaseName;
 
-    public function __construct(Connection $prodDatabaseConnection, IO $ioLogic, Log $log)
+    public function __construct(IO $ioLogic, Log $log)
     {
-        $this->_prodDatabaseConnection = $prodDatabaseConnection;
         $this->_ioLogic = $ioLogic;
         $this->_log = $log;
     }
@@ -45,23 +43,55 @@ class DatabaseProd
         $this->_conn = $this->createConnectionToProdDatabase($config);
     }
 
+
+    /**
+     * @throws DatabaseQueryEmptyResult
+     */
     public function getTableSchemes(string $tableName): array
     {
-        $table = $this->_prodDatabaseName. ".". $tableName;
-        $statement = $this->_conn->prepare("DESCRIBE ?");
-        $statement->execute(array($table));
+        $statement = $this->_conn->prepare("DESCRIBE ". $tableName);
+        //$statement->bindValue(1, $tableName);
+        $statement->execute();
+        var_dump($statement->errorInfo());
 
         $tableSchemes = array();
-        if ($statement->rowCount() > 0) {
-            while($tableScheme = $statement->fetch()) {
-                $tableSchemes[] = array(
-                    "field" => $tableScheme["Field"],
-                    "type" => $tableScheme["Type"],
-                    "nullable" => $tableScheme["Null"]
-                );
-            }
+        if ($statement->rowCount() <= 0) {
+            throw new DatabaseQueryEmptyResult("Database executed query returned null");
         }
+
+        while($tableScheme = $statement->fetch()) {
+            $tableSchemes[] = array(
+                "field" => $tableScheme["Field"],
+                "type" => $tableScheme["Type"],
+                "nullable" => $tableScheme["Null"]
+            );
+        }
+
         return $tableSchemes;
+    }
+
+    public function checkIfTableExists(string $table): bool
+    {
+        $statement = $this->_conn->prepare("DESCRIBE ". $table);
+        $statement->execute();
+        if ($statement->rowCount() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public function createTable(string $table, array $tableScheme): void
+    {
+        echo "create table ". $table;
+        var_dump($tableScheme);
+
+        $columns = array();
+        for ($x = 0; $x != count($tableScheme); $x++)
+        {
+            $columns[] = $tableScheme["Field"]. " ". $tableScheme["Type"];
+        }
+
+        die;
     }
 
     public function runSqlCommandsOnProdDatabase(array $commandsToBeExecuted): void

@@ -14,9 +14,11 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
 use Doctrine\DBAL\Exception;
 
 class DatabaseCopier
@@ -27,7 +29,7 @@ class DatabaseCopier
     private IO $_ioLogic;
 
     public function __construct(Database $databaseLogic, DatabaseProd $prodDatabaseLogic, IO $ioLogic,
-                                Log      $log)
+                                Log $log)
     {
         $this->_databaseLogic = $databaseLogic;
         $this->_prodDatabaseLogic = $prodDatabaseLogic;
@@ -38,15 +40,13 @@ class DatabaseCopier
     /**
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws DatabaseQueryEmptyResult
      */
     public function copy(): void
     {
-        $tableInformation = $this->_databaseLogic->getFullTableInformation();
-
-        foreach ($tableInformation->get() as $table) {
-            $commandsToBeExecuted = $this->createCommandsToBeExecuted($table);
-            $this->_prodDatabaseLogic->runSqlCommandsOnProdDatabase($commandsToBeExecuted);
-        }
+        $tableInformationCollection = $this->_databaseLogic->getFullTableInformation();
+        $this->createTablesIfNotExists($tableInformationCollection);
+        $this->createAndExecuteCommandsOnProdDatabase($tableInformationCollection);
 
         $lastId = $this->_prodDatabaseLogic->getLastIdFromTlLogTable();
         die($lastId);
@@ -55,6 +55,45 @@ class DatabaseCopier
 
     /**
      * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    private function createTablesIfNotExists(TableInformationCollection $tableInformationCollection): void
+    {
+        for ($x = 0; $x != $tableInformationCollection->getLength(); $x++)
+        {
+            $this->createTableIfNotExists($tableInformationCollection->getByIndex($x)->getName());
+        }
+    }
+
+    /**
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    private function createTableIfNotExists(string $table): void
+    {
+        if (!$this->_prodDatabaseLogic->checkIfTableExists($table)) {
+            $tableScheme = $this->_databaseLogic->getTableScheme($table);
+            $this->_prodDatabaseLogic->createTable($table, $tableScheme);
+        }
+    }
+
+    /**
+     * @throws Exception
+     * @throws DatabaseQueryEmptyResult
+     */
+    private function createAndExecuteCommandsOnProdDatabase(TableInformationCollection $tableInformation): void
+    {
+        foreach ($tableInformation->get() as $table) {
+            echo "before creating command";
+            $commandsToBeExecuted = $this->createCommandsToBeExecuted($table);
+            echo "after command for table: ". $table. " was created";
+            $this->_prodDatabaseLogic->runSqlCommandsOnProdDatabase($commandsToBeExecuted);
+        }
+    }
+
+    /**
+     * @throws Exception
+     * @throws DatabaseQueryEmptyResult
      */
     private function createCommandsToBeExecuted(TableInformation $tableInformation): array
     {
@@ -64,12 +103,12 @@ class DatabaseCopier
 
     /**
      * @throws Exception
+     * @throws DatabaseQueryEmptyResult
      */
     private function createColumnWithValuesForCommand(TableInformation $tableInformation): array
     {
         $tableSchemes = $this->_prodDatabaseLogic->getTableSchemes($tableInformation->getName());
         $values = array();
-        echo "test";
         foreach ($tableInformation->getContent() as $column) {
             if (strcmp($tableInformation->getName(), "tl_page") == 0 &&
                 strcmp($column["type"], "root") == 0) {

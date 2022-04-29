@@ -147,6 +147,18 @@ class Database
     }
 
     /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getTableScheme(string $table): array
+    {
+        return $this->_dbConnection
+            ->prepare("DESCRIBE ". $table)
+            ->executeQuery()
+            ->fetchAllAssociative();
+    }
+
+    /**
      * @throws \Doctrine\DBAL\Exception
      */
     public function loadHexById(string $column, string $tableName, string $id) : Result
