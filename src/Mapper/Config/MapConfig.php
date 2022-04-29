@@ -22,7 +22,7 @@ class MapConfig extends Map {
         $localMapper = new MapLocal();
         $local = $localMapper->map($data->local);
 
-        $arrayOfDNSRecordsMapper = new MapArrayOfDNSRecords();
+        $arrayOfDNSRecordsMapper = new MapDNSRecordCollection();
         $dnsRecords = $arrayOfDNSRecordsMapper->mapArray($data->dnsRecords);
 
         $fileFormats = $data->fileFormats;

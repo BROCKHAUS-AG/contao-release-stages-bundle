@@ -4,25 +4,24 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config;
 
-
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Map;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecord;
 use stdClass;
 
-class MapArrayOfDNSRecords extends Map {
+class MapDNSRecordCollection extends Map {
 
-    public function map(stdClass $data) : DNSRecordCollection
+    public function map(stdClass $data): DNSRecordCollection
     {
         return $this->_map($data);
     }
 
-    public function mapArray(array $data) : DNSRecordCollection
+    public function mapArray(array $data): DNSRecordCollection
     {
         return $this->_map($data);
     }
 
-    private function _map($data) : DNSRecordCollection
+    private function _map($data): DNSRecordCollection
     {
         $arrayOfDNSRecords = new DNSRecordCollection();
         foreach ($data as $record) {
