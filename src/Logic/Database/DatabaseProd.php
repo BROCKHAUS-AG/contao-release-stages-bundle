@@ -16,7 +16,6 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseExecutionFailure;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseQueryEmptyResult;
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use PDO;
@@ -25,14 +24,12 @@ use PDOException;
 class DatabaseProd
 {
     private IO $_ioLogic;
-    private Log $_log;
     private PDO $_conn;
     public string $_databaseName;
 
-    public function __construct(IO $ioLogic, Log $log)
+    public function __construct(IO $ioLogic)
     {
         $this->_ioLogic = $ioLogic;
-        $this->_log = $log;
     }
 
     /**

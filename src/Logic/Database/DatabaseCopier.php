@@ -16,7 +16,6 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseExecutionFailure;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseQueryEmptyResult;
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
@@ -24,18 +23,15 @@ use Doctrine\DBAL\Exception;
 
 class DatabaseCopier
 {
-    private Log $_log;
     private Database $_databaseLogic;
     private DatabaseProd $_prodDatabaseLogic;
     private IO $_ioLogic;
 
-    public function __construct(Database $databaseLogic, DatabaseProd $prodDatabaseLogic, IO $ioLogic,
-                                Log $log)
+    public function __construct(Database $databaseLogic, DatabaseProd $prodDatabaseLogic, IO $ioLogic)
     {
         $this->_databaseLogic = $databaseLogic;
         $this->_prodDatabaseLogic = $prodDatabaseLogic;
         $this->_ioLogic = $ioLogic;
-        $this->_log = $log;
     }
 
     /**

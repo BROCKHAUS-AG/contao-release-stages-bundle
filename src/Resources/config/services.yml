@@ -39,7 +39,6 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseProd'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database:
         arguments:
@@ -49,7 +48,6 @@ services:
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseProd:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
         calls:
             - setUpDatabaseConnection: []
 
