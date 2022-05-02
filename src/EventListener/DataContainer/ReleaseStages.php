@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseCouldNotCreateTable;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseExecutionFailure;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServerCopier;
@@ -39,7 +39,7 @@ class ReleaseStages
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws DatabaseQueryEmptyResult
-     * @throws DatabaseCouldNotCreateTable
+     * @throws DatabaseExecutionFailure
      */
     public function onSubmitCallback() : void
     {

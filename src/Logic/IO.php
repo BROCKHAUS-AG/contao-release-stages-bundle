@@ -14,7 +14,8 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseCouldNotCreateTable;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseExecutionFailure;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileNotFound;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
@@ -81,7 +82,7 @@ class IO {
     {
         try {
             return $this->_systemConfig->getConfig();
-        } catch (DatabaseCouldNotCreateTable $e) {
+        } catch (FileNotFound $e) {
             $this->_log->error($e->getMessage());
             die($e->getMessage());
         }
