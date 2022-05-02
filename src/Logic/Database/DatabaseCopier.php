@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseCouldNotCreateTable;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseExecutionFailure;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
@@ -42,7 +42,7 @@ class DatabaseCopier
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws DatabaseQueryEmptyResult
-     * @throws DatabaseCouldNotCreateTable
+     * @throws DatabaseExecutionFailure
      */
     public function copy(): void
     {
@@ -51,14 +51,13 @@ class DatabaseCopier
         $this->createAndExecuteCommandsOnProdDatabase($tableInformationCollection);
 
         $lastId = $this->_prodDatabaseLogic->getLastIdFromTlLogTable();
-        die($lastId);
         $this->checkForDeleteFromInTlLogTable($lastId);
     }
 
     /**
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws DatabaseCouldNotCreateTable
+     * @throws DatabaseExecutionFailure
      */
     private function createTablesIfNotExists(TableInformationCollection $tableInformationCollection): void
     {
@@ -71,7 +70,7 @@ class DatabaseCopier
     /**
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws DatabaseCouldNotCreateTable
+     * @throws DatabaseExecutionFailure
      */
     private function createTableIfNotExists(string $table): void
     {
@@ -84,20 +83,21 @@ class DatabaseCopier
     /**
      * @throws Exception
      * @throws DatabaseQueryEmptyResult
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws DatabaseExecutionFailure
      */
     private function createAndExecuteCommandsOnProdDatabase(TableInformationCollection $tableInformation): void
     {
         foreach ($tableInformation->get() as $table) {
-            echo "before creating command";
             $commandsToBeExecuted = $this->createCommandsToBeExecuted($table);
-            echo "after command for table: ". $table. " was created";
-            $this->_prodDatabaseLogic->runSqlCommandsOnProdDatabase($commandsToBeExecuted);
+            $this->_prodDatabaseLogic->executeCommands($commandsToBeExecuted);
         }
     }
 
     /**
      * @throws Exception
      * @throws DatabaseQueryEmptyResult
+     * @throws \Doctrine\DBAL\Driver\Exception
      */
     private function createCommandsToBeExecuted(TableInformation $tableInformation): array
     {
@@ -108,6 +108,7 @@ class DatabaseCopier
     /**
      * @throws Exception
      * @throws DatabaseQueryEmptyResult
+     * @throws \Doctrine\DBAL\Driver\Exception
      */
     private function createColumnWithValuesForCommand(TableInformation $tableInformation): array
     {
@@ -120,9 +121,6 @@ class DatabaseCopier
             }
             $values[] = $this->createColumnWithValueForCommand($column, $tableSchemes, $tableInformation->getName());
         }
-        echo "test1";
-        var_dump($values);
-        die;
         return $values;
     }
 
@@ -140,6 +138,7 @@ class DatabaseCopier
 
     /**
      * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
      */
     private function createColumnWithValueForCommand(array $column, array $tableSchemes, string $tableName): array
     {
@@ -161,8 +160,7 @@ class DatabaseCopier
                 $columnAndValue[] = $tableSchemes[$index]["field"]. " = NULL";
             }else if (strcmp($tableSchemes[$index]["type"], "binary(16)") == 0 ||
                 strcmp($tableSchemes[$index]["type"], "varbinary(128)") == 0) {
-                $req = $this->_databaseLogic->loadHexById($tableSchemes[$index]["field"], $tableName, $column["id"])
-                    ->fetchAllAssoc();
+                $req = $this->_databaseLogic->loadHexById($tableSchemes[$index]["field"], $tableName, $column["id"]);
                 $rows[] = "UNHEX('". $req[0]["hex(". $tableSchemes[$index]["field"]. ")"]. "')";
                 $columnAndValue[] = $tableSchemes[$index]["field"]. "= UNHEX('". $req[0]["hex(".
                     $tableSchemes[$index]["field"]. ")"]. "')";
@@ -187,7 +185,7 @@ class DatabaseCopier
         $commandsToBeExecuted = array();
         foreach ($values as $value) {
             $commandsToBeExecuted[]
-                = 'INSERT INTO '. $this->_prodDatabaseLogic->_prodDatabaseName. '.'. $tableName. ' ('. $value["columnName"].
+                = 'INSERT INTO '. $this->_prodDatabaseLogic->_databaseName. '.'. $tableName. ' ('. $value["columnName"].
                 ') VALUES ('. $value["value"]. ') ON DUPLICATE KEY UPDATE '. $value["updateColumnAndValue"]. ';';
         }
         if ($commandsToBeExecuted == null) return array();
@@ -196,18 +194,18 @@ class DatabaseCopier
 
     /**
      * @throws Exception
+     * @throws DatabaseExecutionFailure
+     * @throws \Doctrine\DBAL\Driver\Exception
      */
     private function checkForDeleteFromInTlLogTable(int $lastId): void
     {
-        $whereStatement = "id > ". $lastId. " AND text LIKE \"DELETE FROM %\"";
-        $res = $this->_databaseLogic->getLastRowsWithWhereStatement(array("text"), "tl_log", $whereStatement)
-            ->fetchAllAssoc();
+        $res = $this->_databaseLogic->getRowsFromTlLogTableWhereIdIsBiggerThanIdAndTextIsLikeDeleteFrom($lastId);
 
         $deleteStatements = array();
         foreach ($res as $statement) {
             $deleteStatements[] = $statement["text"];
         }
-        $this->_prodDatabaseLogic->runSqlCommandsOnProdDatabase($deleteStatements);
+        $this->_prodDatabaseLogic->executeCommands($deleteStatements);
     }
 
     private function createReturnValue(array $rows, array $tableSchemeFields, array $columnAndValue): array

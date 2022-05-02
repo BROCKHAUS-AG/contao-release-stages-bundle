@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseCouldNotCreateTable;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseExecutionFailure;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
@@ -27,7 +27,7 @@ class DatabaseProd
     private IO $_ioLogic;
     private Log $_log;
     private PDO $_conn;
-    public string $_prodDatabaseName;
+    public string $_databaseName;
 
     public function __construct(IO $ioLogic, Log $log)
     {
@@ -41,7 +41,7 @@ class DatabaseProd
     public function setUpDatabaseConnection(): void
     {
         $config = $this->getDatabaseConfiguration();
-        $this->_prodDatabaseName = $config->getName();
+        $this->_databaseName = $config->getName();
         $this->_conn = $this->createConnectionToProdDatabase($config);
     }
 
@@ -52,9 +52,7 @@ class DatabaseProd
     public function getTableSchemes(string $tableName): array
     {
         $statement = $this->_conn->prepare("DESCRIBE ". $tableName);
-        //$statement->bindValue(1, $tableName);
         $statement->execute();
-        var_dump($statement->errorInfo());
 
         $tableSchemes = array();
         if ($statement->rowCount() <= 0) {
@@ -62,14 +60,19 @@ class DatabaseProd
         }
 
         while($tableScheme = $statement->fetch()) {
-            $tableSchemes[] = array(
-                "field" => $tableScheme["Field"],
-                "type" => $tableScheme["Type"],
-                "nullable" => $tableScheme["Null"]
-            );
+            $tableSchemes[] = $this->createReturnValueForTableSchemes($tableScheme);
         }
 
         return $tableSchemes;
+    }
+
+    private function createReturnValueForTableSchemes(array $tableScheme): array
+    {
+        return array(
+            "field" => $tableScheme["Field"],
+            "type" => $tableScheme["Type"],
+            "nullable" => $tableScheme["Null"]
+        );
     }
 
     public function checkIfTableExists(string $table): bool
@@ -83,7 +86,7 @@ class DatabaseProd
     }
 
     /**
-     * @throws DatabaseCouldNotCreateTable
+     * @throws DatabaseExecutionFailure
      */
     public function createTable(string $table, array $tableScheme): void
     {
@@ -114,7 +117,7 @@ class DatabaseProd
     }
 
     /**
-     * @throws DatabaseCouldNotCreateTable
+     * @throws DatabaseExecutionFailure
      */
     private function runCreateTableCommand(string $createTableCommand): void
     {
@@ -122,34 +125,38 @@ class DatabaseProd
         try {
             $statement->execute();
         }catch (PDOException $e) {
-            throw new DatabaseCouldNotCreateTable($statement->errorCode());
+            throw new DatabaseExecutionFailure($e->getMessage());
         }
     }
 
-    public function runSqlCommandsOnProdDatabase(array $commandsToBeExecuted): void
+    /**
+     * @throws DatabaseExecutionFailure
+     */
+    public function executeCommands(array $commands): void
     {
-        if ($commandsToBeExecuted != null) {
-            foreach ($commandsToBeExecuted as $command) {
-                if ($this->_conn->query($command) === FALSE) {
-                    $this->_log->warning("Something went wrong at running sql commands on prod database: Error-Code: ".
-                        $this->_conn->errorCode());
-                }
+        foreach ($commands as $command) {
+            if ($this->_conn->query($command) === FALSE) {
+                throw new DatabaseExecutionFailure($this->_conn->errorCode());
             }
         }
     }
 
+    /**
+     * @throws DatabaseQueryEmptyResult
+     */
     public function getLastIdFromTlLogTable(): int
     {
-        $table = $this->_prodDatabaseName. ".tl_log";
+        $table = $this->_databaseName. ".tl_log";
         $statement = $this->_conn
             ->prepare("SELECT id FROM ? ORDER BY id DESC LIMIT 1");
-        $statement->execute(array($table));
-        $result = $statement->fetch();
 
-        if ($statement->rowCount() <= 0) {
-            $this->_log->logErrorAndDie("Something went wrong at running sql commands on prod database: Error-Code: ".
-                $this->_conn->errorCode());
+        try {
+            $statement->execute(array($table));
+            $result = $statement->fetch();
+        }catch (PDOException $e) {
+            throw new DatabaseQueryEmptyResult($e->getMessage());
         }
+
         return intval($result["id"]);
     }
 

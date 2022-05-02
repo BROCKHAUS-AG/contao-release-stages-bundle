@@ -121,8 +121,10 @@ class Database
         foreach ($tableNames as $tableName)
         {
             $tableContent = $this->_dbConnection
-                ->prepare("SELECT * FROM ". $tableName)
-                ->executeQuery()
+                ->createQueryBuilder()
+                ->select("*")
+                ->from($tableName)
+                ->execute()
                 ->fetchAllAssociative();
             $tableInformation->add(new TableInformation($tableName, $tableContent));
         }
@@ -160,11 +162,19 @@ class Database
 
     /**
      * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
      */
-    public function loadHexById(string $column, string $tableName, string $id) : Result
+    public function loadHexById(string $column, string $tableName, string $id): array
     {
         return $this->_dbConnection
-            ->executeQuery("SELECT hex(?) FROM ? WHERE id = ?", [$column, $tableName, $id]);
+            ->createQueryBuilder()
+            ->select("hex(:column)")
+            ->from($tableName)
+            ->where("id = :id")
+            ->setParameter("column", $column)
+            ->setParameter("id", $id)
+            ->execute()
+            ->fetchAllAssociative();
     }
 
     /**
@@ -174,5 +184,22 @@ class Database
     {
         return $this->_dbConnection
             ->executeQuery("SELECT text FROM tl_log WHERE text LIKE 'File or folder % has been deleted'");
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    public function getRowsFromTlLogTableWhereIdIsBiggerThanIdAndTextIsLikeDeleteFrom(int $lastId): array
+    {
+        return $this->_dbConnection
+            ->createQueryBuilder()
+            ->select("text")
+            ->from("tl_log")
+            ->where("id > :id")
+            ->andWhere("text LIKE 'DELETE FROM %'")
+            ->setParameter("id", $lastId)
+            ->execute()
+            ->fetchAllAssociative();
     }
 }
