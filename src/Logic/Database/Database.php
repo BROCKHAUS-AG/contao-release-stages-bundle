@@ -71,16 +71,6 @@ class Database
 
     /**
      * @throws \Doctrine\DBAL\Exception
-     */
-    public function getLastRowsWithWhereStatement(array $columns, string $tableName, string $whereStatement) : Result
-    {
-        return $this->_dbConnection
-            ->executeQuery("SELECT ". implode(", ", $columns). " FROM ". $tableName.
-                " WHERE ". $whereStatement);
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
     public function getFullTableInformation(): TableInformationCollection
