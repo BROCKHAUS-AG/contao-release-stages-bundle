@@ -14,11 +14,13 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseCouldNotCreateTable;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use PDO;
+use PDOException;
 
 class DatabaseProd
 {
@@ -80,18 +82,48 @@ class DatabaseProd
         return false;
     }
 
+    /**
+     * @throws DatabaseCouldNotCreateTable
+     */
     public function createTable(string $table, array $tableScheme): void
     {
-        echo "create table ". $table;
-        var_dump($tableScheme);
+        $tableCommand = $this->createCreateTableCommand($table, $tableScheme);
+        $this->runCreateTableCommand($tableCommand);
+    }
 
-        $columns = array();
+    private function createCreateTableCommand(string $table, array $tableScheme): string
+    {
+        $tableCommand = "CREATE TABLE ". $table. "(";
+        $primaryKey = "";
         for ($x = 0; $x != count($tableScheme); $x++)
         {
-            $columns[] = $tableScheme["Field"]. " ". $tableScheme["Type"];
+            $scheme = $tableScheme[$x];
+            $defaultValue = $this->setDefaultValueForAttribute($scheme["Null"]);
+            $tableCommand = $tableCommand. $scheme["Field"]. " ". $scheme["Type"]. " ".
+                $defaultValue. ", ";
+            if (isset($scheme["Key"]) && $scheme["Key"] == "PRI") {
+                $primaryKey = $scheme["Field"];
+            }
         }
+        return $tableCommand. "PRIMARY KEY(". $primaryKey. "));";
+    }
 
-        die;
+    private function setDefaultValueForAttribute(string $scheme): string
+    {
+        return $scheme == "YES" ? "NULL" : "NOT NULL";
+    }
+
+    /**
+     * @throws DatabaseCouldNotCreateTable
+     */
+    private function runCreateTableCommand(string $createTableCommand): void
+    {
+        $statement = $this->_conn->prepare($createTableCommand);
+        try {
+            $statement->execute();
+        }catch (PDOException $e) {
+            throw new DatabaseCouldNotCreateTable($statement->errorCode());
+        }
     }
 
     public function runSqlCommandsOnProdDatabase(array $commandsToBeExecuted): void

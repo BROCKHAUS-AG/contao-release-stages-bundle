@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseCouldNotCreateTable;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
@@ -41,6 +42,7 @@ class DatabaseCopier
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws DatabaseQueryEmptyResult
+     * @throws DatabaseCouldNotCreateTable
      */
     public function copy(): void
     {
@@ -56,6 +58,7 @@ class DatabaseCopier
     /**
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws DatabaseCouldNotCreateTable
      */
     private function createTablesIfNotExists(TableInformationCollection $tableInformationCollection): void
     {
@@ -68,6 +71,7 @@ class DatabaseCopier
     /**
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws DatabaseCouldNotCreateTable
      */
     private function createTableIfNotExists(string $table): void
     {
