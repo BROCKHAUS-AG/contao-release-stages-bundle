@@ -14,15 +14,15 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseExecutionFailure;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseQueryEmptyResult;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseExecutionFailure;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
 use Doctrine\DBAL\Exception;
 
 class DatabaseCopier
-{
+{#
     private Database $_databaseLogic;
     private DatabaseProd $_prodDatabaseLogic;
     private IO $_ioLogic;

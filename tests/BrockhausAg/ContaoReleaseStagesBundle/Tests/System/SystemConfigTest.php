@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\System;
 
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileNotFound;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\File\ConfigNotFound;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecord;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
@@ -42,14 +42,14 @@ class SystemConfigTest extends ContaoTestCase
 
     public function testGetConfig_shouldThrowConfigNotFoundException(): void
     {
-        self::expectException(FileNotFound::class);
+        self::expectException(ConfigNotFound::class);
         $systemConfig = new SystemConfig("", self::createMock(MapConfig::class),
             self::createMock(Log::class));
         $systemConfig->getConfig();
     }
 
     /**
-     * @throws FileNotFound
+     * @throws ConfigNotFound
      */
     public function testGetConfig_shouldReturnConfig(): void
     {

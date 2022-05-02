@@ -14,12 +14,11 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseExecutionFailure;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileNotFound;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\File\ConfigNotFound;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
@@ -82,7 +81,7 @@ class IO {
     {
         try {
             return $this->_systemConfig->getConfig();
-        } catch (FileNotFound $e) {
+        } catch (ConfigNotFound $e) {
             $this->_log->error($e->getMessage());
             die($e->getMessage());
         }
