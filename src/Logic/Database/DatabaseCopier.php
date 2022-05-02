@@ -147,37 +147,96 @@ class DatabaseCopier
         $rows = array();
         $columnAndValue = array();
         foreach ($column as $row) {
-            if (strpos($tableSchemes[$index]["type"], "varchar") ||
-                strpos($tableSchemes[$index]["type"], "string") ||
-                strpos($tableSchemes[$index]["type"], "char") ||
-                strcmp($tableSchemes[$index]["type"], "char(1)") == 0 ||
-                strpos($tableSchemes[$index]["type"], "text")) {
-                $row = str_replace("'", "\'", $row);
-                $rows[] = '\''. $row. '\'';
-                $columnAndValue[] = $tableSchemes[$index]["field"]. " = '". $row. "'";
-            }else if (empty($row) && strcmp($tableSchemes[$index]["nullable"], "YES") == 0) {
-                $rows[] = "NULL";
-                $columnAndValue[] = $tableSchemes[$index]["field"]. " = NULL";
-            }else if (strcmp($tableSchemes[$index]["type"], "binary(16)") == 0 ||
-                strcmp($tableSchemes[$index]["type"], "varbinary(128)") == 0) {
-                $req = $this->_databaseLogic->loadHexById($tableSchemes[$index]["field"], $tableName, $column["id"]);
-                $rows[] = "UNHEX('". $req[0]["hex(". $tableSchemes[$index]["field"]. ")"]. "')";
-                $columnAndValue[] = $tableSchemes[$index]["field"]. "= UNHEX('". $req[0]["hex(".
-                    $tableSchemes[$index]["field"]. ")"]. "')";
-            }else if (strcmp($tableSchemes[$index]["type"], "blob") == 0 ||
-                strcmp($tableSchemes[$index]["type"], "mediumblob") == 0 ||
-                strcmp($tableSchemes[$index]["type"], "longblob") == 0) {
-                $rows[] = "x'". bin2hex($row). "'";
-                $columnAndValue[] = $tableSchemes[$index]["field"]. " = x'". bin2hex($row). "'";
-            }else {
-                $rows[] = $row;
-                $columnAndValue[] = $tableSchemes[$index]["field"]. " = ". $row;
-            }
-
-            $tableSchemeFields[] = $tableSchemes[$index]["field"];
+            $this->createRowsAndColumn($tableSchemes[$index], $rows, $columnAndValue, $tableName,
+                $tableSchemeFields, $row, $column["id"]);
             $index++;
         }
         return $this->createReturnValue($rows, $tableSchemeFields, $columnAndValue);
+    }
+
+    /**
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    private function createRowsAndColumn(array $tableSchemes, array &$rows, array &$columnAndValue,
+                                         string $tableName, array &$tableSchemeFields, ?string $row, ?string $id): void
+    {
+        $type = $tableSchemes["type"];
+        if ($this->checkIfColumnTypeIsText($type)) {
+            $this->createRowsAndColumnValuesForText($rows, $tableSchemes["field"], $columnAndValue, $row);
+        } else if ($this->checkIfColumnIsNullable($tableSchemes["nullable"], $row)) {
+            $this->setRowsAndColumnsNull($rows, $tableSchemes["field"], $columnAndValue);
+        } else if ($this->checkIfColumnTypeIsBinary($type)) {
+            $this->createRowsAndColumnForBinary($tableSchemes["field"], $tableName, $rows, $columnAndValue, $id);
+        } else if ($this->checkIfColumnTypeIsBlob($type)) {
+            $this->createRowsAndColumnForBlob($rows, $tableSchemes["field"], $columnAndValue, $row);
+        } else {
+            $this->createRowsAndColumnForNothing($rows, $tableSchemes["field"], $columnAndValue, $row);
+        }
+
+        $tableSchemeFields[] = $tableSchemes["field"];
+    }
+
+    private function checkIfColumnTypeIsText(string $type): bool
+    {
+        return strpos($type, "varchar") || strpos($type, "string") || strpos($type, "char") ||
+            strcmp($type, "char(1)") == 0 || strpos($type, "text");
+    }
+
+    private function createRowsAndColumnValuesForText(array &$rows, string $field, array &$columnAndValue,
+                                                      ?string $row): void
+    {
+        $row = str_replace("'", "\'", $row);
+        $rows[] = '\'' . $row . '\'';
+        $columnAndValue[] = $field . " = '" . $row . "'";
+    }
+
+    private function checkIfColumnIsNullable(string $nullable, ?string $row): bool
+    {
+        return empty($row) && strcmp($nullable, "YES") == 0;
+    }
+
+    private function setRowsAndColumnsNull(array &$rows, string $field, array &$columnAndValue): void
+    {
+        $rows[] = "NULL";
+        $columnAndValue[] = $field . " = NULL";
+    }
+
+    private function checkIfColumnTypeIsBinary(string $type): bool
+    {
+        return strcmp($type, "binary(16)") == 0 || strcmp($type, "varbinary(128)") == 0;
+    }
+
+    /**
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    private function createRowsAndColumnForBinary(string $field, string $tableName, array &$rows,
+                                                  array &$columnAndValue, ?string $id): void
+    {
+        $req = $this->_databaseLogic->loadHexById($field, $tableName, $id);
+        $rows[] = "UNHEX('" . $req[0]["hex(" . $field . ")"] . "')";
+        $columnAndValue[] = $field . "= UNHEX('" . $req[0]["hex(" .
+            $field . ")"] . "')";
+    }
+
+    private function checkIfColumnTypeIsBlob(string $type): bool
+    {
+        return strcmp($type, "blob") == 0 || strcmp($type, "mediumblob") == 0 ||
+            strcmp($type, "longblob") == 0;
+    }
+
+    private function createRowsAndColumnForBlob(array &$rows, string $field, array &$columnAndValue, ?string $row): void
+    {
+        $rows[] = "x'" . bin2hex($row) . "'";
+        $columnAndValue[] = $field . " = x'" . bin2hex($row) . "'";
+    }
+
+    private function createRowsAndColumnForNothing(array &$rows, string $field, array &$columnAndValue,
+                                                   ?string $row): void
+    {
+        $rows[] = $row;
+        $columnAndValue[] = $field . " = " . $row;
     }
 
     private function createCommandsWithValueForTable(array $values, string $tableName): array
