@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\System;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\ConfigNotFound;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseCouldNotCreateTable;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileNotFound;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig;
@@ -75,12 +75,12 @@ class SystemConfig
     }
 
     /**
-     * @throws ConfigNotFound
+     * @throws DatabaseCouldNotCreateTable
      */
     public function getConfig(): Config
     {
         if (!isset($this->_config)) {
-            throw new ConfigNotFound("Could not get config. Config was maybe not instantiated from
+            throw new DatabaseCouldNotCreateTable("Could not get config. Config was maybe not instantiated from
                 config file");
         }
         return $this->_config;

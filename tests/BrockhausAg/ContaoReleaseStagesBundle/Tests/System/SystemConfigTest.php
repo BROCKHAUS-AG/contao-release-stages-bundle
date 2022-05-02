@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\System;
 
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\ConfigNotFound;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\DatabaseCouldNotCreateTable;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\ConfigNotFoundException;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileNotFoundException;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
@@ -44,14 +44,14 @@ class SystemConfigTest extends ContaoTestCase
 
     public function testGetConfig_shouldThrowConfigNotFoundException(): void
     {
-        self::expectException(ConfigNotFound::class);
+        self::expectException(DatabaseCouldNotCreateTable::class);
         $systemConfig = new SystemConfig("", self::createMock(MapConfig::class),
             self::createMock(Log::class));
         $systemConfig->getConfig();
     }
 
     /**
-     * @throws ConfigNotFound
+     * @throws DatabaseCouldNotCreateTable
      */
     public function testGetConfig_shouldReturnConfig(): void
     {
