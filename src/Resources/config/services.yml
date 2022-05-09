@@ -62,7 +62,14 @@ services:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPConnection:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPConnector:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+        calls:
+            - setUpFTPConfig: []
+
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH\SSHConnection:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
@@ -77,3 +84,13 @@ services:
     BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Compressor\Compressor:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH\SSHConnection'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
+            - '%kernel.project_dir%'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPConnector'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+        calls:
+            - setUp: []

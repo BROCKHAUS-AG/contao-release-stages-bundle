@@ -38,7 +38,8 @@
         "ext-json": "*",
         "ext-mysqli": "*",
         "ext-ftp": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-ssh2": "*"
     },
     "require-dev": {
         "contao/manager-plugin": "^2.3",

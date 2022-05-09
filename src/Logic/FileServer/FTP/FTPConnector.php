@@ -17,7 +17,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 
-class FTPConnection {
+class FTPConnector {
     private IO $_io;
     private Log $_log;
 
