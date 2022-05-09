@@ -1,9 +1,9 @@
 {
   "database": {
-    "server": "192.168.0.2",
-    "name": "prodContao",
+    "server": "meine-db.de",
+    "name": "contao",
     "port": 3306,
-    "username": "prodContao",
+    "username": "admin",
     "password": "admin1234",
     "ignoredTables": [
       "tl_to_be_ignored",
@@ -12,22 +12,22 @@
   },
   "copyTo": "fileServer",
   "fileServer": {
-    "server": "",
-    "path": "",
+    "server": "mein-server.de",
+    "path": "/var/www/html/contao",
     "ftp": {
-      "port": 0,
-      "username": "",
-      "password": "",
-      "ssl": false
+      "username": "admin",
+      "password": "admin1234",
+      "port": 22,
+      "ssl": true
     },
     "ssh": {
-      "port": 0,
-      "username": "",
-      "password": ""
+      "username": "admin",
+      "password": "admin1234",
+      "port": 22
     }
   },
   "local": {
-    "contaoProdPath": "/var/www/html/contao/filesProd/"
+    "contaoProdPath": "/var/www/html/contao"
   },
   "dnsRecords": [
     {
