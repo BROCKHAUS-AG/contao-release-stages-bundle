@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
@@ -34,8 +35,9 @@ class Database
     }
 
     /**
-     * @throws Exception
+     * @throws DatabaseQueryEmptyResult
      * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getLatestReleaseVersion(): Version
     {
@@ -48,7 +50,7 @@ class Database
             ->fetchAllAssociative();
 
         if ($result[1] == NULL || $result[1]["version"] == NULL) {
-            throw new Exception("no entry found");
+            throw new DatabaseQueryEmptyResult();
         }
 
         $latestVersion = $result[1];

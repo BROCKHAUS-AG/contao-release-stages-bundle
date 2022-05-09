@@ -44,7 +44,7 @@ class ReleaseStages
     public function onSubmitCallback() : void
     {
         $this->_versioning->setNewVersionAutomatically();
-        $this->_databaseCopier->copy();
+        // $this->_databaseCopier->copy();
         // $this->_fileServerCopierLogic->copy();
     }
 }

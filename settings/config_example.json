@@ -13,11 +13,18 @@
   "copyTo": "fileServer",
   "fileServer": {
     "server": "",
-    "port": "",
-    "username": "",
-    "password": "",
-    "ssl_tsl": false,
-    "path": ""
+    "path": "",
+    "ftp": {
+      "port": 0,
+      "username": "",
+      "password": "",
+      "ssl": false
+    },
+    "ssh": {
+      "port": 0,
+      "username": "",
+      "password": ""
+    }
   },
   "local": {
     "contaoProdPath": "/var/www/html/contao/filesProd/"

@@ -19,7 +19,9 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecord;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ftp;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ssh;
 use Contao\TestCase\ContaoTestCase;
 
 /**
@@ -54,11 +56,18 @@ class MapConfigTest extends ContaoTestCase
               "copyTo": "fileServer",
               "fileServer": {
                 "server": "192.168.178.23",
-                "port": 1234,
-                "username": "admin",
-                "password": "admin1234",
-                "ssl_tsl": false,
-                "path": "test"
+                "path": "test",
+                "ftp": {
+                    "port": 1234,
+                    "username": "admin",
+                    "password": "admin1234",
+                    "ssl": false
+                },
+                "ssh": {
+                    "port": 1234,
+                    "username": "admin",
+                    "password": "admin1234"
+                }
               },
               "local": {
                 "contaoProdPath": "test"
@@ -83,8 +92,9 @@ class MapConfigTest extends ContaoTestCase
 
         $expectedDatabase = new Database("192.168.0.2", "prodContao", 3306, "prodContao",
             "admin1234", array("tl_to_be_ignored", "tl_to_be_ignored_too"));
-        $expectedFileServer = new FileServer("192.168.178.23", 1234, "admin", "admin1234",
-            false, "test");
+        $expectedFtp = new Ftp(1234, "admin", "admin1234", false);
+        $expectedSsh = new Ssh(1234, "admin", "admin1234");
+        $expectedFileServer = new FileServer("192.168.178.23", "test", $expectedFtp, $expectedSsh);
         $expectedLocal = new Local("test");
         $expectedDNSRecords = new DNSRecordCollection();
         $expectedDNSRecords->add(new DNSRecord("example-site", "www.example-site.de"));
@@ -103,11 +113,14 @@ class MapConfigTest extends ContaoTestCase
         self::assertSame($expectedDatabase->getIgnoredTables(), $actual->getDatabase()->getIgnoredTables());
         self::assertSame($expected->getCopyTo(), $actual->getCopyTo());
         self::assertSame($expectedFileServer->getServer(), $actual->getFileServer()->getServer());
-        self::assertSame($expectedFileServer->getPort(), $actual->getFileServer()->getPort());
-        self::assertSame($expectedFileServer->getUsername(), $actual->getFileServer()->getUsername());
-        self::assertSame($expectedFileServer->getPassword(), $actual->getFileServer()->getPassword());
-        self::assertSame($expectedFileServer->isSslTsl(), $actual->getFileServer()->isSslTsl());
         self::assertSame($expectedFileServer->getPath(), $actual->getFileServer()->getPath());
+        self::assertSame($expectedFtp->getPort(), $actual->getFileServer()->getFtp()->getPort());
+        self::assertSame($expectedFtp->getUsername(), $actual->getFileServer()->getFtp()->getUsername());
+        self::assertSame($expectedFtp->getPassword(), $actual->getFileServer()->getFtp()->getPassword());
+        self::assertSame($expectedFtp->isSsl(), $actual->getFileServer()->getFtp()->isSsl());
+        self::assertSame($expectedFtp->getPort(), $actual->getFileServer()->getSsh()->getPort());
+        self::assertSame($expectedFtp->getUsername(), $actual->getFileServer()->getSsh()->getUsername());
+        self::assertSame($expectedFtp->getPassword(), $actual->getFileServer()->getSsh()->getPassword());
         self::assertSame($expectedLocal->getContaoProdPath(), $actual->getLocal()->getContaoProdPath());
         for ($x = 0; $x != $expectedDNSRecords->getLength(); $x++) {
             self::assertSame($expectedDNSRecords->getByIndex($x)->getAlias(),

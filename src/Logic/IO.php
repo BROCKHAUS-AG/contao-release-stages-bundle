@@ -20,7 +20,9 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ftp;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ssh;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
 
 class IO {
@@ -35,49 +37,59 @@ class IO {
         $this->_log = $log;
     }
 
-    public function getPathToContaoFiles() : string
+    public function getPathToContaoFiles(): string
     {
         return $this->_contaoPath. "/files";
     }
 
-    public function getDatabaseConfiguration() : Database
+    public function getDatabaseConfiguration(): Database
     {
         return $this->getConfig()->getDatabase();
     }
 
-    public function getDatabaseIgnoredTablesConfiguration() : array
+    public function getDatabaseIgnoredTablesConfiguration(): array
     {
         $ignoredTables = $this->getConfig()->getDatabase()->getIgnoredTables();
         array_push($ignoredTables, "tl_user", "tl_cron_job", "tl_release_stages");
         return $ignoredTables;
     }
 
-    public function getDNSRecords() : DNSRecordCollection
+    public function getDNSRecords(): DNSRecordCollection
     {
         return $this->getConfig()->getDnsRecords();
     }
 
-    public function getWhereToCopy() : string
+    public function getWhereToCopy(): string
     {
         return $this->getConfig()->getCopyTo();
     }
 
-    public function getFileServerConfiguration() : FileServer
+    public function getFileServerConfiguration(): FileServer
     {
         return $this->getConfig()->getFileServer();
     }
 
-    public function getLocalFileServerConfiguration() : Local
+    public function getFTPConfiguration(): Ftp
+    {
+        return $this->getFileServerConfiguration()->getFtp();
+    }
+
+    public function getSSHConfiguration(): Ssh
+    {
+        return $this->getFileServerConfiguration()->getSsh();
+    }
+
+    public function getLocalFileServerConfiguration(): Local
     {
         return $this->getConfig()->getLocal();
     }
 
-    public function getFileFormats() : array
+    public function getFileFormats(): array
     {
         return $this->getConfig()->getFileFormats();
     }
 
-    private function getConfig() : Config
+    private function getConfig(): Config
     {
         try {
             return $this->_systemConfig->getConfig();

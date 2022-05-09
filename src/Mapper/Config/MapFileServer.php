@@ -8,17 +8,16 @@ use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Map;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use stdClass;
 
-class MapFileServer extends Map {
-
-    public function map(stdClass $data) : FileServer
+class MapFileServer extends Map
+{
+    public function map(stdClass $data): FileServer
     {
-       return new FileServer(
-         $data->server,
-         $data->port,
-         $data->username,
-         $data->password,
-         $data->ssl_tsl,
-         $data->path
-       );
+        $ftpMapper = new MapFtp();
+        $ftp = $ftpMapper->map($data->ftp);
+
+        $sshMapper = new MapSsh();
+        $ssh = $sshMapper->map($data->ssh);
+
+       return new FileServer($data->server, $data->path, $ftp, $ssh);
     }
 }

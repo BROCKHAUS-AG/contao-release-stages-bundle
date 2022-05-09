@@ -20,7 +20,9 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecord;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ftp;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ssh;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
 use Contao\TestCase\ContaoTestCase;
 
@@ -118,10 +120,46 @@ class IOTest extends ContaoTestCase
         self::assertSame($expected, $actual);
     }
 
+    public function testGetFTPConfiguration(): void
+    {
+        $expected = new Ftp(0, "username", "password", true);
+        $fileServer = new FileServer("server", "path", $expected, self::createMock(Ssh::class));
+        $willReturn = new Config(self::createMock(Database::class), "", $fileServer,
+            self::createMock(Local::class), self::createMock(DNSRecordCollection::class),
+            array());
+
+        $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
+
+        $actual = $ioLogic->getFTPConfiguration();
+
+        self::assertSame($expected->getPassword(), $actual->getPassword());
+        self::assertSame($expected->getUsername(), $actual->getUsername());
+        self::assertSame($expected->getPort(), $actual->getPort());
+        self::assertSame($expected->isSsl(), $actual->isSsl());
+    }
+
+    public function testGetSSHConfiguration(): void
+    {
+        $expected = new Ssh(0, "username", "password");
+        $fileServer = new FileServer("server", "path", self::createMock(Ftp::class), $expected);
+        $willReturn = new Config(self::createMock(Database::class), "", $fileServer,
+            self::createMock(Local::class), self::createMock(DNSRecordCollection::class),
+            array());
+
+        $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
+
+        $actual = $ioLogic->getSSHConfiguration();
+
+        self::assertSame($expected->getPassword(), $actual->getPassword());
+        self::assertSame($expected->getUsername(), $actual->getUsername());
+        self::assertSame($expected->getPort(), $actual->getPort());
+    }
+
     public function testGetFileServerConfiguration(): void
     {
-        $expected = new FileServer("server", 0, "username", "password", true,
-            "path");
+        $expected_ftp = new Ftp(0, "username", "password", true);
+        $expected_ssh = new Ssh(0, "username", "password");
+        $expected = new FileServer("server", "path", $expected_ftp, $expected_ssh);
         $willReturn = new Config(self::createMock(Database::class), "", $expected,
             self::createMock(Local::class), self::createMock(DNSRecordCollection::class),
             array());
@@ -130,11 +168,16 @@ class IOTest extends ContaoTestCase
         $actual = $ioLogic->getFileServerConfiguration();
 
         self::assertSame($expected->getServer(), $actual->getServer());
-        self::assertSame($expected->getPort(), $actual->getPort());
-        self::assertSame($expected->getUsername(), $actual->getUsername());
-        self::assertSame($expected->getPassword(), $actual->getPassword());
-        self::assertSame($expected->isSslTsl(), $actual->isSslTsl());
         self::assertSame($expected->getPath(), $actual->getPath());
+
+        self::assertSame($expected->getFtp()->getPort(), $actual->getFtp()->getPort());
+        self::assertSame($expected->getFtp()->getUsername(), $actual->getFtp()->getUsername());
+        self::assertSame($expected->getFtp()->getPassword(), $actual->getFtp()->getPassword());
+        self::assertSame($expected->getFtp()->isSsl(), $actual->getFtp()->isSsl());
+
+        self::assertSame($expected->getSsh()->getPort(), $actual->getSsh()->getPort());
+        self::assertSame($expected->getSsh()->getUsername(), $actual->getSsh()->getUsername());
+        self::assertSame($expected->getSsh()->getPassword(), $actual->getSsh()->getPassword());
     }
 
     public function testGetLocalServerConfiguration(): void

@@ -13,7 +13,7 @@ class Config
     private DNSRecordCollection $dnsRecords;
     private array $fileFormats;
 
-    public function __construct(Database            $database, string $copyTo, FileServer $fileServer, Local $local,
+    public function __construct(Database $database, string $copyTo, FileServer $fileServer, Local $local,
                                 DNSRecordCollection $dnsRecords, array $fileFormats)
     {
         $this->database = $database;

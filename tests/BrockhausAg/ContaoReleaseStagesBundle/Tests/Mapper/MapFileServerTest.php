@@ -15,6 +15,8 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapFileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ftp;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ssh;
 use Contao\TestCase\ContaoTestCase;
 
 /**
@@ -24,9 +26,6 @@ use Contao\TestCase\ContaoTestCase;
  */
 class MapFileServerTest extends ContaoTestCase
 {
-    /**
-     * Test Contao manager plugin class instantiation
-     */
     public function testInstantiation(): void
     {
         self::assertInstanceOf(MapFileServer::class, new MapFileServer());
@@ -36,23 +35,35 @@ class MapFileServerTest extends ContaoTestCase
     {
         $input = '{
             "server": "192.168.178.23",
-            "port": 1234,
-            "username": "admin",
-            "password": "admin1234",
-            "ssl_tsl": false,
-            "path": "test"
+            "path": "test",
+            "ftp": {
+                "port": 1234,
+                "username": "admin",
+                "password": "admin1234",
+                "ssl": true
+            },
+            "ssh": {
+                "port": 1234,
+                "username": "admin",
+                "password": "admin1234"
+            }
           }';
-        $expected = new FileServer("192.168.178.23", 1234, "admin", "admin1234",
-            false, "test");
-        $mapper = new MapFileServer();
 
+        $expectedFtp = new Ftp(1234, "admin", "admin1234", true);
+        $expectedSsh = new Ssh(1234, "admin", "admin1234");
+        $expected = new FileServer("192.168.178.23", "test", $expectedFtp, $expectedSsh);
+
+        $mapper = new MapFileServer();
         $actual = $mapper->map(json_decode($input));
 
         self::assertSame($expected->getServer(), $actual->getServer());
-        self::assertSame($expected->getPort(), $actual->getPort());
-        self::assertSame($expected->getUsername(), $actual->getUsername());
-        self::assertSame($expected->getPassword(), $actual->getPassword());
-        self::assertSame($expected->isSslTsl(), $actual->isSslTsl());
         self::assertSame($expected->getPath(), $actual->getPath());
+        self::assertSame($expectedFtp->getPort(), $actual->getFtp()->getPort());
+        self::assertSame($expectedFtp->getUsername(), $actual->getFtp()->getUsername());
+        self::assertSame($expectedFtp->getPassword(), $actual->getFtp()->getPassword());
+        self::assertSame($expectedFtp->isSsl(), $actual->getFtp()->isSsl());
+        self::assertSame($expectedSsh->getPort(), $actual->getSsh()->getPort());
+        self::assertSame($expectedSsh->getUsername(), $actual->getSsh()->getUsername());
+        self::assertSame($expectedSsh->getPassword(), $actual->getSsh()->getPassword());
     }
 }

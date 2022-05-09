@@ -22,7 +22,9 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecord;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ftp;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ssh;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
 use Contao\TestCase\ContaoTestCase;
 use ReflectionClass;
@@ -57,8 +59,9 @@ class SystemConfigTest extends ContaoTestCase
             self::createMock(Log::class));
         $expectedDatabase = new Database("192.168.0.2", "prodContao", 3306, "prodContao",
             "admin1234", array("tl_to_be_ignored", "tl_to_be_ignored_too"));
-        $expectedFileServer = new FileServer("192.168.178.23", 1234, "admin", "admin1234",
-            false, "test");
+        $expectedFtp = new Ftp(1234, "admin", "admin1234", false);
+        $expectedSsh = new Ssh(1234, "admin", "admin1234");
+        $expectedFileServer = new FileServer("192.168.178.23", "test", $expectedFtp, $expectedSsh);
         $expectedLocal = new Local("test");
         $expectedDNSRecords = new DNSRecordCollection();
         $expectedDNSRecords->add(new DNSRecord("example-site", "www.example-site.de"));
@@ -81,11 +84,14 @@ class SystemConfigTest extends ContaoTestCase
         self::assertSame($expectedDatabase->getIgnoredTables(), $actual->getDatabase()->getIgnoredTables());
         self::assertSame($expected->getCopyTo(), $actual->getCopyTo());
         self::assertSame($expectedFileServer->getServer(), $actual->getFileServer()->getServer());
-        self::assertSame($expectedFileServer->getPort(), $actual->getFileServer()->getPort());
-        self::assertSame($expectedFileServer->getUsername(), $actual->getFileServer()->getUsername());
-        self::assertSame($expectedFileServer->getPassword(), $actual->getFileServer()->getPassword());
-        self::assertSame($expectedFileServer->isSslTsl(), $actual->getFileServer()->isSslTsl());
         self::assertSame($expectedFileServer->getPath(), $actual->getFileServer()->getPath());
+        self::assertSame($expectedFtp->getPort(), $actual->getFileServer()->getFtp()->getPort());
+        self::assertSame($expectedFtp->getUsername(), $actual->getFileServer()->getFtp()->getUsername());
+        self::assertSame($expectedFtp->getPassword(), $actual->getFileServer()->getFtp()->getPassword());
+        self::assertSame($expectedFtp->isSsl(), $actual->getFileServer()->getFtp()->isSsl());
+        self::assertSame($expectedFtp->getPort(), $actual->getFileServer()->getSsh()->getPort());
+        self::assertSame($expectedFtp->getUsername(), $actual->getFileServer()->getSsh()->getUsername());
+        self::assertSame($expectedFtp->getPassword(), $actual->getFileServer()->getSsh()->getPassword());
         self::assertSame($expectedLocal->getContaoProdPath(), $actual->getLocal()->getContaoProdPath());
         for ($x = 0; $x != $expectedDNSRecords->getLength(); $x++) {
             self::assertSame($expectedDNSRecords->getByIndex($x)->getAlias(),

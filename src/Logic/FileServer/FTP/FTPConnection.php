@@ -39,11 +39,12 @@ class FTPConnection {
     public function setUpFTPConfig(): void
     {
         $config = $this->_io->getFileServerConfiguration();
-        $this->username = $config->getUsername();
-        $this->password = $config->getPassword();
+        $config_ftp = $this->_io->getFTPConfiguration();
+        $this->username = $config_ftp->getUsername();
+        $this->password = $config_ftp->getPassword();
         $this->server = $config->getServer();
-        $this->port = $config->getPort();
-        $this->ssl_tsl = $config->isSslTsl();
+        $this->port = $config_ftp->getPort();
+        $this->ssl_tsl = $config_ftp->isSsl();
     }
 
     public function connect(): bool

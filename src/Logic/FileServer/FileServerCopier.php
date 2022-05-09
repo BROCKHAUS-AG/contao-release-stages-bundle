@@ -190,8 +190,9 @@ class FileServerCopier extends Backend {
     {
         if ($this->isToCopyToFTPFileServer()) {
             $config = $this->_io->getFileServerConfiguration();
+            $config_ssh = $this->_io->getSSHConfiguration();
             $connection = ssh2_connect($config->getServer(), 22);
-            ssh2_auth_password($connection, $config->getUsername(), $config->getPassword());
+            ssh2_auth_password($connection, $config_ssh->getUsername(), $config_ssh->getPassword());
             $stream = ssh2_exec($connection, "bash -r /html/release-stages.sh");
             stream_set_blocking($stream, true);
             fclose($stream);
