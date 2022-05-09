@@ -15,6 +15,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Model;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Collection;
 use Contao\TestCase\ContaoTestCase;
+use Error;
 
 /**
  * Class CollectionTest
@@ -85,6 +86,31 @@ class CollectionTest extends ContaoTestCase
         self::assertSame(2, $testCollection->getLength());
     }
 
+    public function testRemoveFromEmptyList(): void
+    {
+        $testCollection = new TestCollection();
+
+        try {
+            $testCollection->remove(0);
+        }catch (Error $e) {
+            self::assertNotNull($e);
+            return;
+        }
+        self::fail("Exception test should break");
+    }
+
+    public function testGetItemAtIndexWhichNotExistsShouldThrowException(): void
+    {
+        $testCollection = new TestCollection();
+
+        try {
+            $testCollection->getByIndex(0);
+        }catch (Error $e) {
+            self::assertNotNull($e);
+            return;
+        }
+        self::fail("Exception test should break");
+    }
 }
 
 class Test
