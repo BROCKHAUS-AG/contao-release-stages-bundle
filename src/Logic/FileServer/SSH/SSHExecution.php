@@ -32,6 +32,11 @@ class SSHExecution
         return $stream;
     }
 
+    public function executeScript(string $scriptName)
+    {
+        return $this->execute("bash -r ". $scriptName);
+    }
+
     /**
      * @return false|string
      */

@@ -17,7 +17,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 
-class SSHConnection {
+class SSHConnector {
     private IO $_io;
     private Log $_log;
 

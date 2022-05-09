@@ -16,7 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPFileServerCopier;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH\SSHConnection;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH\SSHConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH\SSHExecution;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
@@ -27,14 +27,14 @@ define("FILE_SYSTEM_BACKUP_FILE", "backup_file_system.sh");
 define("LOCAL_PATH", "vendor/brockhaus-ag/contao-release-stages/backup/");
 class BackupCreator
 {
-    private SSHConnection $_sshConnection;
+    private SSHConnector $_sshConnection;
     private IO $_io;
     private string $_path;
     private FTPConnector $_ftpConnector;
     private FTPFileServerCopier $_ftpFileServerCopier;
     private Log $_log;
 
-    public function __construct(SSHConnection $sshConnection, IO $io, string $path, FTPConnector $ftpConnector, Log $log)
+    public function __construct(SSHConnector $sshConnection, IO $io, string $path, FTPConnector $ftpConnector, Log $log)
     {
         $this->_sshConnection = $sshConnection;
         $this->_io = $io;
@@ -52,9 +52,10 @@ class BackupCreator
         $this->_ftpFileServerCopier = new FTPFileServerCopier($ftpConnection);
     }
 
-    public function createBackup(): void
+    public function create(): void
     {
         $sshExecution = $this->createSSHExecution();
+        $this->checkIfBackupExecutionFilesExistsElseCreateIt($sshExecution);
         $this->createBackupFromDB($sshExecution);
         $this->createBackupFromFileSystem($sshExecution);
     }
@@ -84,6 +85,21 @@ class BackupCreator
         return $output != "cat: ". $file. ": No such file or directory";
     }
 
+    private function createSSHExecution(): SSHExecution
+    {
+        return new SSHExecution($this->_sshConnection);
+    }
+
+    private function createBackupFromDB(SSHExecution $execution): void
+    {
+        $execution->executeScript($this->getDBBackupFilePath());
+    }
+
+    private function createBackupFromFileSystem(SSHExecution $execution): void
+    {
+        $execution->executeScript($this->getFileSystemBackupFilePath());
+    }
+
     private function getDBBackupFilePath(): string
     {
         return $this->getBackupPath().DB_BACKUP_FILE;
@@ -97,20 +113,5 @@ class BackupCreator
     private function getBackupPath(): string
     {
         return $this->_io->getFileServerConfiguration()->getPath().BACKUP_PATH;
-    }
-
-    private function createSSHExecution(): SSHExecution
-    {
-        return new SSHExecution($this->_sshConnection);
-    }
-
-    private function createBackupFromDB(SSHExecution $execution): void
-    {
-        $execution->execute("");
-    }
-
-    private function createBackupFromFileSystem(SSHExecution $execution): void
-    {
-        $execution->execute("");
     }
 }

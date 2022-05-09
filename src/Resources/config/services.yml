@@ -31,6 +31,7 @@ services:
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServerCopier'
 
@@ -69,7 +70,7 @@ services:
         calls:
             - setUpFTPConfig: []
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH\SSHConnection:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH\SSHConnector:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
@@ -87,7 +88,7 @@ services:
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator:
         arguments:
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH\SSHConnection'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH\SSHConnector'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
             - '%kernel.project_dir%'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPConnector'
