@@ -43,12 +43,15 @@ class ReleaseStages
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws DatabaseQueryEmptyResult
      * @throws DatabaseExecutionFailure
+     *
+     * This method is called when clicking the submit button in the Release Stages DCA
+     * After clicking the button, the Bundle would create a new Release
      */
     public function onSubmitCallback() : void
     {
-        $this->_versioning->setNewVersionAutomatically();
         $this->_backupCreator->create();
         // $this->_databaseCopier->copy();
-        // $this->_fileServerCopierLogic->copy();
+        // $this->_fileServerCopier->copy();
+        $this->_versioning->generateNewVersionNumber();
     }
 }

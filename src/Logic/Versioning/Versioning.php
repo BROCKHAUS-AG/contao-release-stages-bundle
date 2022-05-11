@@ -34,7 +34,7 @@ class Versioning {
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
-    public function setNewVersionAutomatically(): void
+    public function generateNewVersionNumber(): void
     {
         try {
             $latestVersion = $this->database->getLatestReleaseVersion();

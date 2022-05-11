@@ -16,12 +16,12 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPFileServerCopier;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPConnection;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Local\FileServerLocalCopier;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPFileServerCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Local\FileServerLocalCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
 use Contao\Backend;
 
 DEFINE("COPY_TO_LOCAL", "local");
@@ -63,7 +63,7 @@ class FileServerCopier extends Backend {
        if ($this->isToCopyToLocalFileServer()) {
             return $this->_io->getLocalFileServerConfiguration()->getContaoProdPath();
         }else if ($this->isToCopyToFTPFileServer()) {
-            $ftpConnection = new FTPConnection($this->_io, $this->_log);
+            $ftpConnection = new FTPConnector($this->_io, $this->_log);
             $this->_ftpFileServerCopier = new FTPFileServerCopier($ftpConnection->connect());
             return $this->_io->getFileServerConfiguration()->getPath();
         }

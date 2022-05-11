@@ -11,7 +11,7 @@ declare(strict_types=1);
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
-namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH;
 
 class SSHExecution
 {

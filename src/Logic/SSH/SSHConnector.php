@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;

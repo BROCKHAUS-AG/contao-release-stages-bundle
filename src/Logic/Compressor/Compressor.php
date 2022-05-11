@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Compressor;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Compressor;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use Exception;

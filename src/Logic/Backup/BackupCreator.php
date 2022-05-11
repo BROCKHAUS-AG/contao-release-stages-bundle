@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPConnector;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPFileServerCopier;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH\SSHConnector;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH\SSHExecution;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPFileServerCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHExecution;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
 define("BACKUP_PATH", "backup/");
