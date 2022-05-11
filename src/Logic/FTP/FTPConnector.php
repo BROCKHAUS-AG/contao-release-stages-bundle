@@ -25,7 +25,7 @@ class FTPConnector {
     private string $password;
     private string $server;
     private int $port;
-    private bool $ssl_tsl;
+    private bool $ssl;
 
     public function __construct(IO $io, Log $log)
     {
@@ -36,7 +36,7 @@ class FTPConnector {
     /**
      * This function is called from dependency injection while injecting this dependency
      */
-    public function setUpFTPConfig(): void
+    public function setUp(): void
     {
         $config = $this->_io->getFileServerConfiguration();
         $config_ftp = $this->_io->getFTPConfiguration();
@@ -44,12 +44,12 @@ class FTPConnector {
         $this->password = $config_ftp->getPassword();
         $this->server = $config->getServer();
         $this->port = $config_ftp->getPort();
-        $this->ssl_tsl = $config_ftp->isSsl();
+        $this->ssl = $config_ftp->isSsl();
     }
 
     public function connect(): bool
     {
-        if ($this->ssl_tsl) {
+        if ($this->ssl) {
             $conn = $this->connectToSFTPServer();
         }else {
             $conn = $this->connectToFTPServer();
