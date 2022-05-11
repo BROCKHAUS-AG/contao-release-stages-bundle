@@ -8,7 +8,7 @@ while getopts f:t: flag
 do
   case "${flag}" in
     f) from_path=${OPTARG};;
-    t) to_path="${OPTARG}";;
+    t) to_path=${OPTARG};;
   esac
 done
 
