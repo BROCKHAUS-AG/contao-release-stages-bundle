@@ -35,7 +35,7 @@ class DatabaseProd
     /**
      * This function is called from dependency injection while injecting this dependency
      */
-    public function setUpDatabaseConnection(): void
+    public function setUp(): void
     {
         $config = $this->getDatabaseConfiguration();
         $this->_databaseName = $config->getName();

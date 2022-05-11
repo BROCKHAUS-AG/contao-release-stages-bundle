@@ -13,7 +13,7 @@ declare(strict_types=1);
  */
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH;
 
-class SSHExecution
+class SSHRunner
 {
     private $_conn;
 

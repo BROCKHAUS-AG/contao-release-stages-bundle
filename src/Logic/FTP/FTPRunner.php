@@ -14,9 +14,10 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
-class FTPFileServerCopier {
+class FTPRunner {
     private $_conn;
 
     public function __construct($conn)
@@ -24,7 +25,7 @@ class FTPFileServerCopier {
         $this->_conn = $conn;
     }
 
-    public function createDirectory(string $directory) : void
+    public function createDirectory(string $directory): void
     {
         if (!$this->checkIfDirectoryExists($directory)) {
             $this->mkdir($directory);
@@ -32,12 +33,15 @@ class FTPFileServerCopier {
         }
     }
 
-    public function getLastModifiedTimeFromFile(string $file) : int
+    public function getLastModifiedTimeFromFile(string $file): int
     {
         return ftp_mdtm($this->_conn, $file);
     }
 
-    public function copy(File $file) : void
+    /**
+     * @throws FTPCopy
+     */
+    public function copy(File $file): void
     {
         $prodPath = $file->getProdPath();
         $path = $file->getPath();
@@ -47,12 +51,15 @@ class FTPFileServerCopier {
         $this->put($prodPath, $path);
     }
 
-    public function update(File $file) : void
+    /**
+     * @throws FTPCopy
+     */
+    public function update(File $file): void
     {
         $this->copy($file);
     }
 
-    public function delete(string $file, string $path) : void
+    public function delete(string $file, string $path): void
     {
         $file = $path. $file;
         if ($this->checkIfFileExists($file)) {
@@ -60,7 +67,7 @@ class FTPFileServerCopier {
         }
     }
 
-    private function checkIfDirectoryExists(string $path) : bool
+    private function checkIfDirectoryExists(string $path): bool
     {
         if (@ftp_chdir($this->_conn, $path)) {
             return true;
@@ -68,7 +75,7 @@ class FTPFileServerCopier {
         return false;
     }
 
-    private function checkIfFileExists(string $file) : bool
+    private function checkIfFileExists(string $file): bool
     {
         $fileName = substr($file, strrpos($file, '/') + 1);
         $path = str_replace($fileName, "", $file);
@@ -79,38 +86,34 @@ class FTPFileServerCopier {
         return in_array($file, $files);
     }
 
-    private function mkdir(string $directory) : void
+    private function mkdir(string $directory): void
     {
         ftp_mkdir($this->_conn, $directory);
     }
 
-    private function repairDirectoryPermission(string $directory) : void
+    private function repairDirectoryPermission(string $directory): void
     {
         $this->changePermission($directory, 0755);
     }
 
-    private function put(string $serverPath, string $path) : void
+    /**
+     * @throws FTPCopy
+     */
+    private function put(string $serverPath, string $path): void
     {
         if (@ftp_put($this->_conn, $serverPath, $path, FTP_ASCII)) {
             $this->repairPermission($serverPath);
         }else {
-            $this->handleFileCopyError();
+            throw new FTPCopy();
         }
     }
 
-    private function repairPermission(string $prodPath) : void
+    private function repairPermission(string $prodPath): void
     {
         $this->changePermission($prodPath, 0644);
     }
 
-    private function handleFileCopyError() : void
-    {
-        $errors = error_get_last();
-        echo "COPY ERROR: " . $errors['type'];
-        echo "<br />\n" . $errors['message'];
-    }
-
-    private function changePermission(string $directory, int $permission) : void
+    private function changePermission(string $directory, int $permission): void
     {
         ftp_chmod($this->_conn, $permission, $directory);
     }

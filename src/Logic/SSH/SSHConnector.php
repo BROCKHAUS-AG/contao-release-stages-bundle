@@ -35,7 +35,7 @@ class SSHConnector {
     /**
      * This function is called from dependency injection while injecting this dependency
      */
-    public function setUpConfig(): void
+    public function setUp(): void
     {
         $config = $this->_io->getFileServerConfiguration();
         $this->server = $config->getServer();

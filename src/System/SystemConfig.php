@@ -20,8 +20,6 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 
-DEFINE("SETTINGS_PATH", "/settings/brockhaus-ag/contao-release-stages-bundle");
-DEFINE("CONFIG_FILE", "/config.json");
 class SystemConfig
 {
     private string $_contaoPath;
@@ -36,9 +34,6 @@ class SystemConfig
         $this->_mapConfig = $mapConfig;
     }
 
-    /**
-     * This function is called from dependency injection while injecting this dependency
-     */
     public function loadConfig(): void
     {
         $this->_config = $this->loadJsonFileAndDecode();
@@ -71,7 +66,7 @@ class SystemConfig
 
     private function createPath(): string
     {
-        return $this->_contaoPath. SETTINGS_PATH. CONFIG_FILE;
+        return $this->_contaoPath. SystemVariables::CONFIG_FILE;
     }
 
     /**
