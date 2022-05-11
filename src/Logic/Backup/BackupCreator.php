@@ -24,7 +24,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 define("BACKUP_PATH", "backup/");
 define("DB_BACKUP_FILE", "backup_database.sh");
 define("FILE_SYSTEM_BACKUP_FILE", "backup_file_system.sh");
-define("LOCAL_PATH", "vendor/brockhaus-ag/contao-release-stages/backup/");
+define("LOCAL_PATH", "vendor/brockhaus-ag/contao-release-stages/scripts/backup/");
 class BackupCreator
 {
     private SSHConnector $_sshConnection;
@@ -54,7 +54,7 @@ class BackupCreator
 
     public function create(): void
     {
-        $sshExecution = $this->createSSHExecution();
+        $sshExecution = $this->getSSHExecution();
         $this->checkIfBackupExecutionFilesExistsElseCreateIt($sshExecution);
         $this->createBackupFromDB($sshExecution);
         $this->createBackupFromFileSystem($sshExecution);
@@ -85,7 +85,7 @@ class BackupCreator
         return $output != "cat: ". $file. ": No such file or directory";
     }
 
-    private function createSSHExecution(): SSHExecution
+    private function getSSHExecution(): SSHExecution
     {
         return new SSHExecution($this->_sshConnection);
     }
