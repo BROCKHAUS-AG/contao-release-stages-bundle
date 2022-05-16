@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPRunner;
@@ -22,9 +23,6 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHRunner;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
 
-define("BACKUP_PATH", "backup/");
-define("DB_BACKUP_FILE", "backup_database.sh");
-define("FILE_SYSTEM_BACKUP_FILE", "backup_file_system.sh");
 class BackupCreator
 {
     private SSHConnector $_sshConnection;
@@ -52,6 +50,9 @@ class BackupCreator
         $this->_ftpRunner = new FTPRunner($ftpConnection);
     }
 
+    /**
+     * @throws FTPCopy
+     */
     public function create(): void
     {
         $sshExecution = $this->getSSHRunner();
@@ -60,20 +61,26 @@ class BackupCreator
         $this->createBackupFromFileSystem($sshExecution);
     }
 
+    /**
+     * @throws FTPCopy
+     */
     private function checkIfBackupExecutionFilesExistsElseCreateIt(SSHRunner $runner): void
     {
         if ($this->checkIfFileExists($runner, $this->getDBBackupFilePath())) {
-            $this->copyFileToPathAtProd(DB_BACKUP_FILE, $this->getBackupPath());
+            $this->copyFileToPathAtProd( SystemVariables::BACKUP_DATABASE_SCRIPT, $this->getBackupPath());
         }
         if ($this->checkIfFileExists($runner, $this->getFileSystemBackupFilePath())) {
-            $this->copyFileToPathAtProd(FILE_SYSTEM_BACKUP_FILE, $this->getBackupPath());
+            $this->copyFileToPathAtProd( SystemVariables::BACKUP_FILE_SYSTEM_SCRIPT, $this->getBackupPath());
         }
     }
 
+    /**
+     * @throws FTPCopy
+     */
     private function copyFileToPathAtProd(string $fileName, string $prodPath): void
     {
         $localPath = $this->_path. SystemVariables::PATH_TO_VENDOR. $fileName;
-        $file = new File(0, $localPath, $prodPath);
+        $file = new File($localPath, $prodPath);
         $this->_ftpRunner->copy($file);
         $this->_log->info("Successfully copied \"". $fileName. "\" to prod path \"". $prodPath. "\"");
     }
