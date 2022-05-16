@@ -20,7 +20,7 @@ abstract class SystemVariables
 
 
     public const SETTINGS_DIRECTORY = "/settings/brockhaus-ag/contao-release-stages-bundle";
-    public const CONFIG_FILE = self::SETTINGS_DIRECTORY. "config.json";
+    public const CONFIG_FILE = self::SETTINGS_DIRECTORY. "/config.json";
 
 
     public const SCRIPT_DIRECTORY = self::PATH_TO_VENDOR. "scripts";
