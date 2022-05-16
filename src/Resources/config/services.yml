@@ -13,7 +13,7 @@ services:
         arguments:
             - '%kernel.project_dir%'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\LFog'
         calls:
             - loadConfig: []
 
@@ -97,8 +97,5 @@ services:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
-            - '%kernel.project_dir%'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
         calls:
             - setUp: []

@@ -13,112 +13,42 @@ declare(strict_types=1);
  */
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPRunner;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHRunner;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
 
 class BackupCreator
 {
     private SSHConnector $_sshConnection;
     private IO $_io;
-    private string $_path;
-    private FTPConnector $_ftpConnector;
-    private FTPRunner $_ftpRunner;
-    private Log $_log;
 
-    public function __construct(SSHConnector $sshConnection, IO $io, string $path, FTPConnector $ftpConnector, Log $log)
+    public function __construct(SSHConnector $sshConnection, IO $io)
     {
         $this->_sshConnection = $sshConnection;
         $this->_io = $io;
-        $this->_path = $path;
-        $this->_ftpConnector = $ftpConnector;
-        $this->_log = $log;
     }
 
-    /**
-     * This function is called from dependency injection while injecting this dependency
-     */
-    public function setUp(): void
-    {
-        $ftpConnection = $this->_ftpConnector->connect();
-        $this->_ftpRunner = new FTPRunner($ftpConnection);
-    }
-
-    /**
-     * @throws FTPCopy
-     */
     public function create(): void
     {
-        $sshExecution = $this->getSSHRunner();
-        $this->checkIfBackupExecutionFilesExistsElseCreateIt($sshExecution);
-        $this->createBackupFromDB($sshExecution);
-        $this->createBackupFromFileSystem($sshExecution);
+        $path = $this->_io->getFileServerConfiguration()->getPath();
+        $runner = $this->getSSHRunner();
+        $this->createDatabaseBackup($path, $runner);
+        $this->createFileServerBackup($path, $runner);
     }
 
-    /**
-     * @throws FTPCopy
-     */
-    private function checkIfBackupExecutionFilesExistsElseCreateIt(SSHRunner $runner): void
+    private function createDatabaseBackup(string $path, SSHRunner $runner): void
     {
-        if ($this->checkIfFileExists($runner, $this->getDBBackupFilePath())) {
-            $this->copyFileToPathAtProd( SystemVariables::BACKUP_DATABASE_SCRIPT, $this->getBackupPath());
-        }
-        if ($this->checkIfFileExists($runner, $this->getFileSystemBackupFilePath())) {
-            $this->copyFileToPathAtProd( SystemVariables::BACKUP_FILE_SYSTEM_SCRIPT, $this->getBackupPath());
-        }
+        $runner->executeScript($path. SystemVariables::BACKUP_DATABASE_SCRIPT_PROD);
     }
 
-    /**
-     * @throws FTPCopy
-     */
-    private function copyFileToPathAtProd(string $fileName, string $prodPath): void
+    private function createFileServerBackup(string $path, SSHRunner $runner): void
     {
-        $localPath = $this->_path. SystemVariables::PATH_TO_VENDOR. $fileName;
-        $file = new File($localPath, $prodPath);
-        $this->_ftpRunner->copy($file);
-        $this->_log->info("Successfully copied \"". $fileName. "\" to prod path \"". $prodPath. "\"");
-    }
-
-    private function checkIfFileExists(SSHRunner $runner, string $file): bool
-    {
-        $stream = $runner->execute("cat ". $file);
-        $output = $runner->getResponse($stream);
-        return $output != "cat: ". $file. ": No such file or directory";
+        $runner->executeScript($path. SystemVariables::BACKUP_DATABASE_SCRIPT_PROD);
     }
 
     private function getSSHRunner(): SSHRunner
     {
         return new SSHRunner($this->_sshConnection);
-    }
-
-    private function createBackupFromDB(SSHRunner $runner): void
-    {
-        $runner->executeScript($this->getDBBackupFilePath());
-    }
-
-    private function createBackupFromFileSystem(SSHRunner $runner): void
-    {
-        $runner->executeScript($this->getFileSystemBackupFilePath());
-    }
-
-    private function getDBBackupFilePath(): string
-    {
-        return SystemVariables::BACKUP_DATABASE_SCRIPT;
-    }
-
-    private function getFileSystemBackupFilePath(): string
-    {
-        return SystemVariables::BACKUP_FILE_SYSTEM_SCRIPT;
-    }
-
-    private function getBackupPath(): string
-    {
-        return SystemVariables::BACKUP_DIRECTORY;
     }
 }
