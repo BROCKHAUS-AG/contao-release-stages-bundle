@@ -59,7 +59,7 @@ class LocalLoader {
         foreach ($files as $file)
         {
             $prodPathFile = $this->changePathToProdPath($file);
-            $file = new File($this->getTimestampFromFile($file), $file, $prodPathFile);
+            $file = new File($file, $prodPathFile);
             $filesWithTimestamp->add($file);
         }
         return $filesWithTimestamp;

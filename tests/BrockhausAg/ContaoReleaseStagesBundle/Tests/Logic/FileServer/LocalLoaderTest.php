@@ -61,8 +61,8 @@ class LocalLoaderTest extends ContaoTestCase
     {
         $files = array("path/test/a.a", "path/test/a.b");
         $expected = new FileCollection();
-        $expected->add(new File(0, $files[0], "prodPath/test/a.a"));
-        $expected->add(new File(0, $files[1], "prodPath/test/a.b"));
+        $expected->add(new File($files[0], "prodPath/test/a.a"));
+        $expected->add(new File($files[1], "prodPath/test/a.b"));
 
         $loadFromLocalMock = self::createMock(LocalLoader::class);
         $reflection = new ReflectionClass($loadFromLocalMock);
@@ -81,8 +81,6 @@ class LocalLoaderTest extends ContaoTestCase
         $actual = $method->invoke($loadFromLocalMock, $files);
 
         for ($x = 0; $x != count($expected->get()); $x++) {
-            self::assertSame($expected->getByIndex($x)->getLastModifiedTime(),
-                $actual->getByIndex($x)->getLastModifiedTime());
             self::assertSame($expected->getByIndex($x)->getPath(), $actual->getByIndex($x)->getPath());
             self::assertSame($expected->getByIndex($x)->getProdPath(), $actual->getByIndex($x)->getProdPath());
         }
