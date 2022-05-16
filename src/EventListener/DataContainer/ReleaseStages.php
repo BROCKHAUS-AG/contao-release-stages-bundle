@@ -16,6 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseExecutionFailure;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServerCopier;
@@ -43,6 +44,7 @@ class ReleaseStages
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws DatabaseQueryEmptyResult
      * @throws DatabaseExecutionFailure
+     * @throws FTPCopy
      *
      * This method is called when clicking the submit button in the Release Stages DCA
      * After clicking the button, the Bundle would create a new Release
