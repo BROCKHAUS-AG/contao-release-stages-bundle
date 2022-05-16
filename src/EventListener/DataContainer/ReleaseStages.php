@@ -56,9 +56,9 @@ class ReleaseStages
     public function onSubmitCallback() : void
     {
         $this->_scriptFileSynchronizer->synchronize();
-        die();
         // ghost/zombie tasks
         // $this->_backupCreator->create();
+        die();
 
         // try
         // erzeugt eine Datenbank-update Skript, in der alle Befehle stehen die in der prod db stehen sollen

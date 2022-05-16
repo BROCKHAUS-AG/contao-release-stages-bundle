@@ -13,11 +13,11 @@ services:
         arguments:
             - '%kernel.project_dir%'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\LFog'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
         calls:
             - loadConfig: []
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer:
         arguments:
             - '%kernel.project_dir%'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector'
@@ -36,7 +36,7 @@ services:
 
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages:
         arguments:
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier'
