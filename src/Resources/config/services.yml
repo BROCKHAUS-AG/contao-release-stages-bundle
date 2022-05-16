@@ -17,17 +17,11 @@ services:
         calls:
             - loadConfig: []
 
-    BrockhausAg\ContaoReleaseStagesBundle\System\ScriptFileSynchronizer:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer:
         arguments:
             - '%kernel.project_dir%'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
-
-    BrockhausAg\ContaoReleaseStagesBundle\System\SystemBuilder:
-        arguments:
-            - '@BrockhausAg\ContaoReleaseStagesBundle\System\ScriptFileSynchronizer'
-        calls:
-            - build: []
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning:
         arguments:
@@ -42,6 +36,7 @@ services:
 
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages:
         arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier'

@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\System;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
@@ -20,6 +20,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPRunner;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
+use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
 
 
 class ScriptFileSynchronizer

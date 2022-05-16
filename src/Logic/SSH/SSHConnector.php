@@ -45,7 +45,10 @@ class SSHConnector {
         $this->port = $config_ssh->getPort();
     }
 
-    public function connect(): bool
+    /**
+     * @return false|resource
+     */
+    public function connect()
     {
         $connection = ssh2_connect($this->server, $this->port)
             or $this->_log->error("Connection to SSH server \"" . $this->server. "\" failed");

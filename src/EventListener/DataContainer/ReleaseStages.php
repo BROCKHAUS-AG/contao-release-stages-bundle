@@ -20,19 +20,23 @@ use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServerCopier;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning;
 use Doctrine\DBAL\Exception;
 
 class ReleaseStages
 {
+    private ScriptFileSynchronizer $_scriptFileSynchronizer;
     private Versioning $_versioning;
     private BackupCreator $_backupCreator;
     private DatabaseCopier $_databaseCopier;
     private FileServerCopier $_fileServerCopier;
 
-    public function __construct(Versioning $versioning, BackupCreator $backupCreator, DatabaseCopier $databaseCopier,
+    public function __construct(ScriptFileSynchronizer $scriptFileSynchronizer, Versioning $versioning,
+                                BackupCreator $backupCreator, DatabaseCopier $databaseCopier,
                                 FileServerCopier $fileServerCopier)
     {
+        $this->_scriptFileSynchronizer = $scriptFileSynchronizer;
         $this->_versioning = $versioning;
         $this->_backupCreator = $backupCreator;
         $this->_databaseCopier = $databaseCopier;
@@ -51,8 +55,10 @@ class ReleaseStages
      */
     public function onSubmitCallback() : void
     {
+        $this->_scriptFileSynchronizer->synchronize();
+        die();
         // ghost/zombie tasks
-        $this->_backupCreator->create();
+        // $this->_backupCreator->create();
 
         // try
         // erzeugt eine Datenbank-update Skript, in der alle Befehle stehen die in der prod db stehen sollen
