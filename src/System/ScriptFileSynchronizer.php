@@ -19,6 +19,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPRunner;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
 
 
 class ScriptFileSynchronizer
@@ -41,10 +42,8 @@ class ScriptFileSynchronizer
     {
         $ftpRunner = $this->getFTPRunner();
 
-        $ftpRunner->createDirectory($this->_io->getFileServerConfiguration()->getPath(). SystemVariables::SCRIPT_DIRECTORY_PROD);
-        $ftpRunner->createDirectory($this->_io->getFileServerConfiguration()->getPath(). SystemVariables::BACKUP_DIRECTORY_PROD);
-
-        $this->copyBackupDatabaseScript($ftpRunner);
+        $this->createDirectories($ftpRunner);
+        $this->copyScriptFiles($ftpRunner);
     }
 
     private function getFTPRunner(): FTPRunner
@@ -52,23 +51,36 @@ class ScriptFileSynchronizer
         return new FTPRunner($this->_ftpConnector->connect());
     }
 
-    /**
-     * @throws FTPCopy
-     */
-    private function copyBackupDatabaseScript(FTPRunner $ftpRunner): void
+    private function createDirectories(FTPRunner $ftpRunner): void
     {
-        $file = new File(0, $this->getFullBackupDatabaseScriptPath(),
-            $this->getFullProdBackupDatabaseScriptPath());
-        $ftpRunner->copy($file);
+        $fileServerConfigurationPath = $this->_io->getFileServerConfiguration()->getPath();
+        $directories = array(
+            $fileServerConfigurationPath. SystemVariables::SCRIPT_DIRECTORY_PROD,
+            $fileServerConfigurationPath. SystemVariables::BACKUP_DIRECTORY_PROD
+        );
+
+        foreach ($directories as $directory) {
+            $ftpRunner->createDirectory($directory);
+        }
     }
 
     /**
      * @throws FTPCopy
      */
-    private function copyBackupFileServerScript(FTPRunner $ftpRunner): void
+    private function copyScriptFiles(FTPRunner $ftpRunner): void
     {
-        $file = new File();
-        $ftpRunner->copy($file);
+        $files = $this->createFiles();
+        foreach ($files->get() as $file) {
+            $ftpRunner->copy($file);
+        }
+    }
+
+    private function createFiles(): FileCollection
+    {
+        $files = new FileCollection();
+        $files->add(new File($this->getFullBackupDatabaseScriptPath(), $this->getFullProdBackupDatabaseScriptPath()));
+        $files->add(new File($this->getFullFileServerScriptPath(), $this->getFullProdFileServerScriptPath()));
+        return $files;
     }
 
     private function getFullBackupDatabaseScriptPath(): string
@@ -81,5 +93,13 @@ class ScriptFileSynchronizer
         return $this->_io->getFileServerConfiguration()->getPath(). SystemVariables::BACKUP_DATABASE_SCRIPT_PROD;
     }
 
-//    private function
+    private function getFullFileServerScriptPath(): string
+    {
+        return $this->_path. SystemVariables::BACKUP_FILE_SYSTEM_SCRIPT;
+    }
+
+    private function getFullProdFileServerScriptPath(): string
+    {
+        return $this->_io->getFileServerConfiguration()->getPath(). SystemVariables::BACKUP_FILE_SYSTEM_SCRIPT_PROD;
+    }
 }
