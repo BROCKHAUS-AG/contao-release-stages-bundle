@@ -68,10 +68,10 @@ services:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Local\FileServerLocalCopier'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Local\FileServerLocalCopier'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Local\FileServerLocalCopier:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Local\FileServerLocalCopier:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
