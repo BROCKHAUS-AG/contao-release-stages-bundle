@@ -14,31 +14,29 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\System;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
+
 class SystemBuilder
 {
-    private SystemConfig $_systemConfig;
     private ScriptFileSynchronizer $_scriptFileSynchronizer;
 
-    public function __construct(SystemConfig $systemConfig, ScriptFileSynchronizer $scriptFileSynchronizer)
+    public function __construct(ScriptFileSynchronizer $scriptFileSynchronizer)
     {
-        $this->_systemConfig = $systemConfig;
         $this->_scriptFileSynchronizer = $scriptFileSynchronizer;
     }
 
     /**
      * This function is called from dependency injection while injecting this dependency
+     * @throws FTPCopy
      */
     public function build(): void
     {
-        $this->loadConfig();
         $this->synchronizeScriptFiles();
     }
 
-    private function loadConfig(): void
-    {
-        $this->_systemConfig->loadConfig();
-    }
-
+    /**
+     * @throws FTPCopy
+     */
     private function synchronizeScriptFiles(): void
     {
         $this->_scriptFileSynchronizer->synchronize();

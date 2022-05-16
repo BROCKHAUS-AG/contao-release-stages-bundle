@@ -25,7 +25,7 @@ class SystemConfig
     private string $_contaoPath;
     private Log $_log;
     private MapConfig $_mapConfig;
-    protected Config $_config;
+    private Config $_config;
 
     public function __construct(string $contaoPath, MapConfig $mapConfig, Log $log)
     {
@@ -34,6 +34,9 @@ class SystemConfig
         $this->_mapConfig = $mapConfig;
     }
 
+    /**
+     * This function is called from dependency injection while injecting this dependency
+     */
     public function loadConfig(): void
     {
         $this->_config = $this->loadJsonFileAndDecode();

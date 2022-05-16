@@ -14,6 +14,8 @@ services:
             - '%kernel.project_dir%'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+        calls:
+            - loadConfig: []
 
     BrockhausAg\ContaoReleaseStagesBundle\System\ScriptFileSynchronizer:
         arguments:
@@ -23,7 +25,6 @@ services:
 
     BrockhausAg\ContaoReleaseStagesBundle\System\SystemBuilder:
         arguments:
-            - '@BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig'
             - '@BrockhausAg\ContaoReleaseStagesBundle\System\ScriptFileSynchronizer'
         calls:
             - build: []
@@ -81,7 +82,7 @@ services:
         calls:
             - setUp: []
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH\SSHConnector:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
@@ -99,7 +100,7 @@ services:
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator:
         arguments:
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\SSH\SSHConnector'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
             - '%kernel.project_dir%'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FTP\FTPConnector'
