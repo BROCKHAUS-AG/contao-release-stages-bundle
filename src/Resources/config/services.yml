@@ -97,5 +97,3 @@ services:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
-        calls:
-            - setUp: []
