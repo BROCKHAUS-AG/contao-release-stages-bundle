@@ -47,7 +47,10 @@ class FTPConnector {
         $this->ssl = $config_ftp->isSsl();
     }
 
-    public function connect(): bool
+    /**
+     * @return false|resource
+     */
+    public function connect()
     {
         if ($this->ssl) {
             $conn = $this->connectToSFTPServer();
@@ -58,28 +61,34 @@ class FTPConnector {
         return $conn;
     }
 
-    private function login($conn) : void
+    private function login($conn): void
     {
         if (!@ftp_login($conn, $this->username, $this->password)) {
             $this->_log->logErrorAndDie("Username or password is false.");
         }
     }
 
-    private function connectToSFTPServer(): bool
+    /**
+     * @return false|resource
+     */
+    private function connectToSFTPServer()
     {
         $sftpConn = ftp_ssl_connect($this->server, $this->port)
-            or $this->_log->logErrorAndDie("Connection to SFTP Server \"". $this->server. "\" failed");
+        or $this->_log->logErrorAndDie("Connection to SFTP Server \"". $this->server. ":". $this->port. "\" failed");
         return $sftpConn;
     }
 
-    private function connectToFTPServer(): bool
+    /**
+     * @return false|resource
+     */
+    private function connectToFTPServer()
     {
         $ftpConn = ftp_connect($this->server, $this->port)
-            or $this->_log->logErrorAndDie("Connection to FTP Server \"". $this->server. "\" failed");
+            or $this->_log->logErrorAndDie("Connection to FTP Server \"". $this->server. ":". $this->port. "\" failed");
         return $ftpConn;
     }
 
-    public function disconnect($conn) : void
+    public function disconnect($conn): void
     {
         ftp_close($conn);
     }
