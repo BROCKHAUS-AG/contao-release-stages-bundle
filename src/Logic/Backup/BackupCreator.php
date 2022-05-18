@@ -44,7 +44,7 @@ class BackupCreator
 
     private function createFileServerBackup(string $path, SSHRunner $runner): void
     {
-        $runner->executeScript($path. SystemVariables::BACKUP_DATABASE_SCRIPT_PROD);
+        $runner->executeScript($path. SystemVariables::BACKUP_FILE_SYSTEM_SCRIPT_PROD);
     }
 
     private function getSSHRunner(): SSHRunner

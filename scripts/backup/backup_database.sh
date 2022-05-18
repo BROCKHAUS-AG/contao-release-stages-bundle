@@ -18,8 +18,8 @@ do
   esac
 done
 
-mkdir -p "$to_path"
+mkdir -p "$path"
 
-to_path="$to_path/database_backup.sql"
+path="$path/database_backup.sql"
 
-mysqldump --opt --no-tablespaces -u "$user" -p"$path" -h"$host" "$database" > "$path"
+mysqldump --opt --no-tablespaces -u "$user" -p"$password" -h"$host" "$database" > "$path"

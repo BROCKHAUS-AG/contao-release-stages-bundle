@@ -64,7 +64,7 @@ class ReleaseStages
         }
 
         // ghost/zombie tasks
-        // $this->_backupCreator->create();
+        $this->_backupCreator->create();
         die();
 
         // try
