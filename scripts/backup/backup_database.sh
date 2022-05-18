@@ -18,16 +18,15 @@ do
   esac
 done
 
-PATH="$(dirname $0)"
-STATE_FILE="$PATH/database_backup"
+STATE_FILE="$(dirname $0)/database_backup"
 
-create_pending_file $STATE_FILE
+create_pending_file "$STATE_FILE"
 
-BACKUP_FILE="$PATH/database_backup.sql"
+BACKUP_FILE="$(dirname $0)/database_backup.sql"
 {
   mysqldump --opt --no-tablespaces -u "$user" -p"$password" -h"$host" "$database" > "$BACKUP_FILE"
 } || {
-  create_finish_failure_file $STATE_FILE
+  create_finish_failure_file "$STATE_FILE"
 }
 
-create_finish_success_file $STATE_FILE
+create_finish_success_file "$STATE_FILE"

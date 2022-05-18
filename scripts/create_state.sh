@@ -14,7 +14,7 @@ delete_file() {
   fi
 }
 
-delete_old_files(){
+delete_old_files() {
   delete_file $1
   delete_file $2
   delete_file $3
@@ -29,14 +29,14 @@ create_pending_file() {
 # parameter 1 should be the path
 create_finish_success_file() {
   if [ ! -f "$1$FAILURE_FILE" ]; then
-    [ -f "$1$PENDING_FILE" ] && rm -f "$1$PENDING_FILE"
+    delete_file "$1$PENDING_FILE"
     write_state "$1$SUCCESS_FILE"
   fi
 }
 
 # parameter 1 should be the path
 create_finish_failure_file() {
-  [ -f "$1$PENDING_FILE" ] && rm -f "$1$PENDING_FILE"
+  delete_file "$1$PENDING_FILE"
   write_state "$1$FAILURE_FILE"
 }
 
