@@ -3,6 +3,8 @@ services:
         autoconfigure: true
         public: true
 
+    BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\EditButtonsCallback:
+
     BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig:
 
     BrockhausAg\ContaoReleaseStagesBundle\Logger\Log:
