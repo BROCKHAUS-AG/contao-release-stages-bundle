@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
 class FTPRunner {
@@ -25,6 +26,9 @@ class FTPRunner {
         $this->_conn = $conn;
     }
 
+    /**
+     * @throws FTPCreateDirectory
+     */
     public function createDirectory(string $directory): void
     {
         if (!$this->checkIfDirectoryExists($directory)) {
@@ -86,9 +90,14 @@ class FTPRunner {
         return in_array($file, $files);
     }
 
+    /**
+     * @throws FTPCreateDirectory
+     */
     private function mkdir(string $directory): void
     {
-        ftp_mkdir($this->_conn, $directory);
+        if(!ftp_mkdir($this->_conn, $directory)){
+            throw new FTPCreateDirectory("Couldn't create directory \"$directory\". Maybe permissions are invalid.");
+        }
     }
 
     private function repairDirectoryPermission(string $directory): void
@@ -104,7 +113,7 @@ class FTPRunner {
         if (@ftp_put($this->_conn, $serverPath, $path, FTP_ASCII)) {
             $this->repairPermission($serverPath);
         }else {
-            throw new FTPCopy();
+            throw new FTPCopy("Couldn't put file to \"$serverPath\" from \"$path\"");
         }
     }
 

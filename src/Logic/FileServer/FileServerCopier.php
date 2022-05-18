@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
@@ -44,6 +45,9 @@ class FileServerCopier extends Backend {
         $this->_log = $log;
     }
 
+    /**
+     * @throws FTPCreateDirectory
+     */
     public function copy() : void
     {
         $this->copyTo = $this->_io->getWhereToCopy();
@@ -71,6 +75,9 @@ class FileServerCopier extends Backend {
         return "";
     }
 
+    /**
+     * @throws FTPCreateDirectory
+     */
     private function createDirectories(FileCollection $files) : void
     {
         for ($x = 0; $x != count($files->get()); $x++)
@@ -83,6 +90,9 @@ class FileServerCopier extends Backend {
         }
     }
 
+    /**
+     * @throws FTPCreateDirectory
+     */
     private function createDirectory(string $directory) : void
     {
         if ($this->isToCopyToLocalFileServer()) {

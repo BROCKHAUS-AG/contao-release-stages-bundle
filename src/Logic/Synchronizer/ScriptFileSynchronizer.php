@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPRunner;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
@@ -38,6 +39,7 @@ class ScriptFileSynchronizer
 
     /**
      * @throws FTPCopy
+     * @throws FTPCreateDirectory
      */
     public function synchronize(): void
     {
@@ -52,6 +54,9 @@ class ScriptFileSynchronizer
         return new FTPRunner($this->_ftpConnector->connect());
     }
 
+    /**
+     * @throws FTPCreateDirectory
+     */
     private function createDirectories(FTPRunner $ftpRunner): void
     {
         $fileServerConfigurationPath = $this->_io->getFileServerConfiguration()->getPath();

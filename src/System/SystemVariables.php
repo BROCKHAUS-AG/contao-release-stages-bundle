@@ -16,7 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\System;
 
 abstract class SystemVariables
 {
-    public const PATH_TO_VENDOR = "vendor/brockhaus-ag/contao-release-stages/";
+    public const PATH_TO_VENDOR = "/vendor/brockhaus-ag/contao-release-stages-bundle/";
 
 
     public const SETTINGS_DIRECTORY = "/settings/brockhaus-ag/contao-release-stages-bundle";
