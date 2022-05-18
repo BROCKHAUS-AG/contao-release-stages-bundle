@@ -4,6 +4,8 @@
 #   -f'path/from' -> here comes the path which should be compressed
 #   -t'path/to' -> here comes the path where the backup should be saved
 
+source ../create_state.sh
+
 while getopts f:t: flag
 do
   case "${flag}" in
@@ -12,8 +14,17 @@ do
   esac
 done
 
-mkdir -p "$to_path"
+STATE_FILE="$(dirname $0)/file_system_backup"
 
-to_path="$to_path/file_system_backup.tar.gz"
+create_pending_file $STATE_FILE
 
-tar -zcvf $to_path $from_path
+
+FILE_SYSTEM_PATH="$to_path/file_system_backup.tar.gz"
+
+{
+  tar -zcvf $FILE_SYSTEM_PATH $from_path
+} || {
+  create_finish_failure_file $STATE_FILE
+}
+
+create_finish_success_file $STATE_FILE

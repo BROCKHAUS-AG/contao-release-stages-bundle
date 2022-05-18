@@ -5,7 +5,8 @@
 #   -p'password' -> here comes the password
 #   -h'hostName' -> here comes the host name
 #   -d'database' -> here comes the name from the database
-#   -f'path/to/backup/folder' -> here comes the path to the backup folder
+
+source ../create_state.sh
 
 while getopts u:p:h:d:f: flag
 do
@@ -14,12 +15,20 @@ do
     p) password=${OPTARG};;
     h) host=${OPTARG};;
     d) database=${OPTARG};;
-    f) path=${OPTARG};;
   esac
 done
 
-mkdir -p "$path"
+PATH=$(dirname $0)
 
-path="$path/database_backup.sql"
+STATE_FILE="$PATH/database_backup"
 
-mysqldump --opt --no-tablespaces -u "$user" -p"$password" -h"$host" "$database" > "$path"
+create_pending_file $STATE_FILE
+
+BACKUP_FILE="$PATH/database_backup.sql"
+{
+  mysqldump --opt --no-tablespaces -u "$user" -p"$password" -h"$host" "$database" > "$BACKUP_FILE"
+} || {
+  create_finish_failure_file $STATE_FILE
+}
+
+create_finish_success_file $STATE_FILE
