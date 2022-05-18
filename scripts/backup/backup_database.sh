@@ -8,7 +8,7 @@
 
 source ../create_state.sh
 
-while getopts u:p:h:d:f: flag
+while getopts u:p:h:d: flag
 do
   case "${flag}" in
     u) user=${OPTARG};;
@@ -19,8 +19,10 @@ do
 done
 
 PATH=$(dirname $0)
+echo $PATH
 
 STATE_FILE="$PATH/database_backup"
+echo $STATE_FILE
 
 create_pending_file $STATE_FILE
 
