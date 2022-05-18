@@ -25,12 +25,16 @@ abstract class SystemVariables
 
     public const SCRIPT_DIRECTORY = self::PATH_TO_VENDOR. "scripts";
 
+    public const CREATE_STATE_SCRIPT = self::SCRIPT_DIRECTORY. "/create_state.sh";
+
     public const BACKUP_DIRECTORY = self::SCRIPT_DIRECTORY. "/backup";
     public const BACKUP_FILE_SYSTEM_SCRIPT = self::BACKUP_DIRECTORY. "/backup_file_system.sh";
     public const BACKUP_DATABASE_SCRIPT = self::BACKUP_DIRECTORY. "/backup_database.sh";
 
 
     public const SCRIPT_DIRECTORY_PROD = "/scripts";
+
+    public const CREATE_STATE_SCRIPT_PROD = self::SCRIPT_DIRECTORY_PROD. "/create_state.sh";
 
     public const BACKUP_DIRECTORY_PROD = self::SCRIPT_DIRECTORY_PROD. "/backup";
     public const BACKUP_FILE_SYSTEM_SCRIPT_PROD = self::BACKUP_DIRECTORY_PROD. "/backup_file_system.sh";
