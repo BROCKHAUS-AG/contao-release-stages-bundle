@@ -18,6 +18,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseExecutionFa
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServerCopier;
@@ -51,12 +52,14 @@ class ReleaseStages
      * @throws DatabaseExecutionFailure
      * @throws FTPCopy
      * @throws FTPCreateDirectory
+     * @throws Validation
      *
      * This method is called when clicking the submit button in the Release Stages DCA
      * After clicking the button, the Bundle would create a new Release
      */
     public function onSubmitCallback() : void
     {
+        $this->_versioning->generateNewVersionNumber();
         try {
             $this->_scriptFileSynchronizer->synchronize();
         } catch (Exception $e) {
@@ -64,7 +67,7 @@ class ReleaseStages
         }
 
         // ghost/zombie tasks
-        $this->_backupCreator->create();
+        //$this->_backupCreator->create();
         die();
 
         // try
@@ -78,7 +81,7 @@ class ReleaseStages
         // $this->_fileServerCopier->copy();
         // ghost/zombie tasks
         // this execute remote installation
-        $this->_versioning->generateNewVersionNumber();
+
         // catch
         // recover backup
     }

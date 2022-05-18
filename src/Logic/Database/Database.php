@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
@@ -38,11 +39,12 @@ class Database
      * @throws DatabaseQueryEmptyResult
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws \Doctrine\DBAL\Exception
+     * @throws Validation
      */
     public function getLatestReleaseVersion(): Version
     {
         $result = $this->_dbConnection->createQueryBuilder()
-            ->select("id", "version", "kindOfRelease")
+            ->select("id", "version", "kindOfRelease", "state")
             ->from("tl_release_stages")
             ->orderBy("id", "DESC")
             ->setMaxResults(2)
@@ -54,7 +56,8 @@ class Database
         }
 
         $latestVersion = $result[1];
-        return new Version(intval($latestVersion["id"]), $latestVersion["kindOfRelease"], $latestVersion["version"]);
+        return new Version(intval($latestVersion["id"]), $latestVersion["kindOfRelease"], $latestVersion["version"],
+            $latestVersion["state"]);
     }
 
     /**

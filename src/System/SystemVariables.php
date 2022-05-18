@@ -40,5 +40,7 @@ abstract class SystemVariables
     public const BACKUP_FILE_SYSTEM_SCRIPT_PROD = self::BACKUP_DIRECTORY_PROD. "/backup_file_system.sh";
     public const BACKUP_DATABASE_SCRIPT_PROD = self::BACKUP_DIRECTORY_PROD. "/backup_database.sh";
 
-
+    public const STATE_SUCCESS = "SUCCESS";
+    public const STATE_FAILURE = "FAILURE";
+    public const STATE_PENDING = "PENDING";
 }

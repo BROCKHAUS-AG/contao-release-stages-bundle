@@ -15,9 +15,11 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
+use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
 use Doctrine\DBAL\Driver\Exception;
 
 class Versioning {
@@ -33,6 +35,7 @@ class Versioning {
     /**
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
+     * @throws Validation
      */
     public function generateNewVersionNumber(): void
     {
@@ -44,9 +47,12 @@ class Versioning {
         $this->createAndUpdateToNewVersion($latestVersion);
     }
 
+    /**
+     * @throws Validation
+     */
     private function createDummyVersion(): Version
     {
-        return new Version(0, "majorRelease", "0.0");
+        return new Version(0, "majorRelease", "0.0", SystemVariables::STATE_PENDING);
     }
 
     /**

@@ -89,6 +89,9 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
             'flag' => 1,
             'eval' => array('mandatory' => true, 'maxlength' => 1024, 'tl_class' => 'clr w50'),
             'sql' => ['type' => 'string', 'length' => '1024', 'default' => '']
+        ),
+        'state' => array(
+            'sql' => ['type' => 'string', 'length' => '10', 'unsigned' => true]
         )
     ),
     'palettes' => array(
