@@ -18,11 +18,8 @@ do
   esac
 done
 
-PATH=$(dirname $0)
-echo $PATH
-
+PATH="$(dirname $0)"
 STATE_FILE="$PATH/database_backup"
-echo $STATE_FILE
 
 create_pending_file $STATE_FILE
 

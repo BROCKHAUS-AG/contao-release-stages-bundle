@@ -18,9 +18,7 @@ STATE_FILE="$(dirname $0)/file_system_backup"
 
 create_pending_file $STATE_FILE
 
-
 FILE_SYSTEM_PATH="$to_path/file_system_backup.tar.gz"
-
 {
   tar -zcvf $FILE_SYSTEM_PATH $from_path
 } || {
