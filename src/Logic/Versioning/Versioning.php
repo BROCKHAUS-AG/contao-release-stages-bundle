@@ -32,12 +32,14 @@ class Versioning {
         $this->_log = $log;
     }
 
+
+
     /**
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      * @throws Validation
      */
-    public function generateNewVersionNumber(): void
+    public function generateNewVersionNumber(): int
     {
         try {
             $latestVersion = $this->database->getLatestReleaseVersion();
@@ -45,6 +47,7 @@ class Versioning {
             $latestVersion = $this->createDummyVersion();
         }
         $this->createAndUpdateToNewVersion($latestVersion);
+        return $latestVersion->getId();
     }
 
     /**

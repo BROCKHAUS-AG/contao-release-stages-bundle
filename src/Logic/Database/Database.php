@@ -20,6 +20,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
+use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Exception;
@@ -57,7 +58,7 @@ class Database
 
         $latestVersion = $result[1];
         return new Version(intval($latestVersion["id"]), $latestVersion["kindOfRelease"], $latestVersion["version"],
-            $latestVersion["state"]);
+            SystemVariables::STATE_PENDING);
     }
 
     /**
@@ -69,8 +70,23 @@ class Database
             ->createQueryBuilder()
             ->update("tl_release_stages")
             ->set("version", ":version")
+            ->set("state", SystemVariables::STATE_PENDING)
             ->where("version = \"None\"")
             ->setParameter("version", $version)
+            ->execute();
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function updateState(string $state, int $id){
+        $this->_dbConnection
+            ->createQueryBuilder()
+            ->update("tl_release_stages")
+            ->set("state",":state")
+            ->where("id",":id")
+            ->setParameter("state",$state)
+            ->setParameter("id",$id)
             ->execute();
     }
 

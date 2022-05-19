@@ -43,6 +43,7 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServerCopier'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier:
         arguments:
@@ -54,6 +55,10 @@ services:
         arguments:
             - '@database_connection'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
+
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseProd:
         arguments:
