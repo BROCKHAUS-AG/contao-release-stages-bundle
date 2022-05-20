@@ -6,6 +6,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Model\Version;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
+use phpDocumentor\Reflection\Types\This;
 
 class Version
 {
@@ -52,7 +53,7 @@ class Version
     private function checkState(): void
     {
         if(SystemVariables::STATE_SUCCESS != $this->state && SystemVariables::STATE_FAILURE != $this->state &&
-            SystemVariables::STATE_PENDING != $this->state)
+            SystemVariables::STATE_PENDING != $this->state && SystemVariables::STATE_OLD_PENDING != $this->state)
         {
             throw new Validation("\"$this->state\" is not a valid state");
         }

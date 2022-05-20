@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\NoSubmittedPendingState;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 
 class StateSynchronizer
@@ -27,13 +29,25 @@ class StateSynchronizer
     }
 
     /**
+     * @throws DatabaseQueryEmptyResult
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws DatabaseQueryEmptyResult
      */
-    public function checkLatestState(): array
+    public function getActualId(): int
     {
-        return $this->_database->checkLatestState();
+        return $this->_database->getActualIdFromTlReleaseStages();
+    }
+
+    /**
+     * @throws OldStateIsPending
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws DatabaseQueryEmptyResult
+     * @throws \Doctrine\DBAL\Exception
+     * @throws NoSubmittedPendingState
+     */
+    public function checkLatestState(): void
+    {
+        $this->_database->checkLatestState();
     }
 
     /**

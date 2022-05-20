@@ -43,4 +43,5 @@ abstract class SystemVariables
     public const STATE_SUCCESS = "SUCCESS";
     public const STATE_FAILURE = "FAILURE";
     public const STATE_PENDING = "PENDING";
+    public const STATE_OLD_PENDING = "OLD_PENDING";
 }

@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\NoSubmittedPendingState;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
@@ -84,10 +86,10 @@ class Database
         $this->_dbConnection
             ->createQueryBuilder()
             ->update("tl_release_stages")
-            ->set("state",":state")
-            ->where("id",":id")
-            ->setParameter("state",$state)
-            ->setParameter("id",$id)
+            ->set("state", ":state")
+            ->where("id = :id")
+            ->setParameter("state", $state)
+            ->setParameter("id", $id)
             ->execute();
     }
 
@@ -216,45 +218,53 @@ class Database
     }
 
     /**
+     * @throws DatabaseQueryEmptyResult
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws DatabaseQueryEmptyResult
      */
-    public function getLatestId(): int
+    public function getActualIdFromTlReleaseStages(): int
     {
         $result = $this->_dbConnection
             ->createQueryBuilder()
             ->select("id")
             ->from("tl_release_stages")
             ->orderBy("id", "DESC")
-            ->setMaxResults(2)
+            ->setMaxResults(1)
             ->execute()
             ->fetchAllAssociative();
 
-        if ($result[1] == NULL || $result[1]["id"] == NULL) {
+        if ($result[0] == NULL || $result[0]["id"] == NULL) {
             throw new DatabaseQueryEmptyResult();
         }
-
-        var_dump($result);
-        return $result[1]["id"];
+        return intval($result[0]["id"]);
     }
 
     /**
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws OldStateIsPending
+     * @throws NoSubmittedPendingState
      * @throws DatabaseQueryEmptyResult
      */
-    public function checkLatestState(): array
+    public function checkLatestState(): void
     {
-        $id = $this->getLatestId();
-
-        return $this->_dbConnection
+        $actualId = $this->getActualIdFromTlReleaseStages();
+        $result = $this->_dbConnection
             ->createQueryBuilder()
             ->select("state")
-            ->from("tl_release_stage")
-            ->where("id = :id")
-            ->set("id", $id)
+            ->from("tl_release_stages")
+            ->where("state = :state")
+            ->andWhere("id != :id")
+            ->setParameter("state", SystemVariables::STATE_PENDING)
+            ->setParameter("id", $actualId)
             ->execute()
             ->fetchAllAssociative();
+        if ($result == null) {
+            throw new NoSubmittedPendingState();
+        }
+        $state = $result[0]["state"];
+        if ($state == SystemVariables::STATE_PENDING) {
+            throw new OldStateIsPending();
+        }
     }
 }

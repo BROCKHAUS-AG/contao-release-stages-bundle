@@ -14,11 +14,9 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseExecutionFailure;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\NoSubmittedPendingState;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServerCopier;
@@ -50,33 +48,46 @@ class ReleaseStages
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws DatabaseQueryEmptyResult
-     * @throws DatabaseExecutionFailure
-     * @throws FTPCopy
-     * @throws FTPCreateDirectory
-     * @throws Validation
      *
      * This method is called when clicking the submit button in the Release Stages DCA
      * After clicking the button, the Bundle would create a new Release
      */
-    public function onSubmitCallback() : void
+    public function onSubmitCallback(): void
     {
-        $latestState = $this->_stateSynchronizer->checkLatestState();
-        var_dump($latestState);
-
-
-        $id = $this->_versioning->generateNewVersionNumber();
+        $actualId = $this->_stateSynchronizer->getActualId();
+        $this->checkLatestStateInDatabase($actualId);
         try {
-            $this->_scriptFileSynchronizer->synchronize();
-        } catch (Exception $e) {
-            $this->_stateSynchronizer->setState(SystemVariables::STATE_FAILURE, $id);
-            echo $e;
-            die("File Synchronization failed.");
-        }
-        $this->_stateSynchronizer->setState(SystemVariables::STATE_SUCCESS, $id);
+            echo "create new version";
+            // $this->_versioning->generateNewVersionNumber();
 
-        die;
+            //$this->_scriptFileSynchronizer->synchronize();
+        } catch (Exception $e) {
+            $this->_stateSynchronizer->setState(SystemVariables::STATE_FAILURE, $actualId);
+            echo $e;
+            die("test");
+        }
+        $this->_stateSynchronizer->setState(SystemVariables::STATE_SUCCESS, $actualId);
+        die("test");
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws OldStateIsPending
+     * @throws DatabaseQueryEmptyResult
+     */
+    private function checkLatestStateInDatabase(int $actualId)
+    {
+        try {
+            $this->_stateSynchronizer->checkLatestState();
+        } catch (OldStateIsPending $e) {
+            $this->_stateSynchronizer->setState(SystemVariables::STATE_OLD_PENDING, $actualId);
+            throw new OldStateIsPending("An old release is pending");
+        } catch (NoSubmittedPendingState $e) {
+            // when this exception throws, there is no old release in database
+            // continue script
+        }
     }
 }
