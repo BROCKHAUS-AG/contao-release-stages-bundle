@@ -22,6 +22,9 @@ use Contao\DataContainer;
  */
 class EditButtonsCallback
 {
+    /**
+     * This method is to remove "save", "save and create" and "save and duplicate" button from dca
+     */
     public function __invoke(array $buttons, DataContainer $dc): array
     {
         unset($buttons['save']);
