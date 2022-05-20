@@ -65,8 +65,7 @@ class ReleaseStages
             //$this->_scriptFileSynchronizer->synchronize();
         } catch (Exception $e) {
             $this->_stateSynchronizer->setState(SystemVariables::STATE_FAILURE, $actualId);
-            echo $e;
-            die("test");
+            die("An exception has been thrown: $e");
         }
         $this->_stateSynchronizer->setState(SystemVariables::STATE_SUCCESS, $actualId);
         die("test");
