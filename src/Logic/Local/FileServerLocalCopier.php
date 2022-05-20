@@ -55,7 +55,7 @@ class FileServerLocalCopier {
             if (!unlink($file)) {
                 $error = error_get_last();
                 $errorMessage = "Failed to delete file: \"". $file. "\"</br>rm error: ". $error['message'];
-                $this->_log->logErrorAndDie($errorMessage);
+                $this->_log->error($errorMessage);
             }
         }
     }

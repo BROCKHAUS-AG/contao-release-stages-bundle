@@ -42,12 +42,6 @@ class Log {
         $this->log(LogLevel::ERROR, $message);
     }
 
-    public function logErrorAndDie(string $message): void
-    {
-        $this->error($message);
-        die($message);
-    }
-
     private function log(string $level, string $message): void
     {
         $this->_logger->log(

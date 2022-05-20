@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnetion;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 
@@ -49,6 +50,7 @@ class FTPConnector {
 
     /**
      * @return false|resource
+     * @throws FTPConnetion
      */
     public function connect()
     {
@@ -61,31 +63,50 @@ class FTPConnector {
         return $conn;
     }
 
+    /**
+     * @throws FTPConnetion
+     */
     private function login($conn): void
     {
         if (!@ftp_login($conn, $this->username, $this->password)) {
-            $this->_log->logErrorAndDie("Username or password is false.");
+            $this->_log->error("Username or password is false.");
+            throw new FTPConnetion("Username or password is false");
         }
     }
 
     /**
      * @return false|resource
+     * @throws FTPConnetion
      */
     private function connectToSFTPServer()
     {
-        $sftpConn = ftp_ssl_connect($this->server, $this->port)
-        or $this->_log->logErrorAndDie("Connection to SFTP Server \"". $this->server. ":". $this->port. "\" failed");
+        $sftpConn = ftp_ssl_connect($this->server, $this->port);
+        if (!$sftpConn) {
+            $this->errorMessage("Connection to SFTP Server \"$this->server: $this->port\" failed");
+        }
         return $sftpConn;
     }
 
     /**
      * @return false|resource
+     * @throws FTPConnetion
      */
     private function connectToFTPServer()
     {
-        $ftpConn = ftp_connect($this->server, $this->port)
-            or $this->_log->logErrorAndDie("Connection to FTP Server \"". $this->server. ":". $this->port. "\" failed");
+        $ftpConn = ftp_connect($this->server, $this->port);
+        if (!$ftpConn) {
+            $this->errorMessage("Connection to FTP Server \"$this->server: $this->port\" failed");
+        }
         return $ftpConn;
+    }
+
+    /**
+     * @throws FTPConnetion
+     */
+    private function errorMessage(string $message): void
+    {
+        $this->_log->error($message);
+        throw new FTPConnetion($message);
     }
 
     public function disconnect($conn): void

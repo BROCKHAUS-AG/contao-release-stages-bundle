@@ -35,7 +35,7 @@ class Compressor {
             $archive->compress(Phar::GZ);
             $this->_log->info("Successfully saved ". $compressedFile);
         }catch (Exception $e) {
-            $this->_log->logErrorAndDie($e->getMessage());
+            $this->_log->error($e->getMessage());
         }
     }
 

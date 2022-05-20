@@ -61,13 +61,12 @@ class ReleaseStages
         try {
             $this->_versioning->generateNewVersionNumber($actualId);
             $this->_scriptFileSynchronizer->synchronize();
-
         } catch (Exception $e) {
             $this->_stateSynchronizer->setState(SystemVariables::STATE_FAILURE, $actualId);
             die("An exception has been thrown: $e");
         }
         $this->_stateSynchronizer->setState(SystemVariables::STATE_SUCCESS, $actualId);
-        die("test");
+        die("finished");
     }
 
     /**

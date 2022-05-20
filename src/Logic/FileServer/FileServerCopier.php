@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnetion;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
@@ -47,6 +48,7 @@ class FileServerCopier extends Backend {
 
     /**
      * @throws FTPCreateDirectory
+     * @throws FTPConnetion
      */
     public function copy() : void
     {
@@ -62,6 +64,9 @@ class FileServerCopier extends Backend {
         $this->copyDirectoryToMainDirectoryWithSSHCommand();
     }
 
+    /**
+     * @throws FTPConnetion
+     */
     private function getPathToCopy() : string
     {
        if ($this->isToCopyToLocalFileServer()) {
@@ -193,7 +198,7 @@ class FileServerCopier extends Backend {
 
     private function couldNotFindCopyTo() : void
     {
-        $this->_log->logErrorAndDie("Could not find a valid path to update files");
+        $this->_log->error("Could not find a valid path to update files");
     }
 
     private function copyDirectoryToMainDirectoryWithSSHCommand() : void
