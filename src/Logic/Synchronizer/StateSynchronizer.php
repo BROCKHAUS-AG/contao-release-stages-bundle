@@ -14,12 +14,11 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer;
 
-
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 
 class StateSynchronizer
 {
-
     private Database $_database;
 
     public function __construct(Database $database)
@@ -29,9 +28,19 @@ class StateSynchronizer
 
     /**
      * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws DatabaseQueryEmptyResult
      */
-    public function setState(string $state, int $id){
-        $this->_database->updateState($state, $id);
+    public function checkLatestState(): array
+    {
+        return $this->_database->checkLatestState();
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function setState(string $state, int $id): void
+    {
+        $this->_database->updateState($state, $id);
+    }
 }

@@ -63,6 +63,10 @@ class ReleaseStages
      */
     public function onSubmitCallback() : void
     {
+        $latestState = $this->_stateSynchronizer->checkLatestState();
+        var_dump($latestState);
+
+
         $id = $this->_versioning->generateNewVersionNumber();
         try {
             $this->_scriptFileSynchronizer->synchronize();
@@ -73,23 +77,6 @@ class ReleaseStages
         }
         $this->_stateSynchronizer->setState(SystemVariables::STATE_SUCCESS, $id);
 
-        // ghost/zombie tasks
-        //$this->_backupCreator->create();
-        die();
-
-        // try
-        // erzeugt eine Datenbank-update Skript, in der alle Befehle stehen die in der prod db stehen sollen
-        // das Ausführen des Skriptes passiert noch nicht hier, sondern erst in remote installation
-        // ghost/zombie tasks
-        // $this->_databaseCopier->copy();
-        // alle Dateien, auch einzelne Dateien sollen gezippt werden, also auch das Datenbank-Update Skript
-        // nach der Übertragung zum Prod Server, werden die gezippte Dateien auf dem Prod Server entpackt (prüfen, ob entpacken erfolgreich)
-        // ghost/zombie tasks
-        // $this->_fileServerCopier->copy();
-        // ghost/zombie tasks
-        // this execute remote installation
-
-        // catch
-        // recover backup
+        die;
     }
 }

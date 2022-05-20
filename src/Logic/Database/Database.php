@@ -44,7 +44,8 @@ class Database
      */
     public function getLatestReleaseVersion(): Version
     {
-        $result = $this->_dbConnection->createQueryBuilder()
+        $result = $this->_dbConnection
+            ->createQueryBuilder()
             ->select("id", "version", "kindOfRelease", "state")
             ->from("tl_release_stages")
             ->orderBy("id", "DESC")
@@ -210,6 +211,49 @@ class Database
             ->where("id > :id")
             ->andWhere("text LIKE 'DELETE FROM %'")
             ->setParameter("id", $lastId)
+            ->execute()
+            ->fetchAllAssociative();
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws DatabaseQueryEmptyResult
+     */
+    public function getLatestId(): int
+    {
+        $result = $this->_dbConnection
+            ->createQueryBuilder()
+            ->select("id")
+            ->from("tl_release_stages")
+            ->orderBy("id", "DESC")
+            ->setMaxResults(2)
+            ->execute()
+            ->fetchAllAssociative();
+
+        if ($result[1] == NULL || $result[1]["id"] == NULL) {
+            throw new DatabaseQueryEmptyResult();
+        }
+
+        var_dump($result);
+        return $result[1]["id"];
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws DatabaseQueryEmptyResult
+     */
+    public function checkLatestState(): array
+    {
+        $id = $this->getLatestId();
+
+        return $this->_dbConnection
+            ->createQueryBuilder()
+            ->select("state")
+            ->from("tl_release_stage")
+            ->where("id = :id")
+            ->set("id", $id)
             ->execute()
             ->fetchAllAssociative();
     }
