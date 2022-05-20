@@ -33,21 +33,19 @@ class Versioning {
     }
 
 
-
     /**
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      * @throws Validation
      */
-    public function generateNewVersionNumber(): int
+    public function generateNewVersionNumber(int $id): void
     {
         try {
             $latestVersion = $this->database->getLatestReleaseVersion();
         } catch (DatabaseQueryEmptyResult $e) {
             $latestVersion = $this->createDummyVersion();
         }
-        $this->createAndUpdateToNewVersion($latestVersion);
-        return $latestVersion->getId();
+        $this->createAndUpdateToNewVersion($id, $latestVersion);
     }
 
     /**
@@ -61,10 +59,10 @@ class Versioning {
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    private function createAndUpdateToNewVersion(Version $latestVersion): void
+    private function createAndUpdateToNewVersion(int $id, Version $latestVersion): void
     {
         $versionNumber = $this->createVersionNumber($latestVersion, "release");
-        $this->database->updateVersion($versionNumber);
+        $this->database->updateVersion($id, $versionNumber);
     }
 
     public function createVersionNumber(Version $latestVersion, string $kindOfNewVersion): string

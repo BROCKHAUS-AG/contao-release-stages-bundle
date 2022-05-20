@@ -59,10 +59,9 @@ class ReleaseStages
         $actualId = $this->_stateSynchronizer->getActualId();
         $this->checkLatestStateInDatabase($actualId);
         try {
-            echo "create new version";
-            // $this->_versioning->generateNewVersionNumber();
+            $this->_versioning->generateNewVersionNumber($actualId);
+            $this->_scriptFileSynchronizer->synchronize();
 
-            //$this->_scriptFileSynchronizer->synchronize();
         } catch (Exception $e) {
             $this->_stateSynchronizer->setState(SystemVariables::STATE_FAILURE, $actualId);
             die("An exception has been thrown: $e");

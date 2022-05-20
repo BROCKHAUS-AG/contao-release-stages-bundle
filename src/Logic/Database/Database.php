@@ -64,18 +64,19 @@ class Database
             SystemVariables::STATE_PENDING);
     }
 
+
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    public function updateVersion(string $version) : void
+    public function updateVersion(int $id, string $version) : void
     {
         $this->_dbConnection
             ->createQueryBuilder()
             ->update("tl_release_stages")
             ->set("version", ":version")
-            ->set("state", SystemVariables::STATE_PENDING)
-            ->where("version = \"None\"")
+            ->where("id = :id")
             ->setParameter("version", $version)
+            ->setParameter("id", $id)
             ->execute();
     }
 
