@@ -72,6 +72,7 @@ class MapConfigTest extends ContaoTestCase
               "local": {
                 "contaoProdPath": "test"
               },
+              "maxSpendTimeWhileCreatingRelease": 0,
               "dnsRecords": [
                 {
                   "alias": "example-site",
@@ -100,7 +101,7 @@ class MapConfigTest extends ContaoTestCase
         $expectedDNSRecords->add(new DNSRecord("example-site", "www.example-site.de"));
         $expectedDNSRecords->add(new DNSRecord("example-site-better", "www.example-site-better.de"));
         $expected = new Config($expectedDatabase, "fileServer", $expectedFileServer, $expectedLocal,
-            $expectedDNSRecords, array("jpg", "mp4", "MP4"));
+            0, $expectedDNSRecords, array("jpg", "mp4", "MP4"));
         $mapper = new MapConfig();
 
         $actual = $mapper->map(json_decode($input));
@@ -128,6 +129,7 @@ class MapConfigTest extends ContaoTestCase
             self::assertSame($expectedDNSRecords->getByIndex($x)->getDns(),
                 $actual->getDnsRecords()->getByIndex($x)->getDns());
         }
+        self::assertSame($expected->getMaxSpendTimeWhileCreatingRelease(), $actual->getMaxSpendTimeWhileCreatingRelease());
         self::assertSame($expected->getFileFormats(), $actual->getFileFormats());
     }
 }

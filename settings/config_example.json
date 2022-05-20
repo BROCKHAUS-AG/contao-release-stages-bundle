@@ -29,6 +29,7 @@
   "local": {
     "contaoProdPath": "/var/www/html/contao"
   },
+  "maxSpendTimeWhileCreatingRelease": 120,
   "dnsRecords": [
     {
       "alias": "example-site",

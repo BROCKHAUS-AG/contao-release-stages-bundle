@@ -25,8 +25,11 @@ class MapConfig extends Map {
         $arrayOfDNSRecordsMapper = new MapDNSRecordCollection();
         $dnsRecords = $arrayOfDNSRecordsMapper->mapArray($data->dnsRecords);
 
+        $maxSpendTimeWhileCreatingRelease = $data->maxSpendTimeWhileCreatingRelease;
+
         $fileFormats = $data->fileFormats;
 
-        return new Config($database, $copyTo, $fileServer, $local, $dnsRecords, $fileFormats);
+        return new Config($database, $copyTo, $fileServer, $local, $maxSpendTimeWhileCreatingRelease, $dnsRecords,
+            $fileFormats);
     }
 }

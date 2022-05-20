@@ -84,11 +84,15 @@ class IO {
         return $this->getConfig()->getLocal();
     }
 
+    public function getMaxSpendTimeWhileCreatingRelease(): int
+    {
+        return $this->getConfig()->getMaxSpendTimeWhileCreatingRelease();
+    }
+
     public function getFileFormats(): array
     {
         return $this->getConfig()->getFileFormats();
     }
-
     private function getConfig(): Config
     {
         try {

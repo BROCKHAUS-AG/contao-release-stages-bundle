@@ -22,12 +22,14 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServerCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Timer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
 use Exception;
 
 class ReleaseStages
 {
+    private Timer $_timer;
     private ScriptFileSynchronizer $_scriptFileSynchronizer;
     private Versioning $_versioning;
     private BackupCreator $_backupCreator;
@@ -35,10 +37,11 @@ class ReleaseStages
     private FileServerCopier $_fileServerCopier;
     private StateSynchronizer $_stateSynchronizer;
 
-    public function __construct(ScriptFileSynchronizer $scriptFileSynchronizer, Versioning $versioning,
+    public function __construct(Timer $timer, ScriptFileSynchronizer $scriptFileSynchronizer, Versioning $versioning,
                                 BackupCreator $backupCreator, DatabaseCopier $databaseCopier,
                                 FileServerCopier $fileServerCopier, StateSynchronizer $stateSynchronizer)
     {
+        $this->_timer = $timer;
         $this->_scriptFileSynchronizer = $scriptFileSynchronizer;
         $this->_versioning = $versioning;
         $this->_backupCreator = $backupCreator;
@@ -56,11 +59,13 @@ class ReleaseStages
      */
     public function onSubmitCallback(): void
     {
+        $this->_timer->start();
         $actualId = $this->_stateSynchronizer->getActualId();
         $this->checkLatestStateInDatabase($actualId);
         try {
             $this->_versioning->generateNewVersionNumber($actualId);
             $this->_scriptFileSynchronizer->synchronize();
+            echo $this->_timer->getSpendTime();
         } catch (Exception $e) {
             $this->_stateSynchronizer->setState(SystemVariables::STATE_FAILURE, $actualId);
             die("An exception has been thrown: $e");

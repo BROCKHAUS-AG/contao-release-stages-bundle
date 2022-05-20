@@ -19,6 +19,10 @@ services:
         calls:
             - loadConfig: []
 
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Timer:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
+
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer:
         arguments:
             - '%kernel.project_dir%'
@@ -36,8 +40,10 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
 
+
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages:
         arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Timer'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator'

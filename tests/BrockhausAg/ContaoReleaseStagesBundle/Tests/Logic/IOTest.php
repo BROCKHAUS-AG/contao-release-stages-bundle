@@ -54,10 +54,9 @@ class IOTest extends ContaoTestCase
 
     public function testGetDatabaseConfiguration(): void
     {
-        $expected = new Database("server", "name", 0, "username", "password", array(),
-            "testStageDatabaseName");
+        $expected = new Database("server", "name", 0, "username", "password", array());
         $willReturn = new Config($expected, "", self::createMock(FileServer::class),
-            self::createMock(Local::class),
+            self::createMock(Local::class), 0,
             self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
@@ -74,9 +73,9 @@ class IOTest extends ContaoTestCase
     public function testGetDatabaseIgnoredTablesConfiguration(): void
     {
         $database = new Database("server", "name", 0, "username", "password",
-            array("a", "b"), "testStageDatabaseName");
+            array("a", "b"));
         $willReturn = new Config($database, "", self::createMock(FileServer::class),
-            self::createMock(Local::class),
+            self::createMock(Local::class), 0,
             self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
         $expected = $database->getIgnoredTables();
@@ -96,7 +95,7 @@ class IOTest extends ContaoTestCase
         $expected->add(new DNSRecord("c", "d"));
         $willReturn = new Config(self::createMock(Database::class), "",
             self::createMock(FileServer::class), self::createMock(Local::class),
-            $expected, array());
+            0, $expected, array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
         $actual = $ioLogic->getDNSRecords();
@@ -112,7 +111,7 @@ class IOTest extends ContaoTestCase
         $expected = "test";
         $willReturn = new Config(self::createMock(Database::class), $expected,
             self::createMock(FileServer::class), self::createMock(Local::class),
-            self::createMock(DNSRecordCollection::class), array());
+            0, self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
         $actual = $ioLogic->getWhereToCopy();
@@ -125,8 +124,8 @@ class IOTest extends ContaoTestCase
         $expected = new Ftp(0, "username", "password", true);
         $fileServer = new FileServer("server", "path", $expected, self::createMock(Ssh::class));
         $willReturn = new Config(self::createMock(Database::class), "", $fileServer,
-            self::createMock(Local::class), self::createMock(DNSRecordCollection::class),
-            array());
+            self::createMock(Local::class), 0,
+            self::createMock(DNSRecordCollection::class), array());
 
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
@@ -143,8 +142,8 @@ class IOTest extends ContaoTestCase
         $expected = new Ssh(0, "username", "password");
         $fileServer = new FileServer("server", "path", self::createMock(Ftp::class), $expected);
         $willReturn = new Config(self::createMock(Database::class), "", $fileServer,
-            self::createMock(Local::class), self::createMock(DNSRecordCollection::class),
-            array());
+            self::createMock(Local::class), 0,
+            self::createMock(DNSRecordCollection::class), array());
 
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
@@ -161,8 +160,8 @@ class IOTest extends ContaoTestCase
         $expected_ssh = new Ssh(0, "username", "password");
         $expected = new FileServer("server", "path", $expected_ftp, $expected_ssh);
         $willReturn = new Config(self::createMock(Database::class), "", $expected,
-            self::createMock(Local::class), self::createMock(DNSRecordCollection::class),
-            array());
+            self::createMock(Local::class), 0,
+            self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
         $actual = $ioLogic->getFileServerConfiguration();
@@ -184,7 +183,7 @@ class IOTest extends ContaoTestCase
     {
         $expected = new Local("contaoProdPath");
         $willReturn = new Config(self::createMock(Database::class), "",
-            self::createMock(FileServer::class), $expected,
+            self::createMock(FileServer::class), $expected, 0,
             self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
@@ -193,12 +192,25 @@ class IOTest extends ContaoTestCase
         self::assertSame($expected->getContaoProdPath(), $actual->getContaoProdPath());
     }
 
+    public function testGetMaxSpendTimeWhileCreatingRelease(): void
+    {
+        $expected = 0;
+        $willReturn = new Config(self::createMock(Database::class), "",
+            self::createMock(FileServer::class), self::createMock(Local::class),
+            0, self::createMock(DNSRecordCollection::class), array());
+        $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
+
+        $actual = $ioLogic->getMaxSpendTimeWhileCreatingRelease();
+
+        self::assertSame($expected, $actual);
+    }
+
     public function testGetFileFormats(): void
     {
         $expected = array("a", "b", "c");
         $willReturn = new Config(self::createMock(Database::class), "",
             $this->createMock(FileServer::class), self::createMock(Local::class),
-            self::createMock(DNSRecordCollection::class), $expected);
+            0, self::createMock(DNSRecordCollection::class), $expected);
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
         $actual = $ioLogic->getFileFormats();

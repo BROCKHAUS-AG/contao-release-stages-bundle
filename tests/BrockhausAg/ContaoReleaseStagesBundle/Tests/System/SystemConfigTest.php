@@ -67,7 +67,7 @@ class SystemConfigTest extends ContaoTestCase
         $expectedDNSRecords->add(new DNSRecord("example-site", "www.example-site.de"));
         $expectedDNSRecords->add(new DNSRecord("example-site-better", "www.example-site-better.de"));
         $expected = new Config($expectedDatabase, "fileServer", $expectedFileServer, $expectedLocal,
-            $expectedDNSRecords, array("jpg", "mp4", "MP4"));
+            0, $expectedDNSRecords, array("jpg", "mp4", "MP4"));
 
         $reflection = new ReflectionClass($systemConfig);
         $reflection_property = $reflection->getProperty("_config");

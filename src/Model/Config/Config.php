@@ -10,16 +10,19 @@ class Config
     private string $copyTo;
     private FileServer $fileServer;
     private Local $local;
+    private int $maxSpendTimeWhileCreatingRelease;
     private DNSRecordCollection $dnsRecords;
     private array $fileFormats;
 
     public function __construct(Database $database, string $copyTo, FileServer $fileServer, Local $local,
-                                DNSRecordCollection $dnsRecords, array $fileFormats)
+                                int $maxSpendTimeWhileCreatingRelease, DNSRecordCollection $dnsRecords,
+                                array $fileFormats)
     {
         $this->database = $database;
         $this->copyTo = $copyTo;
         $this->fileServer = $fileServer;
         $this->local = $local;
+        $this->maxSpendTimeWhileCreatingRelease = $maxSpendTimeWhileCreatingRelease;
         $this->dnsRecords = $dnsRecords;
         $this->fileFormats = $fileFormats;
     }
@@ -42,6 +45,11 @@ class Config
     public function getLocal(): Local
     {
         return $this->local;
+    }
+
+    public function getMaxSpendTimeWhileCreatingRelease(): int
+    {
+        return $this->maxSpendTimeWhileCreatingRelease;
     }
 
     public function getDnsRecords(): DNSRecordCollection
