@@ -17,25 +17,27 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 use DateTime;
 
 class Timer {
-    private DateTime $_dateTime;
     private IO $_io;
     private int $startTime;
-    private int $endTIme;
 
     public function __construct(IO $io)
     {
-        $this->_dateTime = new DateTime();
         $this->_io = $io;
+    }
+
+    private function createDateTime(): DateTime
+    {
+        return new DateTime();
     }
 
     public function start(): void
     {
-        $this->startTime = $this->_dateTime->getTimestamp();
+        $this->startTime = $this->createDateTime()->getTimestamp();
     }
 
     public function getActualTime(): int
     {
-        return $this->_dateTime->getTimestamp();
+        return $this->createDateTime()->getTimestamp();
     }
 
     public function getSpendTime(): int
@@ -43,14 +45,14 @@ class Timer {
         return $this->getActualTime() - $this->startTime;
     }
 
-    public function checkIfTimeIsOver(): bool
+    public function getMaxTime(): int
     {
-        $maxSpendTime = $this->_io->getMaxSpendTimeWhileCreatingRelease();
-        return false;
+        return $this->_io->getMaxSpendTimeWhileCreatingRelease();
     }
 
-    public function stop(): void
+    public function checkIfTimeIsOver(): bool
     {
-        $this->endTIme = $this->_dateTime->getTimestamp();
+        $maxSpendTime = $this->getMaxTime() * 60;
+        return $this->getSpendTime() <= $maxSpendTime;
     }
 }

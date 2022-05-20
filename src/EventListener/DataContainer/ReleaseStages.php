@@ -25,6 +25,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Timer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
+use DateTime;
 use Exception;
 
 class ReleaseStages
@@ -65,12 +66,12 @@ class ReleaseStages
         try {
             $this->_versioning->generateNewVersionNumber($actualId);
             $this->_scriptFileSynchronizer->synchronize();
-            echo $this->_timer->getSpendTime();
         } catch (Exception $e) {
             $this->_stateSynchronizer->setState(SystemVariables::STATE_FAILURE, $actualId);
             die("An exception has been thrown: $e");
         }
         $this->_stateSynchronizer->setState(SystemVariables::STATE_SUCCESS, $actualId);
+        echo $this->_timer->getSpendTime();
         die("finished");
     }
 
