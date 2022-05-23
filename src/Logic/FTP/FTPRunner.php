@@ -19,6 +19,13 @@ use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
 class FTPRunner extends Runner {
+    private $_conn;
+
+    public function __construct($conn)
+    {
+        $this->_conn = $conn;
+    }
+
     /**
      * @throws FTPCreateDirectory
      */

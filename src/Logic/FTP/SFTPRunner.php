@@ -18,8 +18,15 @@ use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use Doctrine\ORM\Cache\Exception\FeatureNotImplemented;
+use phpseclib3\Net\SFTP;
 
 class SFTPRunner extends Runner {
+    private SFTP $_sftp;
+
+    public function __construct(SFTP $sftp)
+    {
+        $this->_sftp = $sftp;
+    }
 
     /**
      * @throws FTPCreateDirectory
@@ -45,7 +52,12 @@ class SFTPRunner extends Runner {
      */
     public function copy(File $file): void
     {
-        throw new FeatureNotImplemented();
+        $prodPath = $file->getProdPath();
+        $path = $file->getPath();
+        if ($this->checkIfFileExists($prodPath)) {
+            return;
+        }
+        $this->put($prodPath, $path);
     }
 
     /**
@@ -63,7 +75,7 @@ class SFTPRunner extends Runner {
 
     private function checkIfDirectoryExists(string $path): bool
     {
-        if ($this->_conn->chdir($path)) {
+        if ($this->_sftp->chdir($path)) {
             return true;
         }
         return false;
@@ -73,11 +85,10 @@ class SFTPRunner extends Runner {
     {
         $fileName = substr($file, strrpos($file, '/') + 1);
         $path = str_replace($fileName, "", $file);
-        $files = ftp_nlist($this->_conn, $path);
-        if (!$files) {
+        if (!$this->_sftp->file_exists($path)) {
             return false;
         }
-        return in_array($file, $files);
+        return true;
     }
 
     /**
@@ -85,10 +96,9 @@ class SFTPRunner extends Runner {
      */
     private function mkdir(string $directory): void
     {
-        $this->_conn->mkdir($directory);
-        /*if(!ftp_mkdir($this->_conn, $directory)){
+        if(!$this->_sftp->mkdir($directory)) {
             throw new FTPCreateDirectory("Couldn't create directory \"$directory\". Maybe permissions are invalid.");
-        }*/
+        }
     }
 
     private function repairDirectoryPermission(string $directory): void
@@ -96,16 +106,17 @@ class SFTPRunner extends Runner {
         $this->changePermission($directory, 0755);
     }
 
+
     /**
      * @throws FTPCopy
      */
     private function put(string $serverPath, string $path): void
     {
-        /*if (@ftp_put($this->_conn, $serverPath, $path, FTP_ASCII)) {
-            $this->repairPermission($serverPath);
-        }else {
+        try {
+            $this->_sftp->put($serverPath, $path, SFTP::SOURCE_LOCAL_FILE);
+        }catch (\Exception $e) {
             throw new FTPCopy("Couldn't put file to \"$serverPath\" from \"$path\"");
-        }*/
+        }
     }
 
     private function repairPermission(string $prodPath): void
