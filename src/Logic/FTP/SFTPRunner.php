@@ -17,8 +17,10 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
+use Doctrine\ORM\Cache\Exception\FeatureNotImplemented;
 
-class FTPRunner extends Runner {
+class SFTPRunner extends Runner {
+
     /**
      * @throws FTPCreateDirectory
      */
@@ -30,9 +32,12 @@ class FTPRunner extends Runner {
         }
     }
 
+    /**
+     * @throws FeatureNotImplemented
+     */
     public function getLastModifiedTimeFromFile(string $file): int
     {
-        return ftp_mdtm($this->_conn, $file);
+        throw new FeatureNotImplemented();
     }
 
     /**
@@ -40,12 +45,7 @@ class FTPRunner extends Runner {
      */
     public function copy(File $file): void
     {
-        $prodPath = $file->getProdPath();
-        $path = $file->getPath();
-        if ($this->checkIfFileExists($prodPath)) {
-            return;
-        }
-        $this->put($prodPath, $path);
+        throw new FeatureNotImplemented();
     }
 
     /**
@@ -53,20 +53,17 @@ class FTPRunner extends Runner {
      */
     public function update(File $file): void
     {
-        $this->copy($file);
+        throw new FeatureNotImplemented();
     }
 
     public function delete(string $file, string $path): void
     {
-        $file = $path. $file;
-        if ($this->checkIfFileExists($file)) {
-            ftp_delete($this->_conn, $file);
-        }
+        throw new FeatureNotImplemented();
     }
 
     private function checkIfDirectoryExists(string $path): bool
     {
-        if (@ftp_chdir($this->_conn, $path)) {
+        if ($this->_conn->chdir($path)) {
             return true;
         }
         return false;
@@ -88,9 +85,10 @@ class FTPRunner extends Runner {
      */
     private function mkdir(string $directory): void
     {
-        if(!ftp_mkdir($this->_conn, $directory)){
+        $this->_conn->mkdir($directory);
+        /*if(!ftp_mkdir($this->_conn, $directory)){
             throw new FTPCreateDirectory("Couldn't create directory \"$directory\". Maybe permissions are invalid.");
-        }
+        }*/
     }
 
     private function repairDirectoryPermission(string $directory): void
@@ -103,11 +101,11 @@ class FTPRunner extends Runner {
      */
     private function put(string $serverPath, string $path): void
     {
-        if (@ftp_put($this->_conn, $serverPath, $path, FTP_ASCII)) {
+        /*if (@ftp_put($this->_conn, $serverPath, $path, FTP_ASCII)) {
             $this->repairPermission($serverPath);
         }else {
             throw new FTPCopy("Couldn't put file to \"$serverPath\" from \"$path\"");
-        }
+        }*/
     }
 
     private function repairPermission(string $prodPath): void
@@ -117,6 +115,6 @@ class FTPRunner extends Runner {
 
     private function changePermission(string $directory, int $permission): void
     {
-        ftp_chmod($this->_conn, $permission, $directory);
+        // ftp_chmod($this->_conn, $permission, $directory);
     }
 }

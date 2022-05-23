@@ -17,6 +17,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnetion;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use phpseclib3\Net\SFTP;
 
 class FTPConnector {
     private IO $_io;
@@ -59,32 +60,23 @@ class FTPConnector {
         }else {
             $conn = $this->connectToFTPServer();
         }
-        $this->login($conn);
         return $conn;
     }
 
-    /**
-     * @throws FTPConnetion
-     */
-    private function login($conn): void
-    {
-        if (!@ftp_login($conn, $this->username, $this->password)) {
-            $this->_log->error("Username or password is false.");
-            throw new FTPConnetion("Username or password is false");
-        }
-    }
 
     /**
-     * @return false|resource
+     * @return SFTP
      * @throws FTPConnetion
      */
     private function connectToSFTPServer()
     {
-        $sftpConn = ftp_ssl_connect($this->server, $this->port);
-        if (!$sftpConn) {
-            $this->errorMessage("Connection to SFTP Server \"$this->server: $this->port\" failed");
+        try {
+            $sftpConn = new SFTP($this->server, $this->port);
+            $sftpConn->login($this->username, $this->password);
+            return $sftpConn;
+        }catch (\Exception $e) {
+            $this->errorMessage("Connection to SFTP Server \"$this->server:$this->port\" failed: $e");
         }
-        return $sftpConn;
     }
 
     /**
@@ -95,9 +87,21 @@ class FTPConnector {
     {
         $ftpConn = ftp_connect($this->server, $this->port);
         if (!$ftpConn) {
-            $this->errorMessage("Connection to FTP Server \"$this->server: $this->port\" failed");
+            $this->errorMessage("Connection to FTP Server \"$this->server:$this->port\" failed");
         }
+        $this->loginFTPServer($ftpConn);
         return $ftpConn;
+    }
+
+    /**
+     * @throws FTPConnetion
+     */
+    private function loginFTPServer($conn): void
+    {
+        if (!@ftp_login($conn, $this->username, $this->password)) {
+            $this->_log->error("Username or password is false.");
+            throw new FTPConnetion("Username or password is false");
+        }
     }
 
     /**

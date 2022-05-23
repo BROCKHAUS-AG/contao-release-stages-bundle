@@ -19,11 +19,12 @@ use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPRunner;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\Runner;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\SFTPRunner;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
-
 
 class ScriptFileSynchronizer
 {
@@ -54,15 +55,18 @@ class ScriptFileSynchronizer
     /**
      * @throws FTPConnetion
      */
-    private function getFTPRunner(): FTPRunner
+    private function getFTPRunner(): Runner
     {
+        if ($this->_io->getFTPConfiguration()->isSsl()) {
+            return new SFTPRunner($this->_ftpConnector->connect());
+        }
         return new FTPRunner($this->_ftpConnector->connect());
     }
 
     /**
      * @throws FTPCreateDirectory
      */
-    private function createDirectories(FTPRunner $ftpRunner): void
+    private function createDirectories(Runner $runner): void
     {
         $fileServerConfigurationPath = $this->_io->getFileServerConfiguration()->getPath();
         $directories = array(
@@ -71,18 +75,18 @@ class ScriptFileSynchronizer
         );
 
         foreach ($directories as $directory) {
-            $ftpRunner->createDirectory($directory);
+            $runner->createDirectory($directory);
         }
     }
 
     /**
      * @throws FTPCopy
      */
-    private function copyScriptFiles(FTPRunner $ftpRunner): void
+    private function copyScriptFiles(Runner $runner): void
     {
         $files = $this->createFiles();
         foreach ($files->get() as $file) {
-            $ftpRunner->copy($file);
+            $runner->copy($file);
         }
     }
 
