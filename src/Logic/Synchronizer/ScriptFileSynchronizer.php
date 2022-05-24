@@ -17,6 +17,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnetion;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPRunner;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\Runner;
@@ -24,7 +25,6 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\SFTPRunner;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
-use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
 
 class ScriptFileSynchronizer
 {
@@ -70,8 +70,8 @@ class ScriptFileSynchronizer
     {
         $fileServerConfigurationPath = $this->_io->getFileServerConfiguration()->getPath();
         $directories = array(
-            $fileServerConfigurationPath. SystemVariables::SCRIPT_DIRECTORY_PROD,
-            $fileServerConfigurationPath. SystemVariables::BACKUP_DIRECTORY_PROD
+            $fileServerConfigurationPath. Constants::SCRIPT_DIRECTORY_PROD,
+            $fileServerConfigurationPath. Constants::BACKUP_DIRECTORY_PROD
         );
 
         foreach ($directories as $directory) {
@@ -101,31 +101,31 @@ class ScriptFileSynchronizer
 
     private function getFullBackupDatabaseScriptPath(): string
     {
-        return $this->_path. SystemVariables::BACKUP_DATABASE_SCRIPT;
+        return $this->_path. Constants::BACKUP_DATABASE_SCRIPT;
     }
 
     private function getFullProdBackupDatabaseScriptPath(): string
     {
-        return $this->_io->getFileServerConfiguration()->getPath(). SystemVariables::BACKUP_DATABASE_SCRIPT_PROD;
+        return $this->_io->getFileServerConfiguration()->getPath(). Constants::BACKUP_DATABASE_SCRIPT_PROD;
     }
 
     private function getFullFileServerScriptPath(): string
     {
-        return $this->_path. SystemVariables::BACKUP_FILE_SYSTEM_SCRIPT;
+        return $this->_path. Constants::BACKUP_FILE_SYSTEM_SCRIPT;
     }
 
     private function getFullProdFileServerScriptPath(): string
     {
-        return $this->_io->getFileServerConfiguration()->getPath(). SystemVariables::BACKUP_FILE_SYSTEM_SCRIPT_PROD;
+        return $this->_io->getFileServerConfiguration()->getPath(). Constants::BACKUP_FILE_SYSTEM_SCRIPT_PROD;
     }
 
     private function getFullCreateStateScriptPath(): string
     {
-        return $this->_path. SystemVariables::CREATE_STATE_SCRIPT;
+        return $this->_path. Constants::CREATE_STATE_SCRIPT;
     }
 
     private function getFullProdCreateStateScriptPath(): string
     {
-        return $this->_io->getFileServerConfiguration()->getPath(). SystemVariables::CREATE_STATE_SCRIPT_PROD;
+        return $this->_io->getFileServerConfiguration()->getPath(). Constants::CREATE_STATE_SCRIPT_PROD;
     }
 }

@@ -16,6 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\System;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\File\ConfigNotFound;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\File\FileNotFound;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\ConfigMapper;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
@@ -69,7 +70,7 @@ class SystemConfig
 
     private function createPath(): string
     {
-        return $this->_contaoPath. SystemVariables::CONFIG_FILE;
+        return $this->_contaoPath. Constants::CONFIG_FILE;
     }
 
     /**

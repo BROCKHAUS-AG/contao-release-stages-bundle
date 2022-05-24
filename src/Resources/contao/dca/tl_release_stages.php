@@ -13,7 +13,7 @@ declare(strict_types=1);
  */
 
 use BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages;
-use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 
 $GLOBALS['TL_DCA']['tl_deployments'] = array(
     'config' => array(
@@ -92,7 +92,7 @@ $GLOBALS['TL_DCA']['tl_deployments'] = array(
             'sql' => ['type' => 'string', 'length' => '1024', 'default' => '']
         ),
         'state' => array(
-            'sql' => ['type' => 'string', 'length' => '14', 'default' => SystemVariables::STATE_PENDING]
+            'sql' => ['type' => 'string', 'length' => '14', 'default' => Constants::STATE_PENDING]
         )
     ),
     'palettes' => array(

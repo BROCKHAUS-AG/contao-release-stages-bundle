@@ -12,9 +12,9 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\System;
+namespace BrockhausAg\ContaoReleaseStagesBundle;
 
-abstract class SystemVariables
+abstract class Constants
 {
     public const PATH_TO_VENDOR = "/vendor/brockhaus-ag/contao-release-stages-bundle/";
 

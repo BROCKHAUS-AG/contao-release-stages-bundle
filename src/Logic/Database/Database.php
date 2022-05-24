@@ -18,14 +18,13 @@ use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyR
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\NoSubmittedPendingState;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
-use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
-use Exception;
 
 class Database
 {
@@ -61,7 +60,7 @@ class Database
 
         $latestVersion = $result[1];
         return new Version(intval($latestVersion["id"]), $latestVersion["kindOfRelease"], $latestVersion["version"],
-            SystemVariables::STATE_PENDING);
+            Constants::STATE_PENDING);
     }
 
 
@@ -256,7 +255,7 @@ class Database
             ->from("tl_deployments")
             ->where("state = :state")
             ->andWhere("id != :id")
-            ->setParameter("state", SystemVariables::STATE_PENDING)
+            ->setParameter("state", Constants::STATE_PENDING)
             ->setParameter("id", $actualId)
             ->execute()
             ->fetchAllAssociative();
@@ -264,7 +263,7 @@ class Database
             throw new NoSubmittedPendingState();
         }
         $state = $result[0]["state"];
-        if ($state == SystemVariables::STATE_PENDING) {
+        if ($state == Constants::STATE_PENDING) {
             throw new OldStateIsPending();
         }
     }

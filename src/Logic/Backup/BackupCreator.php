@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHRunner;
-use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
 
 class BackupCreator
 {
@@ -43,12 +43,12 @@ class BackupCreator
 
     private function createDatabaseBackup(string $path, SSHRunner $runner): void
     {
-        $runner->executeScript($path. SystemVariables::BACKUP_DATABASE_SCRIPT_PROD);
+        $runner->executeScript($path. Constants::BACKUP_DATABASE_SCRIPT_PROD);
     }
 
     private function createFileServerBackup(string $path, SSHRunner $runner): void
     {
-        $runner->executeScript($path. SystemVariables::BACKUP_FILE_SYSTEM_SCRIPT_PROD);
+        $runner->executeScript($path. Constants::BACKUP_FILE_SYSTEM_SCRIPT_PROD);
     }
 
     /**
