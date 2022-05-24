@@ -16,6 +16,9 @@ namespace BrockhausAg\ContaoReleaseStagesBundle;
 
 abstract class Constants
 {
+    public const DEPLOYMENT_TABLE = "tl_release_stages";
+
+
     public const PATH_TO_VENDOR = "/vendor/brockhaus-ag/contao-release-stages-bundle/";
 
 

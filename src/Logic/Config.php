@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\File\ConfigNotFound;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
@@ -49,7 +50,7 @@ class Config {
     public function getDatabaseIgnoredTablesConfiguration(): array
     {
         $ignoredTables = $this->getConfig()->getDatabase()->getIgnoredTables();
-        array_push($ignoredTables, "tl_user", "tl_cron_job", "tl_deployments");
+        array_push($ignoredTables, "tl_user", "tl_cron_job", Constants::DEPLOYMENT_TABLE);
         return $ignoredTables;
     }
 

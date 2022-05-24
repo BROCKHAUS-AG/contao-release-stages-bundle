@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
@@ -78,7 +79,7 @@ class ConfigTest extends ContaoTestCase
             0, self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
         $expected = $database->getIgnoredTables();
-        array_push($expected, "tl_user", "tl_cron_job", "tl_deployments");
+        array_push($expected, "tl_user", "tl_cron_job", Constants::DEPLOYMENT_TABLE);
 
         $actual = $ioLogic->getDatabaseIgnoredTablesConfiguration();
 

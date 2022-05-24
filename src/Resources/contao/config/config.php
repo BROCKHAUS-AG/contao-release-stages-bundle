@@ -10,18 +10,19 @@
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
+use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\ReleaseStages;
 
 /**
  * Backend modules
  */
 $GLOBALS['BE_MOD']['release'] = array(
-    'release_stages' => array(
-        'tables' => array('tl_deployments')
+    Constants::DEPLOYMENT_TABLE => array(
+        'tables' => array(Constants::DEPLOYMENT_TABLE)
     )
 );
 
 /**
  * Models
  */
-$GLOBALS['TL_MODELS']['tl_deployments'] = ReleaseStages::class;
+$GLOBALS['TL_MODELS'][Constants::DEPLOYMENT_TABLE] = ReleaseStages::class;
