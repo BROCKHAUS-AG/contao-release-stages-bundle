@@ -13,22 +13,22 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapDNSRecordCollection;
-use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapDatabase;
+use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\DNSRecordCollectionMapper;
+use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\DatabaseMapper;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecord;
 use Contao\TestCase\ContaoTestCase;
 
 /**
- * Class MapDNSRecordCollectionTest
+ * Class DNSRecordCollectionMapperTest
  *
  * @package BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper
  */
-class MapDNSRecordCollectionTest extends ContaoTestCase
+class DNSRecordCollectionMapperTest extends ContaoTestCase
 {
     public function testInstantiation(): void
     {
-        self::assertInstanceOf(MapDatabase::class, new MapDatabase());
+        self::assertInstanceOf(DatabaseMapper::class, new DatabaseMapper());
     }
 
     public function testMap(): void
@@ -46,7 +46,7 @@ class MapDNSRecordCollectionTest extends ContaoTestCase
         $expected = new DNSRecordCollection();
         $expected->add(new DNSRecord("example-site", "www.example-site.de"));
         $expected->add(new DNSRecord("example-site-better", "www.example-site-better.de"));
-        $mapper = new MapDNSRecordCollection();
+        $mapper = new DNSRecordCollectionMapper();
 
         $actual = $mapper->mapArray(json_decode($input));
 

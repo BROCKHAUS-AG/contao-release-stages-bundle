@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig;
+use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\ConfigMapper;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
@@ -25,18 +25,18 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ssh;
 use Contao\TestCase\ContaoTestCase;
 
 /**
- * Class PluginTest
+ * Class ConfigMapperTest
  *
  * @package BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper
  */
-class MapConfigTest extends ContaoTestCase
+class ConfigMapperTest extends ContaoTestCase
 {
     /**
      * Test Contao manager plugin class instantiation
      */
     public function testInstantiation(): void
     {
-        self::assertInstanceOf(MapConfig::class, new MapConfig());
+        self::assertInstanceOf(ConfigMapper::class, new ConfigMapper());
     }
 
     public function testMap(): void
@@ -102,7 +102,7 @@ class MapConfigTest extends ContaoTestCase
         $expectedDNSRecords->add(new DNSRecord("example-site-better", "www.example-site-better.de"));
         $expected = new Config($expectedDatabase, "fileServer", $expectedFileServer, $expectedLocal,
             0, $expectedDNSRecords, array("jpg", "mp4", "MP4"));
-        $mapper = new MapConfig();
+        $mapper = new ConfigMapper();
 
         $actual = $mapper->map(json_decode($input));
 

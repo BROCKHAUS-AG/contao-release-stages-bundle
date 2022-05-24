@@ -13,27 +13,27 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapLocal;
+use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\LocalMapper;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
 use Contao\TestCase\ContaoTestCase;
 
 /**
- * Class MapLocalTest
+ * Class LocalMapperTest
  *
  * @package BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper
  */
-class MapLocalTest extends ContaoTestCase
+class LocalMapperTest extends ContaoTestCase
 {
     public function testInstantiation(): void
     {
-        self::assertInstanceOf(MapLocal::class, new MapLocal());
+        self::assertInstanceOf(LocalMapper::class, new LocalMapper());
     }
 
     public function testMap() : void
     {
         $input = '{ "contaoProdPath": "test" }';
         $expected = new Local("test");
-        $mapper = new MapLocal();
+        $mapper = new LocalMapper();
 
         $actual = $mapper->map(json_decode($input))->getContaoProdPath();
 

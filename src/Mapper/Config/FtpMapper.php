@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Map;
+use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Mapper;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ftp;
 use stdClass;
 
-class MapFtp extends Map
+class FtpMapper extends Mapper
 {
     public function map(stdClass $data): Ftp
     {

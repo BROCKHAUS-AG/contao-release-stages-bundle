@@ -6,6 +6,6 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Mapper;
 
 use stdClass;
 
-abstract class Map {
+abstract class Mapper {
     abstract public function map(stdClass $data) : Object;
 }

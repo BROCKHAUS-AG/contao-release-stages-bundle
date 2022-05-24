@@ -5,7 +5,7 @@ services:
 
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\EditButtonsCallback:
 
-    BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig:
+    BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\ConfigMapper:
 
     BrockhausAg\ContaoReleaseStagesBundle\Logger\Log:
         arguments:
@@ -14,7 +14,7 @@ services:
     BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig:
         arguments:
             - '%kernel.project_dir%'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\ConfigMapper'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
         calls:
             - loadConfig: []

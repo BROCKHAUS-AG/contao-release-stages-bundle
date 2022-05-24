@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Map;
+use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Mapper;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecord;
 use stdClass;
 
-class MapDNSRecordCollection extends Map {
+class DNSRecordCollectionMapper extends Mapper {
 
     public function map(stdClass $data): DNSRecordCollection
     {

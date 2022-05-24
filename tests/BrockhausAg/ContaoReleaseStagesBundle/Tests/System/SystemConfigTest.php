@@ -16,7 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\System;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\File\ConfigNotFound;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
-use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig;
+use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\ConfigMapper;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecord;
@@ -45,7 +45,7 @@ class SystemConfigTest extends ContaoTestCase
     public function testGetConfig_shouldThrowConfigNotFoundException(): void
     {
         self::expectException(ConfigNotFound::class);
-        $systemConfig = new SystemConfig("", self::createMock(MapConfig::class),
+        $systemConfig = new SystemConfig("", self::createMock(ConfigMapper::class),
             self::createMock(Log::class));
         $systemConfig->getConfig();
     }
@@ -55,7 +55,7 @@ class SystemConfigTest extends ContaoTestCase
      */
     public function testGetConfig_shouldReturnConfig(): void
     {
-        $systemConfig = new SystemConfig("", self::createMock(MapConfig::class),
+        $systemConfig = new SystemConfig("", self::createMock(ConfigMapper::class),
             self::createMock(Log::class));
         $expectedDatabase = new Database("192.168.0.2", "prodContao", 3306, "prodContao",
             "admin1234", array("tl_to_be_ignored", "tl_to_be_ignored_too"));

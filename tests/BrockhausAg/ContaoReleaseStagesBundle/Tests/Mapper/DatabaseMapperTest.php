@@ -13,20 +13,20 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapDatabase;
+use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\DatabaseMapper;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use Contao\TestCase\ContaoTestCase;
 
 /**
- * Class MapDatabaseTest
+ * Class DatabaseMapperTest
  *
  * @package BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper
  */
-class MapDatabaseTest extends ContaoTestCase
+class DatabaseMapperTest extends ContaoTestCase
 {
     public function testInstantiation(): void
     {
-        self::assertInstanceOf(MapDatabase::class, new MapDatabase());
+        self::assertInstanceOf(DatabaseMapper::class, new DatabaseMapper());
     }
 
     public function testMap(): void
@@ -44,7 +44,7 @@ class MapDatabaseTest extends ContaoTestCase
         }';
         $expected = new Database("192.168.0.2", "prodContao", 3306, "prodContao",
             "admin1234", array("tl_to_be_ignored", "tl_to_be_ignored_too"));
-        $mapper = new MapDatabase();
+        $mapper = new DatabaseMapper();
 
         $actual = $mapper->map(json_decode($input));
 

@@ -17,21 +17,21 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\System;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\File\ConfigNotFound;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\File\FileNotFound;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
-use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapConfig;
+use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\ConfigMapper;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 
 class SystemConfig
 {
     private string $_contaoPath;
     private Log $_log;
-    private MapConfig $_mapConfig;
+    private ConfigMapper $_configMapper;
     private Config $_config;
 
-    public function __construct(string $contaoPath, MapConfig $mapConfig, Log $log)
+    public function __construct(string $contaoPath, ConfigMapper $configMapper, Log $log)
     {
         $this->_contaoPath = $contaoPath;
         $this->_log = $log;
-        $this->_mapConfig = $mapConfig;
+        $this->_configMapper = $configMapper;
     }
 
     /**
@@ -52,7 +52,7 @@ class SystemConfig
             die($e);
         }
         $fileContent = file_get_contents($file);
-        return $this->_mapConfig->map(json_decode($fileContent));
+        return $this->_configMapper->map(json_decode($fileContent));
     }
 
     /**

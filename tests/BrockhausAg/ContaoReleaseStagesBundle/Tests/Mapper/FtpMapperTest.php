@@ -13,20 +13,20 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapSsh;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ssh;
+use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\FtpMapper;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ftp;
 use Contao\TestCase\ContaoTestCase;
 
 /**
- * Class MapSshTest
+ * Class FtpMapperTest
  *
  * @package BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper
  */
-class MapSshTest extends ContaoTestCase
+class FtpMapperTest extends ContaoTestCase
 {
     public function testInstantiation(): void
     {
-        self::assertInstanceOf(MapSsh::class, new MapSsh());
+        self::assertInstanceOf(FtpMapper::class, new FtpMapper());
     }
 
     public function testMap() : void
@@ -34,16 +34,19 @@ class MapSshTest extends ContaoTestCase
         $input = '{
             "port": 1234,
             "username": "admin",
-            "password": "admin1234"
+            "password": "admin1234",
+            "ssl": true
         }';
 
-        $expected = new Ssh(1234, "admin", "admin1234");
+        $expected = new Ftp(1234, "admin", "admin1234", true);
 
-        $mapper = new MapSsh();
+        $mapper = new FtpMapper();
         $actual = $mapper->map(json_decode($input));
+
 
         self::assertSame($expected->getPort(), $actual->getPort());
         self::assertSame($expected->getUsername(), $actual->getUsername());
         self::assertSame($expected->getPassword(), $actual->getPassword());
+        self::assertSame($expected->isSsl(), $actual->isSsl());
     }
 }

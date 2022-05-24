@@ -13,22 +13,22 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\MapFileServer;
+use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\FileServerMapper;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ftp;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ssh;
 use Contao\TestCase\ContaoTestCase;
 
 /**
- * Class MapFileServerTest
+ * Class FileServerMapperTest
  *
  * @package BrockhausAg\ContaoReleaseStagesBundle\Tests\Mapper
  */
-class MapFileServerTest extends ContaoTestCase
+class FileServerMapperTest extends ContaoTestCase
 {
     public function testInstantiation(): void
     {
-        self::assertInstanceOf(MapFileServer::class, new MapFileServer());
+        self::assertInstanceOf(FileServerMapper::class, new FileServerMapper());
     }
 
     public function testMap() : void
@@ -53,7 +53,7 @@ class MapFileServerTest extends ContaoTestCase
         $expectedSsh = new Ssh(1234, "admin", "admin1234");
         $expected = new FileServer("192.168.178.23", "test", $expectedFtp, $expectedSsh);
 
-        $mapper = new MapFileServer();
+        $mapper = new FileServerMapper();
         $actual = $mapper->map(json_decode($input));
 
         self::assertSame($expected->getServer(), $actual->getServer());

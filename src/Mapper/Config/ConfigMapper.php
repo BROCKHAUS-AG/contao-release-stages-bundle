@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Map;
+use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Mapper;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use stdClass;
 
-class MapConfig extends Map {
+class ConfigMapper extends Mapper {
     public function map(stdClass $data) : Config
     {
-        $databaseMapper = new MapDatabase();
+        $databaseMapper = new DatabaseMapper();
         $database = $databaseMapper->map($data->database);
 
         $copyTo = $data->copyTo;
 
-        $fileServerMapper = new MapFileServer();
+        $fileServerMapper = new FileServerMapper();
         $fileServer = $fileServerMapper->map($data->fileServer);
 
-        $localMapper = new MapLocal();
+        $localMapper = new LocalMapper();
         $local = $localMapper->map($data->local);
 
-        $arrayOfDNSRecordsMapper = new MapDNSRecordCollection();
+        $arrayOfDNSRecordsMapper = new DNSRecordCollectionMapper();
         $dnsRecords = $arrayOfDNSRecordsMapper->mapArray($data->dnsRecords);
 
         $maxSpendTimeWhileCreatingRelease = $data->maxSpendTimeWhileCreatingRelease;
