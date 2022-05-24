@@ -7,7 +7,7 @@ services:
 
     BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\ConfigMapper:
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logger\Log:
+    BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger:
         arguments:
         - '@logger'
 
@@ -15,7 +15,7 @@ services:
         arguments:
             - '%kernel.project_dir%'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\ConfigMapper'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
         calls:
             - loadConfig: []
 
@@ -32,13 +32,13 @@ services:
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\IO:
         arguments:
             - '%kernel.project_dir%'
             - '@BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
 
 
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages:
@@ -77,34 +77,34 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Local\FileServerLocalCopier'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Local\FileServerLocalCopier:
         arguments:
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
         calls:
             - setUp: []
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
         calls:
             - setUp: []
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\LocalLoader:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\IO'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Compressor\Compressor:
         arguments:
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Log'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator:
         arguments:

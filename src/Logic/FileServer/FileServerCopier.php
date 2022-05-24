@@ -16,7 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnetion;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPRunner;
@@ -30,7 +30,7 @@ DEFINE("COPY_TO_LOCAL", "local");
 DEFINE("COPY_TO_FILE_SERVER", "fileServer");
 
 class FileServerCopier extends Backend {
-    private Log $_log;
+    private Logger $_logger;
     private IO $_io;
     private FileServerLocalCopier $_localFileServerCopier;
     private FTPRunner $_ftpFileServerCopier;
@@ -38,12 +38,12 @@ class FileServerCopier extends Backend {
 
     private string $copyTo;
 
-    public function __construct(Database $database, IO $io, FileServerLocalCopier $localFileServerCopier, Log $log)
+    public function __construct(Database $database, IO $io, FileServerLocalCopier $localFileServerCopier, Logger $logger)
     {
         $this->_database = $database;
         $this->_io = $io;
         $this->_localFileServerCopier = $localFileServerCopier;
-        $this->_log = $log;
+        $this->_logger = $logger;
     }
 
     /**
@@ -54,7 +54,7 @@ class FileServerCopier extends Backend {
     {
         $this->copyTo = $this->_io->getWhereToCopy();
         $path = $this->getPathToCopy();
-        $loadFromLocalLogic = new LocalLoader($this->_io, $this->_log,
+        $loadFromLocalLogic = new LocalLoader($this->_io, $this->_logger,
             $this->_io->getPathToContaoFiles(), $path);
         $files = $loadFromLocalLogic->loadFromLocal();
 
@@ -72,7 +72,7 @@ class FileServerCopier extends Backend {
        if ($this->isToCopyToLocalFileServer()) {
             return $this->_io->getLocalFileServerConfiguration()->getContaoProdPath();
         }else if ($this->isToCopyToFTPFileServer()) {
-            $ftpConnection = new FTPConnector($this->_io, $this->_log);
+            $ftpConnection = new FTPConnector($this->_io, $this->_logger);
             $this->_ftpFileServerCopier = new FTPRunner($ftpConnection->connect());
             return $this->_io->getFileServerConfiguration()->getPath();
         }
@@ -198,7 +198,7 @@ class FileServerCopier extends Backend {
 
     private function couldNotFindCopyTo() : void
     {
-        $this->_log->error("Could not find a valid path to update files");
+        $this->_logger->error("Could not find a valid path to update files");
     }
 
     private function copyDirectoryToMainDirectoryWithSSHCommand() : void

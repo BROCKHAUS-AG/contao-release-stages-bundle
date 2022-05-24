@@ -14,15 +14,15 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Local;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
 class FileServerLocalCopier {
-    private Log $_log;
+    private Logger $_logger;
 
-    public function __construct(Log $log)
+    public function __construct(Logger $logger)
     {
-        $this->_log = $log;
+        $this->_logger = $logger;
     }
 
     public function createDirectory(string $directory) : void
@@ -55,7 +55,7 @@ class FileServerLocalCopier {
             if (!unlink($file)) {
                 $error = error_get_last();
                 $errorMessage = "Failed to delete file: \"". $file. "\"</br>rm error: ". $error['message'];
-                $this->_log->error($errorMessage);
+                $this->_logger->error($errorMessage);
             }
         }
     }

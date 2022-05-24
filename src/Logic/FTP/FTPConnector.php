@@ -15,13 +15,13 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnetion;
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use phpseclib3\Net\SFTP;
 
 class FTPConnector {
     private IO $_io;
-    private Log $_log;
+    private Logger $_logger;
 
     private string $username;
     private string $password;
@@ -29,10 +29,10 @@ class FTPConnector {
     private int $port;
     private bool $ssl;
 
-    public function __construct(IO $io, Log $log)
+    public function __construct(IO $io, Logger $logger)
     {
         $this->_io = $io;
-        $this->_log = $log;
+        $this->_logger = $logger;
     }
 
     /**
@@ -99,7 +99,7 @@ class FTPConnector {
     private function loginFTPServer($conn): void
     {
         if (!@ftp_login($conn, $this->username, $this->password)) {
-            $this->_log->error("Username or password is false.");
+            $this->_logger->error("Username or password is false.");
             throw new FTPConnetion("Username or password is false");
         }
     }
@@ -109,7 +109,7 @@ class FTPConnector {
      */
     private function errorMessage(string $message): void
     {
-        $this->_log->error($message);
+        $this->_logger->error($message);
         throw new FTPConnetion($message);
     }
 

@@ -15,17 +15,17 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Compressor;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Compress;
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use Exception;
 use Phar;
 use PharData;
 
 class Compressor {
-    private Log $_log;
+    private Logger $_logger;
 
-    public function __construct(Log $log)
+    public function __construct(Logger $logger)
     {
-        $this->_log = $log;
+        $this->_logger = $logger;
     }
 
     /**
@@ -38,7 +38,7 @@ class Compressor {
             $archive = $this->addAllFilesToCompressedFile($files, $archive);
             $archive->compress(Phar::TAR);
         }catch (Exception $e) {
-            $this->_log->error($e->getMessage());
+            $this->_logger->error($e->getMessage());
             throw new Compress("Failed to compress to: \"$compressedFile\". $e");
         }
     }

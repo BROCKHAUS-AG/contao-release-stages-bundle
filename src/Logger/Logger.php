@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use const TL_ACCESS;
 
-class Log {
+class Logger {
     private LoggerInterface $_logger;
 
     public function __construct(LoggerInterface $logger)

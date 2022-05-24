@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic\Versioning;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
@@ -32,7 +32,7 @@ class VersioningTest extends ContaoTestCase
     public function setUp(): void
     {
         $databaseMock = self::createMock(Database::class);
-        $logMock = self::createMock(Log::class);
+        $logMock = self::createMock(Logger::class);
         $this->versioning = new Versioning($databaseMock, $logMock);
 
         parent::setUp();

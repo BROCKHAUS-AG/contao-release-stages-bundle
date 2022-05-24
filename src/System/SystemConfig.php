@@ -16,18 +16,18 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\System;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\File\ConfigNotFound;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\File\FileNotFound;
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\ConfigMapper;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 
 class SystemConfig
 {
     private string $_contaoPath;
-    private Log $_log;
+    private Logger $_log;
     private ConfigMapper $_configMapper;
     private Config $_config;
 
-    public function __construct(string $contaoPath, ConfigMapper $configMapper, Log $log)
+    public function __construct(string $contaoPath, ConfigMapper $configMapper, Logger $log)
     {
         $this->_contaoPath = $contaoPath;
         $this->_log = $log;

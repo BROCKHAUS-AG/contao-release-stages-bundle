@@ -16,7 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
@@ -24,12 +24,12 @@ use Doctrine\DBAL\Driver\Exception;
 
 class Versioning {
     private Database $database;
-    private Log $_log;
+    private Logger $_logger;
 
-    public function __construct(Database $database, Log $log)
+    public function __construct(Database $database, Logger $logger)
     {
         $this->database = $database;
-        $this->_log = $log;
+        $this->_logger = $logger;
     }
 
 
@@ -77,14 +77,14 @@ class Versioning {
     private function createRelease(array $version): string
     {
         $newVersion = $version[0]. ".". intval($version[1]+1);
-        $this->_log->info("A new release (version ". $newVersion. ") has been requested");
+        $this->_logger->info("A new release (version ". $newVersion. ") has been requested");
         return $newVersion;
     }
 
     private function createMajorRelease(array $version): string
     {
         $newVersion = intval($version[0]+1). ".0";
-        $this->_log->info("A new major releases (version ". $newVersion. ") has been requested");
+        $this->_logger->info("A new major releases (version ". $newVersion. ") has been requested");
         return $newVersion;
     }
 }

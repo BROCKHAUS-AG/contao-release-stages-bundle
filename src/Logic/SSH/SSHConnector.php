@@ -15,22 +15,22 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 
 class SSHConnector {
     private IO $_io;
-    private Log $_log;
+    private Logger $_logger;
 
     private string $username;
     private string $password;
     private string $server;
     private int $port;
 
-    public function __construct(IO $io, Log $log)
+    public function __construct(IO $io, Logger $logger)
     {
         $this->_io = $io;
-        $this->_log = $log;
+        $this->_logger = $logger;
     }
 
     /**
@@ -55,12 +55,12 @@ class SSHConnector {
         $connection = ssh2_connect($this->server, $this->port);
         if (!$connection) {
             $message = "Connection to SSH server \"$this->server\" failed";
-            $this->_log->error($message);
+            $this->_logger->error($message);
             throw new SSHConnection($message);
         }
         if (!ssh2_auth_password($connection, $this->username, $this->password)) {
             $message = "Connection to SSH server \"$this->server\" failed. Username or password is false";
-            $this->_log->error($message);
+            $this->_logger->error($message);
             throw new SSHConnection($message);
         }
         return $connection;

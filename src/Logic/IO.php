@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\File\ConfigNotFound;
-use BrockhausAg\ContaoReleaseStagesBundle\Logger\Log;
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
@@ -28,13 +28,13 @@ use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
 class IO {
     private string $_contaoPath;
     private SystemConfig $_systemConfig;
-    private Log $_log;
+    private Logger $_logger;
 
-    public function __construct(string $contaoPath, SystemConfig $systemConfig, Log $log)
+    public function __construct(string $contaoPath, SystemConfig $systemConfig, Logger $logger)
     {
         $this->_contaoPath = $contaoPath;
         $this->_systemConfig = $systemConfig;
-        $this->_log = $log;
+        $this->_logger = $logger;
     }
 
     public function getPathToContaoFiles(): string
@@ -98,7 +98,7 @@ class IO {
         try {
             return $this->_systemConfig->getConfig();
         } catch (ConfigNotFound $e) {
-            $this->_log->error($e->getMessage());
+            $this->_logger->error($e->getMessage());
             die($e->getMessage());
         }
     }
