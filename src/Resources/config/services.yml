@@ -40,7 +40,6 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
 
-
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Timer'
