@@ -15,7 +15,7 @@ declare(strict_types=1);
 use BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemVariables;
 
-$GLOBALS['TL_DCA']['tl_release_stages'] = array(
+$GLOBALS['TL_DCA']['tl_deployments'] = array(
     'config' => array(
         'dataContainer' => 'Table',
         'enableVersioning' => true,
@@ -42,7 +42,7 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
         ),
         'operations' => array(
             'show' => array(
-                'label'      => &$GLOBALS['TL_LANG']['tl_release_stages']['show'],
+                'label'      => &$GLOBALS['TL_LANG']['tl_deployments']['show'],
                 'href'       => 'act=show',
                 'icon'       => 'show.gif',
                 'attributes' => 'style="margin-right:3px"'
@@ -62,7 +62,7 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
         'kindOfRelease' => array(
             'inputType' => 'select',
             'options' => array('release', 'majorRelease'),
-            'reference' => &$GLOBALS['TL_LANG']['tl_release_stages']['kindOfReleaseOptions'],
+            'reference' => &$GLOBALS['TL_LANG']['tl_deployments']['kindOfReleaseOptions'],
             'exclude' => true,
             'search' => true,
             'filter' => true,

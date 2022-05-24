@@ -18,7 +18,7 @@ use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
 
 /**
- * @Callback(table="tl_release_stages", target="edit.buttons")
+ * @Callback(table="tl_deployments", target="edit.buttons")
  */
 class EditButtonsCallback
 {

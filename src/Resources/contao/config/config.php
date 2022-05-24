@@ -17,11 +17,11 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\ReleaseStages;
  */
 $GLOBALS['BE_MOD']['release'] = array(
     'release_stages' => array(
-        'tables' => array('tl_release_stages')
+        'tables' => array('tl_deployments')
     )
 );
 
 /**
  * Models
  */
-$GLOBALS['TL_MODELS']['tl_release_stages'] = ReleaseStages::class;
+$GLOBALS['TL_MODELS']['tl_deployments'] = ReleaseStages::class;

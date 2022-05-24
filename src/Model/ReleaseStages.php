@@ -23,7 +23,7 @@ use Contao\Model;
  */
 class ReleaseStages extends Model
 {
-    protected static $strTable = 'tl_release_stages';
+    protected static $strTable = 'tl_deployments';
 
 }
 

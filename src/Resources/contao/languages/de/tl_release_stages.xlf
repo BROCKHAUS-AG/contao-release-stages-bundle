@@ -1,49 +1,49 @@
 <?xml version="1.0" ?><xliff version="1.1">
-    <file datatype="php" original="src/Resources/contao/languages/de/tl_release_stages.php" source-language="en"
+    <file datatype="php" original="src/Resources/contao/languages/de/tl_deployments.php" source-language="en"
         target-language="de">
         <body>
             <!-- operations -->
-            <trans-unit id="tl_release_stages.show.0">
+            <trans-unit id="tl_deployments.show.0">
                 <source>Show details with ID: %s</source>
                 <target>Datensatz mit ID: %s ansehen</target>
             </trans-unit>
-            <trans-unit id="tl_release_stages.show.1">
+            <trans-unit id="tl_deployments.show.1">
                 <source>Show details with ID: %s</source>
                 <target>Datensatz mit ID: %s ansehen</target>
             </trans-unit>
 
             <!-- fields -->
-            <trans-unit id="tl_release_stages.kindOfRelease.0">
+            <trans-unit id="tl_deployments.kindOfRelease.0">
                 <source>Kind of release</source>
                 <target>Release Art</target>
             </trans-unit>
-            <trans-unit id="tl_release_stages.kindOfRelease.1">
+            <trans-unit id="tl_deployments.kindOfRelease.1">
                 <source>Enter, how you want to release</source>
                 <target>Geben Sie an, wie Sie Ihren Release veröffentlichen möchten</target>
             </trans-unit>
-            <trans-unit id="tl_release_stages.kindOfReleaseOptions.release">
+            <trans-unit id="tl_deployments.kindOfReleaseOptions.release">
                 <source>Release</source>
                 <target>Release</target>
             </trans-unit>
-             <trans-unit id="tl_release_stages.kindOfReleaseOptions.majorRelease">
+             <trans-unit id="tl_deployments.kindOfReleaseOptions.majorRelease">
                 <source>Major release</source>
                 <target>Major Release</target>
             </trans-unit>
 
-            <trans-unit id="tl_release_stages.title.0">
+            <trans-unit id="tl_deployments.title.0">
                 <source>Title</source>
                 <target>Titel</target>
             </trans-unit>
-            <trans-unit id="tl_release_stages.title.1">
+            <trans-unit id="tl_deployments.title.1">
                 <source>Enter the title</source>
                 <target>Geben Sie den Titel ein</target>
             </trans-unit>
 
-            <trans-unit id="tl_release_stages.description.0">
+            <trans-unit id="tl_deployments.description.0">
                 <source>Description</source>
                 <target>Beschreibung</target>
             </trans-unit>
-            <trans-unit id="tl_release_stages.description.1">
+            <trans-unit id="tl_deployments.description.1">
                 <source>Enter a description</source>
                 <target>Geben Sie eine Beschreibung ein</target>
             </trans-unit>

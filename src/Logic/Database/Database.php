@@ -49,7 +49,7 @@ class Database
         $result = $this->_dbConnection
             ->createQueryBuilder()
             ->select("id", "version", "kindOfRelease", "state")
-            ->from("tl_release_stages")
+            ->from("tl_deployments")
             ->orderBy("id", "DESC")
             ->setMaxResults(2)
             ->execute()
@@ -72,7 +72,7 @@ class Database
     {
         $this->_dbConnection
             ->createQueryBuilder()
-            ->update("tl_release_stages")
+            ->update("tl_deployments")
             ->set("version", ":version")
             ->where("id = :id")
             ->setParameter("version", $version)
@@ -86,7 +86,7 @@ class Database
     public function updateState(string $state, int $id){
         $this->_dbConnection
             ->createQueryBuilder()
-            ->update("tl_release_stages")
+            ->update("tl_deployments")
             ->set("state", ":state")
             ->where("id = :id")
             ->setParameter("state", $state)
@@ -228,7 +228,7 @@ class Database
         $result = $this->_dbConnection
             ->createQueryBuilder()
             ->select("id")
-            ->from("tl_release_stages")
+            ->from("tl_deployments")
             ->orderBy("id", "DESC")
             ->setMaxResults(1)
             ->execute()
@@ -253,7 +253,7 @@ class Database
         $result = $this->_dbConnection
             ->createQueryBuilder()
             ->select("state")
-            ->from("tl_release_stages")
+            ->from("tl_deployments")
             ->where("state = :state")
             ->andWhere("id != :id")
             ->setParameter("state", SystemVariables::STATE_PENDING)

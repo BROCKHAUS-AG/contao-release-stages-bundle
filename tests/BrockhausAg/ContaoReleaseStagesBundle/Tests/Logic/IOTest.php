@@ -79,7 +79,7 @@ class IOTest extends ContaoTestCase
             self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
         $expected = $database->getIgnoredTables();
-        array_push($expected, "tl_user", "tl_cron_job", "tl_release_stages");
+        array_push($expected, "tl_user", "tl_cron_job", "tl_deployments");
 
         $actual = $ioLogic->getDatabaseIgnoredTablesConfiguration();
 

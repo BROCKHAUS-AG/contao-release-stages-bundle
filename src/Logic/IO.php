@@ -50,7 +50,7 @@ class IO {
     public function getDatabaseIgnoredTablesConfiguration(): array
     {
         $ignoredTables = $this->getConfig()->getDatabase()->getIgnoredTables();
-        array_push($ignoredTables, "tl_user", "tl_cron_job", "tl_release_stages");
+        array_push($ignoredTables, "tl_user", "tl_cron_job", "tl_deployments");
         return $ignoredTables;
     }
 
