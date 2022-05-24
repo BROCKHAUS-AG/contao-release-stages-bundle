@@ -20,7 +20,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPRunner;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Local\FileServerLocalCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
@@ -31,17 +31,17 @@ DEFINE("COPY_TO_FILE_SERVER", "fileServer");
 
 class FileServerCopier extends Backend {
     private Logger $_logger;
-    private IO $_io;
+    private Config $_config;
     private FileServerLocalCopier $_localFileServerCopier;
     private FTPRunner $_ftpFileServerCopier;
     private Database $_database;
 
     private string $copyTo;
 
-    public function __construct(Database $database, IO $io, FileServerLocalCopier $localFileServerCopier, Logger $logger)
+    public function __construct(Database $database, Config $config, FileServerLocalCopier $localFileServerCopier, Logger $logger)
     {
         $this->_database = $database;
-        $this->_io = $io;
+        $this->_config = $config;
         $this->_localFileServerCopier = $localFileServerCopier;
         $this->_logger = $logger;
     }
@@ -52,10 +52,10 @@ class FileServerCopier extends Backend {
      */
     public function copy() : void
     {
-        $this->copyTo = $this->_io->getWhereToCopy();
+        $this->copyTo = $this->_config->getWhereToCopy();
         $path = $this->getPathToCopy();
-        $loadFromLocalLogic = new LocalLoader($this->_io, $this->_logger,
-            $this->_io->getPathToContaoFiles(), $path);
+        $loadFromLocalLogic = new LocalLoader($this->_config, $this->_logger,
+            $this->_config->getPathToContaoFiles(), $path);
         $files = $loadFromLocalLogic->loadFromLocal();
 
         $this->createDirectories($files);
@@ -70,11 +70,11 @@ class FileServerCopier extends Backend {
     private function getPathToCopy() : string
     {
        if ($this->isToCopyToLocalFileServer()) {
-            return $this->_io->getLocalFileServerConfiguration()->getContaoProdPath();
+            return $this->_config->getLocalFileServerConfiguration()->getContaoProdPath();
         }else if ($this->isToCopyToFTPFileServer()) {
-            $ftpConnection = new FTPConnector($this->_io, $this->_logger);
+            $ftpConnection = new FTPConnector($this->_config, $this->_logger);
             $this->_ftpFileServerCopier = new FTPRunner($ftpConnection->connect());
-            return $this->_io->getFileServerConfiguration()->getPath();
+            return $this->_config->getFileServerConfiguration()->getPath();
         }
         $this->couldNotFindCopyTo();
         return "";
@@ -178,9 +178,9 @@ class FileServerCopier extends Backend {
     {
         if ($this->isToCopyToLocalFileServer()) {
             $this->_localFileServerCopier->delete($file,
-                $this->_io->getLocalFileServerConfiguration()->getContaoProdPath());
+                $this->_config->getLocalFileServerConfiguration()->getContaoProdPath());
         }else if ($this->isToCopyToFTPFileServer()) {
-            $this->_ftpFileServerCopier->delete($file, $this->_io->getFileServerConfiguration()->getPath());
+            $this->_ftpFileServerCopier->delete($file, $this->_config->getFileServerConfiguration()->getPath());
         }else {
             $this->couldNotFindCopyTo();
         }
@@ -204,8 +204,8 @@ class FileServerCopier extends Backend {
     private function copyDirectoryToMainDirectoryWithSSHCommand() : void
     {
         if ($this->isToCopyToFTPFileServer()) {
-            $config = $this->_io->getFileServerConfiguration();
-            $config_ssh = $this->_io->getSSHConfiguration();
+            $config = $this->_config->getFileServerConfiguration();
+            $config_ssh = $this->_config->getSSHConfiguration();
             $connection = ssh2_connect($config->getServer(), 22);
             ssh2_auth_password($connection, $config_ssh->getUsername(), $config_ssh->getPassword());
             $stream = ssh2_exec($connection, "bash -r /html/release-stages.sh");

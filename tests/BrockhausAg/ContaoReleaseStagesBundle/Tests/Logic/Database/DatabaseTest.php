@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use Contao\TestCase\ContaoTestCase;
 use Doctrine\DBAL\Connection;
 use ReflectionClass;
@@ -30,7 +30,7 @@ class DatabaseTest extends ContaoTestCase
     public function testInstantiation(): void
     {
         $databaseLogicMock = new Database(self::createMock(Connection::class),
-            self::createMock(IO::class));
+            self::createMock(Config::class));
         self::assertInstanceOf(Database::class, $databaseLogicMock);
     }
 

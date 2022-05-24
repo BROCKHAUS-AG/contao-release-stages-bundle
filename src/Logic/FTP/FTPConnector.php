@@ -16,11 +16,11 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnetion;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use phpseclib3\Net\SFTP;
 
 class FTPConnector {
-    private IO $_io;
+    private Config $_config;
     private Logger $_logger;
 
     private string $username;
@@ -29,9 +29,9 @@ class FTPConnector {
     private int $port;
     private bool $ssl;
 
-    public function __construct(IO $io, Logger $logger)
+    public function __construct(Config $config, Logger $logger)
     {
-        $this->_io = $io;
+        $this->_config = $config;
         $this->_logger = $logger;
     }
 
@@ -40,8 +40,8 @@ class FTPConnector {
      */
     public function setUp(): void
     {
-        $config = $this->_io->getFileServerConfiguration();
-        $config_ftp = $this->_io->getFTPConfiguration();
+        $config = $this->_config->getFileServerConfiguration();
+        $config_ftp = $this->_config->getFTPConfiguration();
         $this->username = $config_ftp->getUsername();
         $this->password = $config_ftp->getPassword();
         $this->server = $config->getServer();

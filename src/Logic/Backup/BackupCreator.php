@@ -15,19 +15,19 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHRunner;
 
 class BackupCreator
 {
     private SSHConnector $_sshConnection;
-    private IO $_io;
+    private Config $_config;
 
-    public function __construct(SSHConnector $sshConnection, IO $io)
+    public function __construct(SSHConnector $sshConnection, Config $config)
     {
         $this->_sshConnection = $sshConnection;
-        $this->_io = $io;
+        $this->_config = $config;
     }
 
     /**
@@ -35,7 +35,7 @@ class BackupCreator
      */
     public function create(): void
     {
-        $path = $this->_io->getFileServerConfiguration()->getPath();
+        $path = $this->_config->getFileServerConfiguration()->getPath();
         $runner = $this->getSSHRunner();
         $this->createDatabaseBackup($path, $runner);
         $this->createFileServerBackup($path, $runner);

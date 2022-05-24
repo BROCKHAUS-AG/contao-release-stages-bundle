@@ -16,7 +16,6 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\File\ConfigNotFound;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
@@ -25,7 +24,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ssh;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
 
-class IO {
+class Config {
     private string $_contaoPath;
     private SystemConfig $_systemConfig;
     private Logger $_logger;
@@ -93,7 +92,7 @@ class IO {
     {
         return $this->getConfig()->getFileFormats();
     }
-    private function getConfig(): Config
+    private function getConfig(): \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config
     {
         try {
             return $this->_systemConfig->getConfig();

@@ -16,10 +16,10 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 
 class SSHConnector {
-    private IO $_io;
+    private Config $_config;
     private Logger $_logger;
 
     private string $username;
@@ -27,9 +27,9 @@ class SSHConnector {
     private string $server;
     private int $port;
 
-    public function __construct(IO $io, Logger $logger)
+    public function __construct(Config $config, Logger $logger)
     {
-        $this->_io = $io;
+        $this->_config = $config;
         $this->_logger = $logger;
     }
 
@@ -38,9 +38,9 @@ class SSHConnector {
      */
     public function setUp(): void
     {
-        $config = $this->_io->getFileServerConfiguration();
+        $config = $this->_config->getFileServerConfiguration();
         $this->server = $config->getServer();
-        $config_ssh = $this->_io->getSSHConfiguration();
+        $config_ssh = $this->_config->getSSHConfiguration();
         $this->username = $config_ssh->getUsername();
         $this->password = $config_ssh->getPassword();
         $this->port = $config_ssh->getPort();

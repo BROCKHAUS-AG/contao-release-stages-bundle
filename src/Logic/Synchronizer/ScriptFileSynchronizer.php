@@ -22,7 +22,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPRunner;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\Runner;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\SFTPRunner;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
 
@@ -30,13 +30,13 @@ class ScriptFileSynchronizer
 {
     private string $_path;
     private FTPConnector $_ftpConnector;
-    private IO $_io;
+    private Config $_config;
 
-    public function __construct(string $path, FTPConnector $ftpConnector, IO $io)
+    public function __construct(string $path, FTPConnector $ftpConnector, Config $config)
     {
         $this->_path = $path;
         $this->_ftpConnector = $ftpConnector;
-        $this->_io = $io;
+        $this->_config = $config;
     }
 
     /**
@@ -57,7 +57,7 @@ class ScriptFileSynchronizer
      */
     private function getFTPRunner(): Runner
     {
-        if ($this->_io->getFTPConfiguration()->isSsl()) {
+        if ($this->_config->getFTPConfiguration()->isSsl()) {
             return new SFTPRunner($this->_ftpConnector->connect());
         }
         return new FTPRunner($this->_ftpConnector->connect());
@@ -68,7 +68,7 @@ class ScriptFileSynchronizer
      */
     private function createDirectories(Runner $runner): void
     {
-        $fileServerConfigurationPath = $this->_io->getFileServerConfiguration()->getPath();
+        $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
         $directories = array(
             $fileServerConfigurationPath. Constants::SCRIPT_DIRECTORY_PROD,
             $fileServerConfigurationPath. Constants::BACKUP_DIRECTORY_PROD
@@ -106,7 +106,7 @@ class ScriptFileSynchronizer
 
     private function getFullProdBackupDatabaseScriptPath(): string
     {
-        return $this->_io->getFileServerConfiguration()->getPath(). Constants::BACKUP_DATABASE_SCRIPT_PROD;
+        return $this->_config->getFileServerConfiguration()->getPath(). Constants::BACKUP_DATABASE_SCRIPT_PROD;
     }
 
     private function getFullFileServerScriptPath(): string
@@ -116,7 +116,7 @@ class ScriptFileSynchronizer
 
     private function getFullProdFileServerScriptPath(): string
     {
-        return $this->_io->getFileServerConfiguration()->getPath(). Constants::BACKUP_FILE_SYSTEM_SCRIPT_PROD;
+        return $this->_config->getFileServerConfiguration()->getPath(). Constants::BACKUP_FILE_SYSTEM_SCRIPT_PROD;
     }
 
     private function getFullCreateStateScriptPath(): string
@@ -126,6 +126,6 @@ class ScriptFileSynchronizer
 
     private function getFullProdCreateStateScriptPath(): string
     {
-        return $this->_io->getFileServerConfiguration()->getPath(). Constants::CREATE_STATE_SCRIPT_PROD;
+        return $this->_config->getFileServerConfiguration()->getPath(). Constants::CREATE_STATE_SCRIPT_PROD;
     }
 }

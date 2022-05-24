@@ -16,7 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseExecutionFailure;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
 use Doctrine\DBAL\Exception;
@@ -25,13 +25,13 @@ class DatabaseCopier
 {#
     private Database $_databaseLogic;
     private DatabaseProd $_prodDatabaseLogic;
-    private IO $_ioLogic;
+    private Config $_config;
 
-    public function __construct(Database $databaseLogic, DatabaseProd $prodDatabaseLogic, IO $ioLogic)
+    public function __construct(Database $databaseLogic, DatabaseProd $prodDatabaseLogic, Config $config)
     {
         $this->_databaseLogic = $databaseLogic;
         $this->_prodDatabaseLogic = $prodDatabaseLogic;
-        $this->_ioLogic = $ioLogic;
+        $this->_config = $config;
     }
 
     /**
@@ -122,7 +122,7 @@ class DatabaseCopier
 
     private function changeDNSEntryForProd(string $alias): string
     {
-        $dnsRecords = $this->_ioLogic->getDNSRecords();
+        $dnsRecords = $this->_config->getDNSRecords();
         for ($x = 0; $x != $dnsRecords->getLength(); $x++) {
             $dnsRecord = $dnsRecords->getByIndex($x);
             if (strcmp($dnsRecord->getAlias(), $alias) == 0) {

@@ -19,7 +19,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\NoSubmittedPendingStat
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
@@ -29,12 +29,12 @@ use Doctrine\DBAL\Result;
 class Database
 {
     private Connection $_dbConnection;
-    private IO $_io;
+    private Config $_config;
 
-    public function __construct(Connection $dbConnection, IO $io)
+    public function __construct(Connection $dbConnection, Config $config)
     {
         $this->_dbConnection = $dbConnection;
-        $this->_io = $io;
+        $this->_config = $config;
     }
 
     /**
@@ -147,7 +147,7 @@ class Database
 
     private function getIgnoredTablesFromConfigurationFile() : array
     {
-        return $this->_io->getDatabaseIgnoredTablesConfiguration();
+        return $this->_config->getDatabaseIgnoredTablesConfiguration();
     }
 
     private function filterTables(array $tables, array $ignoredTables): array

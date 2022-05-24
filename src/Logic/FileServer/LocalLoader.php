@@ -15,19 +15,19 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
 class LocalLoader {
-    private IO $_ioLogic;
+    private Config $_config;
     private Logger $_logger;
     protected string $_path;
     protected string $_prodPath;
 
-    public function __construct(IO $ioLogic, Logger $logger, string $path, string $prodPath)
+    public function __construct(Config $config, Logger $logger, string $path, string $prodPath)
     {
-        $this->_ioLogic = $ioLogic;
+        $this->_config = $config;
         $this->_logger = $logger;
         $this->_path = $path;
         $this->_prodPath = $prodPath;
@@ -42,7 +42,7 @@ class LocalLoader {
 
     private function getFilesWithTimestamp(string $path, array $directoriesLayout) : FileCollection
     {
-        $fileFormats = $this->_ioLogic->getFileFormats();
+        $fileFormats = $this->_config->getFileFormats();
         $fileFormatsAsString = implode(",", $fileFormats);
         $directories = glob($path. "*", GLOB_ONLYDIR);
 

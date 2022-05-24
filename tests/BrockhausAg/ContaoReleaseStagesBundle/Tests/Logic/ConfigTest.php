@@ -14,9 +14,8 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecord;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
@@ -27,16 +26,16 @@ use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
 use Contao\TestCase\ContaoTestCase;
 
 /**
- * Class IOTest
+ * Class ConfigTest
  *
  * @package BrockhausAg\ContaoReleaseStagesBundle\Logic\
  */
-class IOTest extends ContaoTestCase
+class ConfigTest extends ContaoTestCase
 {
     public function testInstantiation(): void
     {
         $systemConfigMock = self::createMock(SystemConfig::class);
-        self::assertInstanceOf(IO::class, new IO("", $systemConfigMock,
+        self::assertInstanceOf(Config::class, new Config("", $systemConfigMock,
             self::createMock(Logger::class)));
     }
 
@@ -45,7 +44,7 @@ class IOTest extends ContaoTestCase
     {
         $expected = "test/files";
         $systemConfigMock = self::createMock(SystemConfig::class);
-        $ioLogic = new IO("test", $systemConfigMock, self::createMock(Logger::class));
+        $ioLogic = new Config("test", $systemConfigMock, self::createMock(Logger::class));
 
         $actual = $ioLogic->getPathToContaoFiles();
 
@@ -55,9 +54,9 @@ class IOTest extends ContaoTestCase
     public function testGetDatabaseConfiguration(): void
     {
         $expected = new Database("server", "name", 0, "username", "password", array());
-        $willReturn = new Config($expected, "", self::createMock(FileServer::class),
-            self::createMock(Local::class), 0,
-            self::createMock(DNSRecordCollection::class), array());
+        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config($expected, "",
+            self::createMock(FileServer::class), self::createMock(Local::class),
+            0, self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
         $actual = $ioLogic->getDatabaseConfiguration();
@@ -74,9 +73,9 @@ class IOTest extends ContaoTestCase
     {
         $database = new Database("server", "name", 0, "username", "password",
             array("a", "b"));
-        $willReturn = new Config($database, "", self::createMock(FileServer::class),
-            self::createMock(Local::class), 0,
-            self::createMock(DNSRecordCollection::class), array());
+        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config($database, "",
+            self::createMock(FileServer::class), self::createMock(Local::class),
+            0, self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
         $expected = $database->getIgnoredTables();
         array_push($expected, "tl_user", "tl_cron_job", "tl_deployments");
@@ -93,9 +92,9 @@ class IOTest extends ContaoTestCase
         $expected = new DNSRecordCollection();
         $expected->add(new DNSRecord("a", "b"));
         $expected->add(new DNSRecord("c", "d"));
-        $willReturn = new Config(self::createMock(Database::class), "",
-            self::createMock(FileServer::class), self::createMock(Local::class),
-            0, $expected, array());
+        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
+            self::createMock(Database::class), "", self::createMock(FileServer::class),
+            self::createMock(Local::class), 0, $expected, array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
         $actual = $ioLogic->getDNSRecords();
@@ -109,9 +108,10 @@ class IOTest extends ContaoTestCase
     public function testGetWhereToCopy(): void
     {
         $expected = "test";
-        $willReturn = new Config(self::createMock(Database::class), $expected,
-            self::createMock(FileServer::class), self::createMock(Local::class),
-            0, self::createMock(DNSRecordCollection::class), array());
+        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
+            self::createMock(Database::class), $expected, self::createMock(FileServer::class),
+            self::createMock(Local::class), 0,
+            self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
         $actual = $ioLogic->getWhereToCopy();
@@ -123,7 +123,8 @@ class IOTest extends ContaoTestCase
     {
         $expected = new Ftp(0, "username", "password", true);
         $fileServer = new FileServer("server", "path", $expected, self::createMock(Ssh::class));
-        $willReturn = new Config(self::createMock(Database::class), "", $fileServer,
+        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
+            self::createMock(Database::class), "", $fileServer,
             self::createMock(Local::class), 0,
             self::createMock(DNSRecordCollection::class), array());
 
@@ -141,7 +142,8 @@ class IOTest extends ContaoTestCase
     {
         $expected = new Ssh(0, "username", "password");
         $fileServer = new FileServer("server", "path", self::createMock(Ftp::class), $expected);
-        $willReturn = new Config(self::createMock(Database::class), "", $fileServer,
+        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
+            self::createMock(Database::class), "", $fileServer,
             self::createMock(Local::class), 0,
             self::createMock(DNSRecordCollection::class), array());
 
@@ -159,7 +161,8 @@ class IOTest extends ContaoTestCase
         $expected_ftp = new Ftp(0, "username", "password", true);
         $expected_ssh = new Ssh(0, "username", "password");
         $expected = new FileServer("server", "path", $expected_ftp, $expected_ssh);
-        $willReturn = new Config(self::createMock(Database::class), "", $expected,
+        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
+            self::createMock(Database::class), "", $expected,
             self::createMock(Local::class), 0,
             self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
@@ -182,7 +185,8 @@ class IOTest extends ContaoTestCase
     public function testGetLocalServerConfiguration(): void
     {
         $expected = new Local("contaoProdPath");
-        $willReturn = new Config(self::createMock(Database::class), "",
+        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
+            self::createMock(Database::class), "",
             self::createMock(FileServer::class), $expected, 0,
             self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
@@ -195,7 +199,8 @@ class IOTest extends ContaoTestCase
     public function testGetMaxSpendTimeWhileCreatingRelease(): void
     {
         $expected = 0;
-        $willReturn = new Config(self::createMock(Database::class), "",
+        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
+            self::createMock(Database::class), "",
             self::createMock(FileServer::class), self::createMock(Local::class),
             0, self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
@@ -208,7 +213,8 @@ class IOTest extends ContaoTestCase
     public function testGetFileFormats(): void
     {
         $expected = array("a", "b", "c");
-        $willReturn = new Config(self::createMock(Database::class), "",
+        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
+            self::createMock(Database::class), "",
             $this->createMock(FileServer::class), self::createMock(Local::class),
             0, self::createMock(DNSRecordCollection::class), $expected);
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
@@ -220,10 +226,10 @@ class IOTest extends ContaoTestCase
         }
     }
 
-    private function createIOLogicInstanceWithConfigMock(Config $willReturn) : IO
+    private function createIOLogicInstanceWithConfigMock(\BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config $willReturn): Config
     {
         $systemConfigMock = self::createMock(SystemConfig::class);
         $systemConfigMock->method("getConfig")->willReturn($willReturn);
-        return new IO("test", $systemConfigMock, self::createMock(Logger::class));
+        return new Config("test", $systemConfigMock, self::createMock(Logger::class));
     }
 }

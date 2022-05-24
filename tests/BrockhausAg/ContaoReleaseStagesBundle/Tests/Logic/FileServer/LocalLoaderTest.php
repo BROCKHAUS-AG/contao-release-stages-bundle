@@ -15,7 +15,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic\FileServer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\LocalLoader;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\FileCollection;
 use Contao\TestCase\ContaoTestCase;
@@ -46,7 +46,7 @@ class LocalLoaderTest extends ContaoTestCase
         $class = new ReflectionClass(LocalLoader::class);
         $method = $class->getMethod("changePathToProdPath");
         $method->setAccessible(true);
-        $loadFromLocalMock = new LocalLoader(self::createMock(IO::class),
+        $loadFromLocalMock = new LocalLoader(self::createMock(Config::class),
             self::createMock(Logger::class), "path", "prodPath");
 
         $actual = $method->invokeArgs($loadFromLocalMock, [$input]);

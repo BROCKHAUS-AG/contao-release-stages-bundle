@@ -17,12 +17,12 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 use DateTime;
 
 class Timer {
-    private IO $_io;
+    private Config $_config;
     private int $startTime;
 
-    public function __construct(IO $io)
+    public function __construct(Config $config)
     {
-        $this->_io = $io;
+        $this->_config = $config;
     }
 
     private function createDateTime(): DateTime
@@ -47,7 +47,7 @@ class Timer {
 
     public function getMaxTime(): int
     {
-        return $this->_io->getMaxSpendTimeWhileCreatingRelease();
+        return $this->_config->getMaxSpendTimeWhileCreatingRelease();
     }
 
     public function checkIfTimeIsOver(): bool
