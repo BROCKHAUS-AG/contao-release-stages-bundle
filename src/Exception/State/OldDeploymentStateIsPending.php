@@ -16,7 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Exception\State;
 
 use Exception;
 
-class OldStateIsPending extends Exception
+class OldDeploymentStateIsPending extends Exception
 {
     public function __construct($message = "", $code = 0)
     {

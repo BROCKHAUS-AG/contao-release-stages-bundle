@@ -16,7 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\NoSubmittedPendingState;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldStateIsPending;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldDeploymentStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier;
@@ -61,36 +61,17 @@ class ReleaseStages
     {
         $this->_timer->start();
         $actualId = $this->_stateSynchronizer->getActualId();
-        $this->checkLatestStateInDatabase($actualId);
         try {
+            $this->_stateSynchronizer->breakDeploymentIfOldDeploymentIsPending($actualId);
             $this->_versioning->generateNewVersionNumber($actualId);
             $this->_scriptFileSynchronizer->synchronize();
             $this->_backupCreator->create();
-        } catch (Exception $e) {
+        }catch (OldDeploymentStateIsPending $e) {
+            die($e);
+        }catch (Exception $e) {
             $this->_stateSynchronizer->setState(Constants::STATE_FAILURE, $actualId);
             die("An exception has been thrown: $e");
         }
         $this->_stateSynchronizer->setState(Constants::STATE_SUCCESS, $actualId);
-        echo $this->_timer->getSpendTime();
-        die("finished");
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws OldStateIsPending
-     * @throws DatabaseQueryEmptyResult
-     */
-    private function checkLatestStateInDatabase(int $actualId)
-    {
-        try {
-            $this->_stateSynchronizer->checkLatestState();
-        } catch (OldStateIsPending $e) {
-            $this->_stateSynchronizer->setState(Constants::STATE_OLD_PENDING, $actualId);
-            throw new OldStateIsPending("An old release is pending");
-        } catch (NoSubmittedPendingState $e) {
-            // when this exception throws, there is no old release in database
-            // continue script
-        }
     }
 }

@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\NoSubmittedPendingState;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldStateIsPending;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldDeploymentStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 
 class StateSynchronizer
@@ -35,19 +35,20 @@ class StateSynchronizer
      */
     public function getActualId(): int
     {
-        return $this->_database->getActualIdFromTlReleaseStages();
+        return $this->_database->getActualIdFromTable(Constants::DEPLOYMENT_TABLE);
     }
 
     /**
-     * @throws OldStateIsPending
+     * @throws OldDeploymentStateIsPending
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws DatabaseQueryEmptyResult
      * @throws \Doctrine\DBAL\Exception
-     * @throws NoSubmittedPendingState
      */
-    public function checkLatestState(): void
+    public function breakDeploymentIfOldDeploymentIsPending(int $actualId): void
     {
-        $this->_database->checkLatestState();
+        if ($this->isOldDeploymentPending($actualId)) {
+            $this->setState(Constants::STATE_OLD_PENDING, $actualId);
+            throw new OldDeploymentStateIsPending("An old release is pending");
+        }
     }
 
     /**
@@ -56,5 +57,14 @@ class StateSynchronizer
     public function setState(string $state, int $id): void
     {
         $this->_database->updateState($state, $id);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function isOldDeploymentPending(int $actualId): bool
+    {
+        return $this->_database->isOldDeploymentPending($actualId);
     }
 }

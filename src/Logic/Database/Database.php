@@ -16,7 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\NoSubmittedPendingState;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldStateIsPending;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldDeploymentStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
@@ -222,12 +222,12 @@ class Database
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
-    public function getActualIdFromTlReleaseStages(): int
+    public function getActualIdFromTable(string $table): int
     {
         $result = $this->_dbConnection
             ->createQueryBuilder()
             ->select("id")
-            ->from(Constants::DEPLOYMENT_TABLE)
+            ->from($table)
             ->orderBy("id", "DESC")
             ->setMaxResults(1)
             ->execute()
@@ -242,13 +242,9 @@ class Database
     /**
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws OldStateIsPending
-     * @throws NoSubmittedPendingState
-     * @throws DatabaseQueryEmptyResult
      */
-    public function checkLatestState(): void
+    public function isOldDeploymentPending(int $actualId): bool
     {
-        $actualId = $this->getActualIdFromTlReleaseStages();
         $result = $this->_dbConnection
             ->createQueryBuilder()
             ->select("state")
@@ -260,11 +256,9 @@ class Database
             ->execute()
             ->fetchAllAssociative();
         if ($result == null) {
-            throw new NoSubmittedPendingState();
+            return false;
         }
         $state = $result[0]["state"];
-        if ($state == Constants::STATE_PENDING) {
-            throw new OldStateIsPending();
-        }
+        return $state == Constants::STATE_PENDING;
     }
 }
