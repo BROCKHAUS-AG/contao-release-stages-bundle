@@ -54,7 +54,7 @@ class ScriptFileSynchronizer
         }catch (Exception $e) {
             throw new Synchronize("Failed to synchronize directories or/and files");
         }finally {
-            $this->_ftpConnector->disconnect($ftpRunner);
+            $this->_ftpConnector->disconnect($ftpRunner->getConn());
         }
     }
 

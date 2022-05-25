@@ -26,6 +26,11 @@ class FTPRunner extends AbstractFTPRunner {
         $this->_conn = $conn;
     }
 
+    public function getConn()
+    {
+        return $this->_conn;
+    }
+
     /**
      * @throws FTPCreateDirectory
      */

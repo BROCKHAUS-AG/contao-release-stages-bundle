@@ -114,7 +114,7 @@ class FTPConnector {
     public function disconnect($conn): void
     {
         if ($this->ssl) {
-            unset($conn);
+            $conn->disconnect();
         }else {
             ftp_close($conn);
         }

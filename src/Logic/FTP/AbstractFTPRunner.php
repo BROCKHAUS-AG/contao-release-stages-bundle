@@ -20,6 +20,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPDelete;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
 abstract class AbstractFTPRunner {
+    public abstract function getConn();
     /**
      * @throws FTPCreateDirectory
      */

@@ -30,6 +30,14 @@ class SFTPRunner extends AbstractFTPRunner {
     }
 
     /**
+     * @return SFTP
+     */
+    public function getConn(): SFTP
+    {
+        return $this->_sftp;
+    }
+
+    /**
      * @throws FTPCreateDirectory
      */
     public function createDirectory(string $directory): void
@@ -63,7 +71,6 @@ class SFTPRunner extends AbstractFTPRunner {
     }
 
     /**
-     * @throws FTPCopy
      * @throws FeatureNotImplemented
      */
     public function update(File $file): void

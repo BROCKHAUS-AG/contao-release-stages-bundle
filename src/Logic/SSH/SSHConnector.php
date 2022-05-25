@@ -27,6 +27,8 @@ class SSHConnector {
     private string $server;
     private int $port;
 
+    private $_conn;
+
     public function __construct(Config $config, Logger $logger)
     {
         $this->_config = $config;
@@ -47,27 +49,26 @@ class SSHConnector {
     }
 
     /**
-     * @return false|resource
      * @throws SSHConnection
      */
-    public function connect()
+    public function connect(): SSHRunner
     {
-        $connection = ssh2_connect($this->server, $this->port);
-        if (!$connection) {
+        $this->_conn = ssh2_connect($this->server, $this->port);
+        if (!$this->_conn) {
             $message = "Connection to SSH server \"$this->server\" failed";
             $this->_logger->error($message);
             throw new SSHConnection($message);
         }
-        if (!ssh2_auth_password($connection, $this->username, $this->password)) {
+        if (!ssh2_auth_password($this->_conn, $this->username, $this->password)) {
             $message = "Connection to SSH server \"$this->server\" failed. Username or password is false";
             $this->_logger->error($message);
             throw new SSHConnection($message);
         }
-        return $connection;
+        return new SSHRunner($this->_conn);
     }
 
-    public function disconnect($stream): void
+    public function disconnect(): void
     {
-        fclose($stream);
+        fclose($this->_conn);
     }
 }
