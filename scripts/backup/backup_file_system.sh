@@ -4,7 +4,7 @@
 #   -f'path/from' -> here comes the path which should be compressed
 #   -t'path/to' -> here comes the path where the backup should be saved
 
-source ../create_state.sh
+. ~/scripts/create_state.sh
 
 while getopts f:t: flag
 do

@@ -18,6 +18,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHRunner;
+use Exception;
 
 class BackupCreator
 {
@@ -32,30 +33,56 @@ class BackupCreator
 
     /**
      * @throws SSHConnection
+     * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\BackupCreator
      */
     public function create(): void
     {
         $path = $this->_config->getFileServerConfiguration()->getPath();
-        $runner = $this->getSSHRunner();
-        $this->createDatabaseBackup($path, $runner);
-        $this->createFileServerBackup($path, $runner);
+        $runner = $this->_sshConnection->connect();
+        try {
+            $this->createDatabaseBackup($path, $runner);
+            $this->createFileServerBackup($path, $runner);
+        }catch (Exception $e) {
+            throw new \BrockhausAg\ContaoReleaseStagesBundle\Exception\BackupCreator(
+                "Couldn't create backup from database or file server");
+        }finally {
+            $this->_sshConnection->disconnect();
+        }
     }
 
     private function createDatabaseBackup(string $path, SSHRunner $runner): void
     {
-        $runner->executeScript($path. Constants::BACKUP_DATABASE_SCRIPT_PROD);
+        $tags = $this->getDatabaseTags();
+        $pid = $runner->executeBackgroundScript($path. Constants::BACKUP_DATABASE_SCRIPT_PROD, $tags);
+    }
+
+    private function getDatabaseTags(): array
+    {
+        $config = $this->_config->getDatabaseConfiguration();
+        $username = $config->getUsername();
+        $password = $config->getPassword();
+        $host = $config->getServer();
+        $database = $config->getName();
+
+        return array(
+            "-u \"$username\"",
+            "-p \"$password\"",
+            "-h \"$host\"",
+            "-d \"$database\""
+        );
     }
 
     private function createFileServerBackup(string $path, SSHRunner $runner): void
     {
-        $runner->executeScript($path. Constants::BACKUP_FILE_SYSTEM_SCRIPT_PROD);
+        $tags = $this->getFileServerTags($path);
+        $pid = $runner->executeBackgroundScript($path. Constants::BACKUP_FILE_SYSTEM_SCRIPT_PROD, $tags);
     }
 
-    /**
-     * @throws SSHConnection
-     */
-    private function getSSHRunner(): SSHRunner
+    private function getFileServerTags(string $path): array
     {
-        return new SSHRunner($this->_sshConnection->connect());
+        return array(
+            "-f \"$path/files\"",
+            "-t \"$path/scripts/backup\""
+        );
     }
 }

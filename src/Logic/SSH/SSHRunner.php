@@ -27,22 +27,25 @@ class SSHRunner
      */
     public function execute(string $command)
     {
-        $stream = ssh2_exec($this->_conn, $command);
-        stream_set_blocking($stream, true);
-        return $stream;
+        $stream = ssh2_exec($this->_conn, $command, );
+        $dioStream = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
+        stream_set_blocking($dioStream, true);
+        return stream_get_contents($dioStream);
     }
 
-    public function executeScript(string $scriptName)
+    public function executeScript(string $scriptName, array $tags = array())
     {
-        return $this->execute("bash -r ". $scriptName);
+        return $this->execute("bash $scriptName ". implode(" ", $tags));
     }
 
-    /**
-     * @return false|string
-     */
-    public function getResponse($stream)
+    public function executeBackgroundScript(string $scriptName, array $tags = array()): int
     {
-        $streamOut = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
-        return stream_get_contents($streamOut);
+        $data = $this->executeScript("$scriptName ". implode(" ", $tags). " & echo $!;");
+        return $this->getResourceId($data);
+    }
+
+    private function getResourceId($data): int
+    {
+        return intval(substr($data, strpos($data, " ") + 0));
     }
 }

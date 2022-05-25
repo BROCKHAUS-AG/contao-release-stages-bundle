@@ -6,7 +6,7 @@
 #   -h'hostName' -> here comes the host name
 #   -d'database' -> here comes the name from the database
 
-source ../create_state.sh
+. ~/scripts/create_state.sh
 
 while getopts u:p:h:d: flag
 do
