@@ -106,7 +106,6 @@ class SFTPRunner extends AbstractFTPRunner {
         $this->changePermission($directory, 0755);
     }
 
-
     /**
      * @throws FTPCopy
      */

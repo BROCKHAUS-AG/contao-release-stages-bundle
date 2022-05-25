@@ -52,14 +52,15 @@ class FTPConnector {
     /**
      * @throws FTPConnetion
      */
-    public function connect()
+    public function connect(): AbstractFTPRunner
     {
         if ($this->ssl) {
             $conn = $this->connectToSFTPServer();
-        }else {
-            $conn = $this->connectToFTPServer();
+            return new SFTPRunner($conn);
         }
-        return $conn;
+
+        $conn = $this->connectToFTPServer();
+        return new FTPRunner($conn);
     }
 
     /**

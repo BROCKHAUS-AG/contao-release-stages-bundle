@@ -46,21 +46,10 @@ class ScriptFileSynchronizer
      */
     public function synchronize(): void
     {
-        $ftpRunner = $this->getFTPRunner();
+        $ftpRunner = $this->_ftpConnector->connect();
 
         $this->createDirectories($ftpRunner);
         $this->copyScriptFiles($ftpRunner);
-    }
-
-    /**
-     * @throws FTPConnetion
-     */
-    private function getFTPRunner(): AbstractFTPRunner
-    {
-        if ($this->_config->getFTPConfiguration()->isSsl()) {
-            return new SFTPRunner($this->_ftpConnector->connect());
-        }
-        return new FTPRunner($this->_ftpConnector->connect());
     }
 
     /**
