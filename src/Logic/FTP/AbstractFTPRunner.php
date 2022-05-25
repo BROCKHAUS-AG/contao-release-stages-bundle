@@ -18,7 +18,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
-abstract class Runner {
+abstract class AbstractFTPRunner {
     /**
      * @throws FTPCreateDirectory
      */

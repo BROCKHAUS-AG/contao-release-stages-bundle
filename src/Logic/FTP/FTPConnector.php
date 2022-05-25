@@ -50,7 +50,6 @@ class FTPConnector {
     }
 
     /**
-     * @return false|resource
      * @throws FTPConnetion
      */
     public function connect()
@@ -63,12 +62,10 @@ class FTPConnector {
         return $conn;
     }
 
-
     /**
-     * @return SFTP
      * @throws FTPConnetion
      */
-    private function connectToSFTPServer()
+    private function connectToSFTPServer(): SFTP
     {
         try {
             $sftpConn = new SFTP($this->server, $this->port);

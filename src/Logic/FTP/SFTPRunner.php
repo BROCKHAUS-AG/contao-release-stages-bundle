@@ -20,7 +20,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use Doctrine\ORM\Cache\Exception\FeatureNotImplemented;
 use phpseclib3\Net\SFTP;
 
-class SFTPRunner extends Runner {
+class SFTPRunner extends AbstractFTPRunner {
     private SFTP $_sftp;
 
     public function __construct(SFTP $sftp)
