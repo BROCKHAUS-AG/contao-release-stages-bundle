@@ -16,7 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP;
 
 use Exception;
 
-class FTPConnetion extends Exception
+class FTPConnection extends Exception
 {
     public function __construct($message = "", $code = 0)
     {

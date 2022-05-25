@@ -16,6 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPDelete;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use Doctrine\ORM\Cache\Exception\FeatureNotImplemented;
 use phpseclib3\Net\SFTP;
@@ -63,15 +64,21 @@ class SFTPRunner extends AbstractFTPRunner {
 
     /**
      * @throws FTPCopy
+     * @throws FeatureNotImplemented
      */
     public function update(File $file): void
     {
         throw new FeatureNotImplemented();
     }
 
+    /**
+     * @throws FTPDelete
+     */
     public function delete(string $file, string $path): void
     {
-        throw new FeatureNotImplemented();
+        if (!$this->_sftp->delete($path. $file)) {
+            throw new FTPDelete("Failed to delete \"$path$file\"");
+        }
     }
 
     private function checkIfDirectoryExists(string $path): bool

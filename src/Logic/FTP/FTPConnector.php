@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnetion;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use phpseclib3\Net\SFTP;
@@ -50,7 +50,7 @@ class FTPConnector {
     }
 
     /**
-     * @throws FTPConnetion
+     * @throws FTPConnection
      */
     public function connect(): AbstractFTPRunner
     {
@@ -64,7 +64,7 @@ class FTPConnector {
     }
 
     /**
-     * @throws FTPConnetion
+     * @throws FTPConnection
      */
     private function connectToSFTPServer(): SFTP
     {
@@ -79,7 +79,7 @@ class FTPConnector {
 
     /**
      * @return false|resource
-     * @throws FTPConnetion
+     * @throws FTPConnection
      */
     private function connectToFTPServer()
     {
@@ -92,23 +92,23 @@ class FTPConnector {
     }
 
     /**
-     * @throws FTPConnetion
+     * @throws FTPConnection
      */
     private function loginFTPServer($conn): void
     {
         if (!@ftp_login($conn, $this->username, $this->password)) {
             $this->_logger->error("Username or password is false.");
-            throw new FTPConnetion("Username or password is false");
+            throw new FTPConnection("Username or password is false");
         }
     }
 
     /**
-     * @throws FTPConnetion
+     * @throws FTPConnection
      */
     private function errorMessage(string $message): void
     {
         $this->_logger->error($message);
-        throw new FTPConnetion($message);
+        throw new FTPConnection($message);
     }
 
     public function disconnect($conn): void

@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnetion;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
@@ -42,7 +42,7 @@ class ScriptFileSynchronizer
     /**
      * @throws FTPCopy
      * @throws FTPCreateDirectory
-     * @throws FTPConnetion
+     * @throws FTPConnection
      */
     public function synchronize(): void
     {

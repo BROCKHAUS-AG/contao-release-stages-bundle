@@ -14,8 +14,9 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnetion;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPDelete;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
@@ -46,9 +47,12 @@ class FileServerCopier extends Backend {
         $this->_logger = $logger;
     }
 
+
     /**
      * @throws FTPCreateDirectory
-     * @throws FTPConnetion
+     * @throws FTPConnection
+     * @throws \Doctrine\DBAL\Exception
+     * @throws FTPDelete
      */
     public function copy() : void
     {
@@ -65,7 +69,7 @@ class FileServerCopier extends Backend {
     }
 
     /**
-     * @throws FTPConnetion
+     * @throws FTPConnection
      */
     private function getPathToCopy() : string
     {
@@ -161,6 +165,10 @@ class FileServerCopier extends Backend {
         }
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws FTPDelete
+     */
     private function checkForDeletion() : void
     {
         $res = $this->_database->checkForDeletedFilesInTlLogTable()
@@ -174,6 +182,9 @@ class FileServerCopier extends Backend {
         }
     }
 
+    /**
+     * @throws FTPDelete
+     */
     private function deleteFile(string $file) : void
     {
         if ($this->isToCopyToLocalFileServer()) {

@@ -16,6 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPDelete;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 
 abstract class AbstractFTPRunner {
@@ -36,5 +37,8 @@ abstract class AbstractFTPRunner {
      */
     public abstract function update(File $file): void;
 
+    /**
+     * @throws FTPDelete
+     */
     public abstract function delete(string $file, string $path): void;
 }
