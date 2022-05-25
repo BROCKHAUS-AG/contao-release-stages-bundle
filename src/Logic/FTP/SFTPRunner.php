@@ -58,6 +58,7 @@ class SFTPRunner extends AbstractFTPRunner {
             return;
         }
         $this->put($prodPath, $path);
+        $this->repairPermission($prodPath);
     }
 
     /**
@@ -75,10 +76,7 @@ class SFTPRunner extends AbstractFTPRunner {
 
     private function checkIfDirectoryExists(string $path): bool
     {
-        if ($this->_sftp->chdir($path)) {
-            return true;
-        }
-        return false;
+        return $this->_sftp->chdir($path);
     }
 
     private function checkIfFileExists(string $file): bool
@@ -96,11 +94,6 @@ class SFTPRunner extends AbstractFTPRunner {
         }
     }
 
-    private function repairDirectoryPermission(string $directory): void
-    {
-        $this->changePermission($directory, 0755);
-    }
-
     /**
      * @throws FTPCopy
      */
@@ -113,6 +106,11 @@ class SFTPRunner extends AbstractFTPRunner {
         }
     }
 
+    private function repairDirectoryPermission(string $directory): void
+    {
+        $this->changePermission($directory, 0755);
+    }
+
     private function repairPermission(string $prodPath): void
     {
         $this->changePermission($prodPath, 0644);
@@ -120,6 +118,6 @@ class SFTPRunner extends AbstractFTPRunner {
 
     private function changePermission(string $directory, int $permission): void
     {
-        // ftp_chmod($this->_conn, $permission, $directory);
+        $this->_sftp->chmod($permission, $directory);
     }
 }
