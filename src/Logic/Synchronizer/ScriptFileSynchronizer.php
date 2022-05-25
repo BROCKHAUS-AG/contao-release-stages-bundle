@@ -57,15 +57,19 @@ class ScriptFileSynchronizer
      */
     private function createDirectories(AbstractFTPRunner $runner): void
     {
-        $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
-        $directories = array(
-            $fileServerConfigurationPath. Constants::SCRIPT_DIRECTORY_PROD,
-            $fileServerConfigurationPath. Constants::BACKUP_DIRECTORY_PROD
-        );
-
+        $directories = $this->createDirectoryCollection();
         foreach ($directories as $directory) {
             $runner->createDirectory($directory);
         }
+    }
+
+    private function createDirectoryCollection(): array
+    {
+        $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
+        return array(
+            $fileServerConfigurationPath. Constants::SCRIPT_DIRECTORY_PROD,
+            $fileServerConfigurationPath. Constants::BACKUP_DIRECTORY_PROD
+        );
     }
 
     /**
@@ -73,13 +77,13 @@ class ScriptFileSynchronizer
      */
     private function copyScriptFiles(AbstractFTPRunner $runner): void
     {
-        $files = $this->createFiles();
+        $files = $this->createFileCollection();
         foreach ($files->get() as $file) {
             $runner->copy($file);
         }
     }
 
-    private function createFiles(): FileCollection
+    private function createFileCollection(): FileCollection
     {
         $files = new FileCollection();
         $files->add(new File($this->getFullBackupDatabaseScriptPath(), $this->getFullProdBackupDatabaseScriptPath()));
