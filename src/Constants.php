@@ -19,14 +19,14 @@ abstract class Constants
     public const DEPLOYMENT_TABLE = "tl_release_stages";
 
 
-    public const PATH_TO_VENDOR = "/vendor/brockhaus-ag/contao-release-stages-bundle/";
+    public const PATH_TO_VENDOR = "/vendor/brockhaus-ag/contao-release-stages-bundle";
 
 
     public const SETTINGS_DIRECTORY = "/settings/brockhaus-ag/contao-release-stages-bundle";
     public const CONFIG_FILE = self::SETTINGS_DIRECTORY. "/config.json";
 
 
-    public const SCRIPT_DIRECTORY = self::PATH_TO_VENDOR. "scripts";
+    public const SCRIPT_DIRECTORY = self::PATH_TO_VENDOR. "/scripts";
 
     public const CREATE_STATE_SCRIPT = self::SCRIPT_DIRECTORY. "/create_state.sh";
 
