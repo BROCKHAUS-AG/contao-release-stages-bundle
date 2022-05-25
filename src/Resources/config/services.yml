@@ -22,17 +22,20 @@ services:
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Timer:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
+        shared: false
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer:
         arguments:
             - '%kernel.project_dir%'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
+        shared: false
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
+        shared: false
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Config:
         arguments:
@@ -49,12 +52,14 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServerCopier'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer'
+        shared: false
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseProd'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
+        shared: false
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database:
         arguments:
@@ -64,6 +69,7 @@ services:
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database'
+        shared: false
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseProd:
         arguments:
@@ -77,10 +83,12 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Local\FileServerLocalCopier'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
+        shared: false
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Local\FileServerLocalCopier:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
+        shared: false
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector:
         arguments:
@@ -88,6 +96,7 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
         calls:
             - setUp: []
+        shared: false
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector:
         arguments:
@@ -95,6 +104,7 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
         calls:
             - setUp: []
+        shared: false
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\LocalLoader:
         arguments:
@@ -109,3 +119,4 @@ services:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
+        shared: false
