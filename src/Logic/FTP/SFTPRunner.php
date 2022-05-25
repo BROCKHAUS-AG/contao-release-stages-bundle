@@ -83,12 +83,7 @@ class SFTPRunner extends AbstractFTPRunner {
 
     private function checkIfFileExists(string $file): bool
     {
-        $fileName = substr($file, strrpos($file, '/') + 1);
-        $path = str_replace($fileName, "", $file);
-        if (!$this->_sftp->file_exists($path)) {
-            return false;
-        }
-        return true;
+        return $this->_sftp->file_exists($file);
     }
 
     /**
