@@ -84,7 +84,7 @@ class FTPRunner extends AbstractFTPRunner {
         return false;
     }
 
-    private function checkIfFileExists(string $file): bool
+    public function checkIfFileExists(string $file): bool
     {
         $fileName = substr($file, strrpos($file, '/') + 1);
         $path = str_replace($fileName, "", $file);

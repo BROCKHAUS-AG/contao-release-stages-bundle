@@ -42,4 +42,6 @@ abstract class AbstractFTPRunner {
      * @throws FTPDelete
      */
     public abstract function delete(string $file, string $path): void;
+
+    public abstract function checkIfFileExists(string $file): bool;
 }

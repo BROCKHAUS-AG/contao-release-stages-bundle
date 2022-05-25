@@ -119,4 +119,10 @@ services:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller'
+        shared: false
+
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
         shared: false

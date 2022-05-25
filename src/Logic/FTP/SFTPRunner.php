@@ -93,7 +93,7 @@ class SFTPRunner extends AbstractFTPRunner {
         return $this->_sftp->chdir($path);
     }
 
-    private function checkIfFileExists(string $file): bool
+    public function checkIfFileExists(string $file): bool
     {
         return $this->_sftp->file_exists($file);
     }

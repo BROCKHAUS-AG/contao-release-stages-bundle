@@ -13,9 +13,11 @@ declare(strict_types=1);
  */
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHRunner;
 use Exception;
@@ -24,11 +26,13 @@ class BackupCreator
 {
     private SSHConnector $_sshConnection;
     private Config $_config;
+    private Poller $_poller;
 
-    public function __construct(SSHConnector $sshConnection, Config $config)
+    public function __construct(SSHConnector $sshConnection, Config $config, Poller $poller)
     {
         $this->_sshConnection = $sshConnection;
         $this->_config = $config;
+        $this->_poller = $poller;
     }
 
     /**
@@ -54,6 +58,7 @@ class BackupCreator
     {
         $tags = $this->getDatabaseTags($path);
         $pid = $runner->executeBackgroundScript($path. Constants::BACKUP_DATABASE_SCRIPT_PROD, $tags);
+        // $this->_poller->pollFile($path. Constants::BACKUP_DATABASE_POLL_FILENAME);
     }
 
     private function getDatabaseTags($path): array
@@ -77,6 +82,7 @@ class BackupCreator
     {
         $tags = $this->getFileServerTags($path);
         $pid = $runner->executeBackgroundScript($path. Constants::BACKUP_FILE_SYSTEM_SCRIPT_PROD, $tags);
+        // $this->_poller->pollFile($path. Constants::BACKUP_FILE_SYSTEM_POLL_FILENAME);
     }
 
     private function getFileServerTags(string $path): array

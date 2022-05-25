@@ -73,6 +73,6 @@ class ReleaseStages
             die("An exception has been thrown: $e");
         }
         $this->_stateSynchronizer->setState(Constants::STATE_SUCCESS, $actualId);
-        die;
+        // die;
     }
 }
