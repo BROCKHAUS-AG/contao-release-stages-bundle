@@ -113,6 +113,10 @@ class FTPConnector {
 
     public function disconnect($conn): void
     {
-        ftp_close($conn);
+        if ($this->ssl) {
+            unset($conn);
+        }else {
+            ftp_close($conn);
+        }
     }
 }
