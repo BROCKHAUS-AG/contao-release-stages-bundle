@@ -18,9 +18,10 @@ STATE_FILE="$(dirname $0)/file_system_backup"
 
 create_pending_file "$STATE_FILE"
 
-mkdir -p "$to_path"
+final_path="$to_path/file_system"
+mkdir -p "$final_path"
 
-FILE_SYSTEM_PATH="$to_path/file_system_backup.tar.gz"
+FILE_SYSTEM_PATH="$final_path/$(date +%s).tar.gz"
 {
   tar -zcvf $FILE_SYSTEM_PATH $from_path
 } || {

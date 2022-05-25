@@ -24,9 +24,10 @@ STATE_FILE="$(dirname $0)/database_backup"
 
 create_pending_file "$STATE_FILE"
 
-mkdir -p "$to_path"
+final_path="$to_path/database"
+mkdir -p "$final_path"
 
-BACKUP_FILE="$to_path/database_backup.sql"
+BACKUP_FILE="$final_path/$(date +%s).sql"
 {
   mysqldump --opt --no-tablespaces -u "$user" -p"$password" -h"$host" "$database" > "$BACKUP_FILE"
 } || {
