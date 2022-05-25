@@ -17,7 +17,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\ReleaseStages;
  * Backend modules
  */
 $GLOBALS['BE_MOD']['release'] = array(
-    Constants::DEPLOYMENT_TABLE => array(
+    'release_stages' => array(
         'tables' => array(Constants::DEPLOYMENT_TABLE)
     )
 );
