@@ -52,11 +52,11 @@ class BackupCreator
 
     private function createDatabaseBackup(string $path, SSHRunner $runner): void
     {
-        $tags = $this->getDatabaseTags();
+        $tags = $this->getDatabaseTags($path);
         $pid = $runner->executeBackgroundScript($path. Constants::BACKUP_DATABASE_SCRIPT_PROD, $tags);
     }
 
-    private function getDatabaseTags(): array
+    private function getDatabaseTags($path): array
     {
         $config = $this->_config->getDatabaseConfiguration();
         $username = $config->getUsername();
@@ -68,7 +68,8 @@ class BackupCreator
             "-u \"$username\"",
             "-p \"$password\"",
             "-h \"$host\"",
-            "-d \"$database\""
+            "-d \"$database\"",
+            "-t \"$path/backups\""
         );
     }
 
@@ -82,7 +83,7 @@ class BackupCreator
     {
         return array(
             "-f \"$path/files\"",
-            "-t \"$path/scripts/backup\""
+            "-t \"$path/backups\""
         );
     }
 }
