@@ -13,10 +13,9 @@ declare(strict_types=1);
  */
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnection;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;

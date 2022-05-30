@@ -15,7 +15,8 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnection;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\PollTimeout;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 
 class Poller {
@@ -28,23 +29,27 @@ class Poller {
 
     /**
      * @throws Poll
+     * @throws PollTimeout
+     *
+     * Run 50 times all 500ms (25s) to check if fail or success file was created. If after 25s no success or fail file
+     * is available, break polling with poll timeout exception
      */
     public function pollFile(string $filePath): void
     {
         try {
             $ftpRunner = $this->_ftpConnector->connect();
-            $x = 0;
-            while ($x < 50) {
+            $repetitions = 0;
+            while ($repetitions < 50) {
                 if ($ftpRunner->checkIfFileExists("$filePath.success")) {
                     return;
                 }
                 if ($ftpRunner->checkIfFileExists("$filePath.fail")) {
-                    throw new Poll("Backup failed, file \"$filePath.fail\" was created");
+                    throw new Poll("Failed file \"$filePath.fail\" was created");
                 }
-                usleep(500);
-                $x = $x + 1;
+                usleep(500000);
+                $repetitions = $repetitions + 1;
             }
-            throw new Poll("Backup failed, timeout");
+            throw new PollTimeout("Backup failed, timeout");
         }catch (FTPConnection $e) {
             throw new Poll("Couldn't poll: $e");
         }finally {

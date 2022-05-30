@@ -12,11 +12,11 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\Exception;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll;
 
 use Exception;
 
-class Poll extends Exception
+class PollTimeout extends Exception
 {
     public function __construct($message = "", $code = 0)
     {
