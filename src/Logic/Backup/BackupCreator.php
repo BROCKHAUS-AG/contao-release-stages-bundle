@@ -15,6 +15,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\PollTimeout;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller;
@@ -56,6 +57,7 @@ class BackupCreator
 
     /**
      * @throws Poll
+     * @throws PollTimeout
      */
     private function createDatabaseBackup(string $path, SSHRunner $runner): void
     {
@@ -83,6 +85,7 @@ class BackupCreator
 
     /**
      * @throws Poll
+     * @throws PollTimeout
      */
     private function createFileServerBackup(string $path, SSHRunner $runner): void
     {
