@@ -18,6 +18,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldDeploymentStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
+use Doctrine\DBAL\Exception;
 
 class StateSynchronizer
 {
@@ -30,7 +31,7 @@ class StateSynchronizer
 
     /**
      * @throws DatabaseQueryEmptyResult
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
     public function getActualId(): int
@@ -41,7 +42,7 @@ class StateSynchronizer
     /**
      * @throws OldDeploymentStateIsPending
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function breakDeploymentIfOldDeploymentIsPending(int $actualId): void
     {
@@ -52,7 +53,7 @@ class StateSynchronizer
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function setState(string $state, int $id): void
     {
@@ -61,7 +62,7 @@ class StateSynchronizer
 
     /**
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     private function isOldDeploymentPending(int $actualId): bool
     {
