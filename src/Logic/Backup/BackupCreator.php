@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
@@ -48,17 +49,20 @@ class BackupCreator
             $this->createFileServerBackup($path, $runner);
         }catch (Exception $e) {
             throw new \BrockhausAg\ContaoReleaseStagesBundle\Exception\BackupCreator(
-                "Couldn't create backup from database or file server");
+                "Couldn't create backup from database or file server: $e");
         }finally {
             $this->_sshConnection->disconnect();
         }
     }
 
+    /**
+     * @throws Poll
+     */
     private function createDatabaseBackup(string $path, SSHRunner $runner): void
     {
         $tags = $this->getDatabaseTags($path);
-        $pid = $runner->executeBackgroundScript($path. Constants::BACKUP_DATABASE_SCRIPT_PROD, $tags);
-        // $this->_poller->pollFile($path. Constants::BACKUP_DATABASE_POLL_FILENAME);
+        $runner->executeBackgroundScript($path. Constants::BACKUP_DATABASE_SCRIPT_PROD, $tags);
+        $this->_poller->pollFile($path. Constants::BACKUP_DATABASE_POLL_FILENAME);
     }
 
     private function getDatabaseTags($path): array
@@ -78,11 +82,14 @@ class BackupCreator
         );
     }
 
+    /**
+     * @throws Poll
+     */
     private function createFileServerBackup(string $path, SSHRunner $runner): void
     {
         $tags = $this->getFileServerTags($path);
-        $pid = $runner->executeBackgroundScript($path. Constants::BACKUP_FILE_SYSTEM_SCRIPT_PROD, $tags);
-        // $this->_poller->pollFile($path. Constants::BACKUP_FILE_SYSTEM_POLL_FILENAME);
+        $runner->executeBackgroundScript($path. Constants::BACKUP_FILE_SYSTEM_SCRIPT_PROD, $tags);
+        $this->_poller->pollFile($path. Constants::BACKUP_FILE_SYSTEM_POLL_FILENAME);
     }
 
     private function getFileServerTags(string $path): array

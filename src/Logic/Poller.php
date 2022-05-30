@@ -14,43 +14,41 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
-
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
-use Exception;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 
 class Poller {
-    private SSHConnector $_sshConnection;
+    private FTPConnector $_ftpConnector;
 
-    public function __construct(SSHConnector $sshConnection)
+    public function __construct(FTPConnector $ftpConnector)
     {
-        $this->_sshConnection = $sshConnection;
+        $this->_ftpConnector = $ftpConnector;
     }
 
     /**
-     * @throws SSHConnection
      * @throws Poll
      */
-    public function pollFile(string $filePath): bool
+    public function pollFile(string $filePath): void
     {
-        $sshRunner = $this->_sshConnection->connect();
         try {
-            $haveToPoll = true;
-            $count = 0;
-            $responseSuccess = $sshRunner->execute("test -f $filePath.success && echo \"true\"");
-            $responseFail = $sshRunner->execute("test -f $filePath.fail && echo \"true\"");
-            echo $responseSuccess;
-            echo $responseFail;
-            if ($responseSuccess == "true" || $responseFail == "true") {
-                $haveToPoll = false;
+            $ftpRunner = $this->_ftpConnector->connect();
+            $x = 0;
+            while ($x < 50) {
+                if ($ftpRunner->checkIfFileExists("$filePath.success")) {
+                    return;
+                }
+                if ($ftpRunner->checkIfFileExists("$filePath.fail")) {
+                    throw new Poll("Backup failed, file \"$filePath.fail\" was created");
+                }
+                usleep(500);
+                $x = $x + 1;
             }
-            return true;
-        }catch (Exception $e) {
+            throw new Poll("Backup failed, timeout");
+        }catch (FTPConnection $e) {
             throw new Poll("Couldn't poll: $e");
         }finally {
-            $this->_sshConnection->disconnect();
-            return false;
+            $this->_ftpConnector->disconnect($ftpRunner->getConn());
         }
     }
 }

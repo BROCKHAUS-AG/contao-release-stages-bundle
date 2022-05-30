@@ -124,5 +124,5 @@ services:
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller:
         arguments:
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector'
         shared: false

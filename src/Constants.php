@@ -41,9 +41,9 @@ abstract class Constants
 
     public const BACKUP_DIRECTORY_PROD = self::SCRIPT_DIRECTORY_PROD. "/backup";
     public const BACKUP_FILE_SYSTEM_SCRIPT_PROD = self::BACKUP_DIRECTORY_PROD. "/backup_file_system.sh";
-    public const BACKUP_FILE_SYSTEM_POLL_FILENAME = self::BACKUP_DIRECTORY_PROD. "/backup_file_system";
+    public const BACKUP_FILE_SYSTEM_POLL_FILENAME = self::BACKUP_DIRECTORY_PROD. "/file_system_backup";
     public const BACKUP_DATABASE_SCRIPT_PROD = self::BACKUP_DIRECTORY_PROD. "/backup_database.sh";
-    public const BACKUP_DATABASE_POLL_FILENAME = self::BACKUP_DIRECTORY_PROD. "/backup_database";
+    public const BACKUP_DATABASE_POLL_FILENAME = self::BACKUP_DIRECTORY_PROD. "/database_backup";
 
     public const STATE_SUCCESS = "SUCCESS";
     public const STATE_FAILURE = "FAILURE";
