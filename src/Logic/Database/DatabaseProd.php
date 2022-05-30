@@ -42,7 +42,6 @@ class DatabaseProd
         $this->_conn = $this->createConnectionToProdDatabase($config);
     }
 
-
     /**
      * @throws DatabaseQueryEmptyResult
      */
@@ -80,62 +79,6 @@ class DatabaseProd
             return true;
         }
         return false;
-    }
-
-    /**
-     * @throws DatabaseExecutionFailure
-     */
-    public function createTable(string $table, array $tableScheme): void
-    {
-        $tableCommand = $this->createCreateTableCommand($table, $tableScheme);
-        $this->runCreateTableCommand($tableCommand);
-    }
-
-    private function createCreateTableCommand(string $table, array $tableScheme): string
-    {
-        $tableCommand = "CREATE TABLE ". $table. "(";
-        $primaryKey = "";
-        for ($x = 0; $x != count($tableScheme); $x++)
-        {
-            $scheme = $tableScheme[$x];
-            $defaultValue = $this->setDefaultValueForAttribute($scheme["Null"]);
-            $tableCommand = $tableCommand. $scheme["Field"]. " ". $scheme["Type"]. " ".
-                $defaultValue. ", ";
-            if (isset($scheme["Key"]) && $scheme["Key"] == "PRI") {
-                $primaryKey = $scheme["Field"];
-            }
-        }
-        return $tableCommand. "PRIMARY KEY(". $primaryKey. "));";
-    }
-
-    private function setDefaultValueForAttribute(string $scheme): string
-    {
-        return $scheme == "YES" ? "NULL" : "NOT NULL";
-    }
-
-    /**
-     * @throws DatabaseExecutionFailure
-     */
-    private function runCreateTableCommand(string $createTableCommand): void
-    {
-        $statement = $this->_conn->prepare($createTableCommand);
-        try {
-            $statement->execute();
-        }catch (PDOException $e) {
-            throw new DatabaseExecutionFailure($e->getMessage());
-        }
-    }
-
-    /**
-     * @throws DatabaseExecutionFailure
-     */
-    public function executeCommands(array $commands): void
-    {
-        foreach ($commands as $command) {
-            if ($this->_conn->query($command) === FALSE) {
-                throw new DatabaseExecutionFailure($this->_conn->errorCode());
-            }
-        }
     }
 
     /**

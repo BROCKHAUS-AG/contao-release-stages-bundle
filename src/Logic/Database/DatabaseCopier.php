@@ -17,6 +17,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseExecutionFailure;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\MigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
 use Doctrine\DBAL\Exception;
@@ -26,12 +27,15 @@ class DatabaseCopier
     private Database $_databaseLogic;
     private DatabaseProd $_prodDatabaseLogic;
     private Config $_config;
+    private MigrationBuilder $_migrationBuilder;
 
-    public function __construct(Database $databaseLogic, DatabaseProd $prodDatabaseLogic, Config $config)
+    public function __construct(Database $databaseLogic, DatabaseProd $prodDatabaseLogic, Config $config,
+                                MigrationBuilder $migrationBuilder)
     {
         $this->_databaseLogic = $databaseLogic;
         $this->_prodDatabaseLogic = $prodDatabaseLogic;
         $this->_config = $config;
+        $this->_migrationBuilder = $migrationBuilder;
     }
 
     /**
@@ -72,7 +76,7 @@ class DatabaseCopier
     {
         if (!$this->_prodDatabaseLogic->checkIfTableExists($table)) {
             $tableScheme = $this->_databaseLogic->getTableScheme($table);
-            $this->_prodDatabaseLogic->createTable($table, $tableScheme);
+            $this->_migrationBuilder->buildAndWriteCreateTableCommandWithTableScheme($table, $tableScheme);
         }
     }
 
