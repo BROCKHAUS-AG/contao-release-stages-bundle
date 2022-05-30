@@ -66,13 +66,11 @@ class ReleaseStages
             $this->_versioning->generateNewVersionNumber($actualId);
             $this->_scriptFileSynchronizer->synchronize();
             $this->_backupCreator->create();
+            $this->_stateSynchronizer->setState(Constants::STATE_SUCCESS, $actualId);
         }catch (OldDeploymentStateIsPending $e) {
             die($e);
         }catch (Exception $e) {
             $this->_stateSynchronizer->setState(Constants::STATE_FAILURE, $actualId);
-            die("An exception has been thrown: $e");
         }
-        $this->_stateSynchronizer->setState(Constants::STATE_SUCCESS, $actualId);
-        // die;
     }
 }
