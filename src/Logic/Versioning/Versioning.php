@@ -37,13 +37,14 @@ class Versioning {
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      * @throws Validation
+     * @throws DatabaseQueryEmptyResult
      */
     public function generateNewVersionNumber(int $id): void
     {
-        try {
-            $latestVersion = $this->database->getLatestReleaseVersion();
-        } catch (DatabaseQueryEmptyResult $e) {
+        if ($this->database->isTableEmpty(Constants::DEPLOYMENT_TABLE)) {
             $latestVersion = $this->createDummyVersion();
+        }else {
+            $latestVersion = $this->database->getLatestReleaseVersion();
         }
         $this->createAndUpdateToNewVersion($id, $latestVersion);
     }

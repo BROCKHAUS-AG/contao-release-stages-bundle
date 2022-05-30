@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\NoSubmittedPendingState;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldDeploymentStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
@@ -66,11 +64,35 @@ class ReleaseStages
             $this->_versioning->generateNewVersionNumber($actualId);
             $this->_scriptFileSynchronizer->synchronize();
             $this->_backupCreator->create();
-            $this->_stateSynchronizer->setState(Constants::STATE_SUCCESS, $actualId);
+            $this->finishWithSuccess($actualId);
         }catch (OldDeploymentStateIsPending $e) {
-            die($e);
+            $this->finishWithOldStateIsPending($actualId);
         }catch (Exception $e) {
-            $this->_stateSynchronizer->setState(Constants::STATE_FAILURE, $actualId);
+            $this->finishWithFailure($actualId);
         }
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function finishWithSuccess(int $actualId): void
+    {
+        $this->_stateSynchronizer->updateState(Constants::STATE_SUCCESS, $actualId);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function finishWithOldStateIsPending(int $actualId): void
+    {
+        $this->_stateSynchronizer->updateState(Constants::STATE_OLD_PENDING, $actualId);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function finishWithFailure(int $actualId): void
+    {
+        $this->_stateSynchronizer->updateState(Constants::STATE_FAILURE, $actualId);
     }
 }

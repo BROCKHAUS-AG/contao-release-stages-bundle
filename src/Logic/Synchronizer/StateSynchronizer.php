@@ -47,7 +47,6 @@ class StateSynchronizer
     public function breakDeploymentIfOldDeploymentIsPending(int $actualId): void
     {
         if ($this->isOldDeploymentPending($actualId)) {
-            $this->setState(Constants::STATE_OLD_PENDING, $actualId);
             throw new OldDeploymentStateIsPending("An old release is pending");
         }
     }
@@ -55,7 +54,7 @@ class StateSynchronizer
     /**
      * @throws Exception
      */
-    public function setState(string $state, int $id): void
+    public function updateState(string $state, int $id): void
     {
         $this->_database->updateState($state, $id);
     }

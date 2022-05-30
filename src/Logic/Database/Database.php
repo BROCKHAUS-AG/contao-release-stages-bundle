@@ -24,6 +24,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Result;
 
 class Database
@@ -38,9 +39,24 @@ class Database
     }
 
     /**
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    public function isTableEmpty(string $table): bool
+    {
+        $result = $this->_dbConnection
+            ->createQueryBuilder()
+            ->select("*")
+            ->from($table)
+            ->execute()
+            ->fetchAllAssociative();
+        return $result == NULL;
+    }
+
+    /**
      * @throws DatabaseQueryEmptyResult
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws Validation
      */
     public function getLatestReleaseVersion(): Version
@@ -65,7 +81,7 @@ class Database
 
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function updateVersion(int $id, string $version) : void
     {
@@ -80,7 +96,7 @@ class Database
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function updateState(string $state, int $id){
         $this->_dbConnection
@@ -94,7 +110,7 @@ class Database
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
     public function getFullTableInformation(): TableInformationCollection
@@ -104,7 +120,7 @@ class Database
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
     private function getTableNamesFromDatabase() : array
@@ -126,7 +142,7 @@ class Database
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
     private function getTableInformationByTableNames(array $tableNames): TableInformationCollection
@@ -164,7 +180,7 @@ class Database
 
     /**
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function getTableScheme(string $table): array
     {
@@ -175,7 +191,7 @@ class Database
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
     public function loadHexById(string $column, string $tableName, string $id): array
@@ -192,7 +208,7 @@ class Database
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function checkForDeletedFilesInTlLogTable() : Result
     {
@@ -201,7 +217,7 @@ class Database
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
     public function getRowsFromTlLogTableWhereIdIsBiggerThanIdAndTextIsLikeDeleteFrom(int $lastId): array
@@ -219,7 +235,7 @@ class Database
 
     /**
      * @throws DatabaseQueryEmptyResult
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
     public function getActualIdFromTable(string $table): int
@@ -240,7 +256,7 @@ class Database
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
     public function isOldDeploymentPending(int $actualId): bool
