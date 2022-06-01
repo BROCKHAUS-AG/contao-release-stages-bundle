@@ -82,7 +82,8 @@ class DatabaseMigrationBuilder
 
     private function saveStatementsToMigrationFile(array $statements): void
     {
-
+        var_dump($statements);
+        die;
     }
 
     private function copyMigrationFileToProd(): void

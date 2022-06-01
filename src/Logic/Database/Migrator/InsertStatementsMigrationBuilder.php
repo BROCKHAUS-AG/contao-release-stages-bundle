@@ -20,19 +20,21 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseProd;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
+use Doctrine\DBAL\Exception;
 use Throwable;
 
 class InsertStatementsMigrationBuilder
 {
-    private Config $_config;
     private Database $_database;
     private DatabaseProd $_databaseProd;
+    private Config $_config;
 
-    public function __construct(Config $config, Database $database, DatabaseProd $databaseProd)
+    public function __construct(Database $database, DatabaseProd $databaseProd, Config $config)
     {
-        $this->_config = $config;
         $this->_database = $database;
         $this->_databaseProd = $databaseProd;
+        $this->_config = $config;
     }
 
     /**
@@ -41,11 +43,48 @@ class InsertStatementsMigrationBuilder
     public function build(): array
     {
         try {
-            $command = "";
-            return array();
+            $tableInformationCollection = $this->_database->getFullTableInformation();
+            return $this->buildStatements($tableInformationCollection);
         }catch (Throwable $e) {
             throw new InsertMigrationBuilder("Couldn't build insert statements: $e");
         }
+    }
+
+    /**
+     * @throws DatabaseQueryEmptyResult
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    private function buildStatements(TableInformationCollection $tableInformationCollection): array
+    {
+        $statements = array();
+        foreach ($tableInformationCollection->get() as $tableInformation) {
+            $values = $this->createColumnWithValuesForCommand($tableInformation);
+            $statement = $this->createCommandsWithValueForTable($values, $tableInformation->getName());
+            if ($statement != null) {
+                $statements[] = $statement;
+            }
+        }
+        return $statements;
+    }
+
+    /**
+     * @throws DatabaseQueryEmptyResult
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws Exception
+     */
+    private function createColumnWithValuesForCommand(TableInformation $tableInformation): array
+    {
+        $tableSchemes = $this->_databaseProd->getTableSchemes($tableInformation->getName());
+        $values = array();
+        foreach ($tableInformation->getContent() as $column) {
+            if (strcmp($tableInformation->getName(), "tl_page") == 0 &&
+                strcmp($column["type"], "root") == 0) {
+                $column["dns"] = $this->changeDNSEntryForProd($column["alias"]);
+            }
+            $values[] = $this->createColumnWithValueForCommand($column, $tableSchemes, $tableInformation->getName());
+        }
+        return $values;
     }
 
     private function changeDNSEntryForProd(string $alias): string
@@ -62,7 +101,7 @@ class InsertStatementsMigrationBuilder
 
     /**
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     private function createColumnWithValueForCommand(array $column, array $tableSchemes, string $tableName): array
     {
@@ -80,7 +119,7 @@ class InsertStatementsMigrationBuilder
 
     /**
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     private function createRowsAndColumn(array $tableSchemes, array &$rows, array &$columnAndValue,
                                          string $tableName, array &$tableSchemeFields, ?string $row, ?string $id): void
@@ -133,7 +172,7 @@ class InsertStatementsMigrationBuilder
 
     /**
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     private function createRowsAndColumnForBinary(string $field, string $tableName, array &$rows,
                                                   array &$columnAndValue, ?string $id): void
@@ -163,18 +202,6 @@ class InsertStatementsMigrationBuilder
         $columnAndValue[] = $field . " = " . $row;
     }
 
-    private function createCommandsWithValueForTable(array $values, string $tableName): array
-    {
-        $commandsToBeExecuted = array();
-        foreach ($values as $value) {
-            $commandsToBeExecuted[]
-                = 'INSERT INTO '. $this->_databaseProd->_databaseName. '.'. $tableName. ' ('. $value["columnName"].
-                ') VALUES ('. $value["value"]. ') ON DUPLICATE KEY UPDATE '. $value["updateColumnAndValue"]. ';';
-        }
-        if ($commandsToBeExecuted == null) return array();
-        return $commandsToBeExecuted;
-    }
-
     private function createReturnValue(array $rows, array $tableSchemeFields, array $columnAndValue): array
     {
         $value = implode(", ", $rows);
@@ -188,22 +215,14 @@ class InsertStatementsMigrationBuilder
         );
     }
 
-    /**
-     * @throws DatabaseQueryEmptyResult
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
-     */
-    private function createColumnWithValuesForCommand(TableInformation $tableInformation): array
+    private function createCommandsWithValueForTable(array $values, string $tableName): ?array
     {
-        $tableSchemes = $this->_databaseProd->getTableSchemes($tableInformation->getName());
-        $values = array();
-        foreach ($tableInformation->getContent() as $column) {
-            if (strcmp($tableInformation->getName(), "tl_page") == 0 &&
-                strcmp($column["type"], "root") == 0) {
-                $column["dns"] = $this->changeDNSEntryForProd($column["alias"]);
-            }
-            $values[] = $this->createColumnWithValueForCommand($column, $tableSchemes, $tableInformation->getName());
+        $commandsToBeExecuted = array();
+        foreach ($values as $value) {
+            $commandsToBeExecuted[]
+                = 'INSERT INTO '. $this->_databaseProd->_databaseName. '.'. $tableName. ' ('. $value["columnName"].
+                ') VALUES ('. $value["value"]. ') ON DUPLICATE KEY UPDATE '. $value["updateColumnAndValue"]. ';';
         }
-        return $values;
+        return $commandsToBeExecuted;
     }
 }

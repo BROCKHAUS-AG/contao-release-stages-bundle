@@ -39,7 +39,7 @@ class CreateTableStatementsMigrationBuilder
     {
         try {
             $tableInformationCollection = $this->_database->getFullTableInformation();
-            return $this->buildCreateTableCommandsIfNotExists($tableInformationCollection);
+            return $this->buildCreateTableStatementsIfNotExists($tableInformationCollection);
         }catch (Throwable $e) {
             throw new CreateTableMigrationBuilder("Couldn't build create table statements: $e");
         }
@@ -49,30 +49,30 @@ class CreateTableStatementsMigrationBuilder
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws Exception
      */
-    private function buildCreateTableCommandsIfNotExists(TableInformationCollection $tableInformationCollection): array
+    private function buildCreateTableStatementsIfNotExists(TableInformationCollection $tableInformationCollection): array
     {
-        $commands = array();
+        $statements = array();
         for ($x = 0; $x != $tableInformationCollection->getLength(); $x++)
         {
-            $command = $this->buildCreateTableCommandIfNotExists($tableInformationCollection->getByIndex($x)->getName());
+            $command = $this->buildCreateTableStatementIfNotExists($tableInformationCollection->getByIndex($x)->getName());
             if ($command != null) {
-                $commands[] = $command;
+                $statements[] = $command;
             }
         }
-        return $commands;
+        return $statements;
     }
 
     /**
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws Exception
      */
-    private function buildCreateTableCommandIfNotExists(string $table): ?string
+    private function buildCreateTableStatementIfNotExists(string $table): ?string
     {
         if (!$this->_databaseProd->checkIfTableExists($table)) {
             $tableScheme = $this->_database->getTableScheme($table);
-            $command = $this->buildCreateTableCommand($table, $tableScheme);
+            $statement = $this->buildCreateTableCommand($table, $tableScheme);
         }
-        return $command ?? null;
+        return $statement ?? null;
     }
 
     private function buildCreateTableCommand(string $table, array $tableScheme): string
