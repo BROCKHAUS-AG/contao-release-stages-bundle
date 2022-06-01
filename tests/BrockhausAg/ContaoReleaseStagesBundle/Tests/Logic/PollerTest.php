@@ -16,12 +16,10 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\PollTimeout;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPRunner;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\SFTPRunner;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller;
 use Contao\TestCase\ContaoTestCase;
 use Exception;
-use phpseclib3\Net\SFTP;
 
 /**
  * Class PollerTest
