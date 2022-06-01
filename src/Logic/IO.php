@@ -24,10 +24,16 @@ class IO {
 
     public function append(string $data): void
     {
+        $file = fopen($this->filePath, "w+");
+        fwrite($file, $data);
+        fclose($file);
     }
 
     public function read(): string
     {
-        return "";
+        $file = fopen($this->filePath, "w+");
+        $data = fread($file, filesize($this->filePath));
+        fclose($file);
+        return $data;
     }
 }

@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldDeploymentStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldDeploymentStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServerCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer;
@@ -31,19 +31,19 @@ class ReleaseStages
     private ScriptFileSynchronizer $_scriptFileSynchronizer;
     private Versioning $_versioning;
     private BackupCreator $_backupCreator;
-    private DatabaseCopier $_databaseCopier;
+    private DatabaseMigrationBuilder $_databaseMigrator;
     private FileServerCopier $_fileServerCopier;
     private StateSynchronizer $_stateSynchronizer;
 
-    public function __construct(Timer $timer, ScriptFileSynchronizer $scriptFileSynchronizer, Versioning $versioning,
-                                BackupCreator $backupCreator, DatabaseCopier $databaseCopier,
+    public function __construct(Timer            $timer, ScriptFileSynchronizer $scriptFileSynchronizer, Versioning $versioning,
+                                BackupCreator    $backupCreator, DatabaseMigrationBuilder $databaseMigrator,
                                 FileServerCopier $fileServerCopier, StateSynchronizer $stateSynchronizer)
     {
         $this->_timer = $timer;
         $this->_scriptFileSynchronizer = $scriptFileSynchronizer;
         $this->_versioning = $versioning;
         $this->_backupCreator = $backupCreator;
-        $this->_databaseCopier = $databaseCopier;
+        $this->_databaseMigrator = $databaseMigrator;
         $this->_fileServerCopier = $fileServerCopier;
         $this->_stateSynchronizer = $stateSynchronizer;
     }
@@ -64,12 +64,19 @@ class ReleaseStages
             $this->_versioning->generateNewVersionNumber($actualId);
             $this->_scriptFileSynchronizer->synchronize();
             $this->_backupCreator->create();
+            $this->_databaseMigrator->migrate();
             $this->finishWithSuccess($actualId);
         }catch (OldDeploymentStateIsPending $e) {
             $this->finishWithOldStateIsPending($actualId);
+            // ToDo: die is only for development
+            die($e);
         }catch (Exception $e) {
             $this->finishWithFailure($actualId);
+            // ToDo: die is only for development
+            die($e);
         }
+        // ToDo: die is only for development
+        die;
     }
 
     /**
