@@ -49,7 +49,7 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrationBuilder'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServerCopier'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer'
         shared: false
