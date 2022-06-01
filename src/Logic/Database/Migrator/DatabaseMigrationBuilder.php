@@ -82,8 +82,12 @@ class DatabaseMigrationBuilder
 
     private function saveStatementsToMigrationFile(array $statements): void
     {
-        var_dump($statements);
-        die;
+        $convertedStatements = "";
+        foreach ($statements as $statement)
+        {
+            $convertedStatements = $convertedStatements. $statement. "\n";
+        }
+        $this->_io->write($convertedStatements);
     }
 
     private function copyMigrationFileToProd(): void

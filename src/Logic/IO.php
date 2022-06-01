@@ -22,11 +22,18 @@ class IO {
         $this->filePath = $filePath;
     }
 
-    public function append(string $data): void
+    public function write(string $data): void
     {
-        $file = fopen($this->filePath, "w+");
-        fwrite($file, $data);
-        fclose($file);
+        $this->createDirectoryIfNotExists();
+        echo file_put_contents($this->filePath, $data);
+    }
+
+    private function createDirectoryIfNotExists(): void
+    {
+        $directory = substr($this->filePath, 0, - strlen(substr(strrchr($this->filePath,'/'), 1)));
+        if (!file_exists($directory)) {
+            mkdir($directory, 0777, true);
+        }
     }
 
     public function read(): string

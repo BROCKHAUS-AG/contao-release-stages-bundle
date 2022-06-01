@@ -62,7 +62,7 @@ class InsertStatementsMigrationBuilder
             $values = $this->createColumnWithValuesForCommand($tableInformation);
             $statement = $this->createCommandsWithValueForTable($values, $tableInformation->getName());
             if ($statement != null) {
-                $statements[] = $statement;
+                $statements = array_merge($statements, $statement);
             }
         }
         return $statements;
@@ -75,11 +75,10 @@ class InsertStatementsMigrationBuilder
      */
     private function createColumnWithValuesForCommand(TableInformation $tableInformation): array
     {
-        $tableSchemes = $this->_databaseProd->getTableSchemes($tableInformation->getName());
+        $tableSchemes = $this->_database->getTableScheme($tableInformation->getName());
         $values = array();
         foreach ($tableInformation->getContent() as $column) {
-            if (strcmp($tableInformation->getName(), "tl_page") == 0 &&
-                strcmp($column["type"], "root") == 0) {
+            if ($tableInformation->getName() == "tl_page" && $column["type"] == "root") {
                 $column["dns"] = $this->changeDNSEntryForProd($column["alias"]);
             }
             $values[] = $this->createColumnWithValueForCommand($column, $tableSchemes, $tableInformation->getName());
@@ -125,6 +124,9 @@ class InsertStatementsMigrationBuilder
                                          string $tableName, array &$tableSchemeFields, ?string $row, ?string $id): void
     {
         $type = $tableSchemes["type"];
+        if ($type == null) {
+            return;
+        }
         if ($this->checkIfColumnTypeIsText($type)) {
             $this->createRowsAndColumnValuesForText($rows, $tableSchemes["field"], $columnAndValue, $row);
         } else if ($this->checkIfColumnIsNullable($tableSchemes["nullable"], $row)) {

@@ -31,19 +31,19 @@ class ReleaseStages
     private ScriptFileSynchronizer $_scriptFileSynchronizer;
     private Versioning $_versioning;
     private BackupCreator $_backupCreator;
-    private DatabaseMigrationBuilder $_databaseMigrator;
+    private DatabaseMigrationBuilder $_databaseMigrationBuilder;
     private FileServerCopier $_fileServerCopier;
     private StateSynchronizer $_stateSynchronizer;
 
-    public function __construct(Timer            $timer, ScriptFileSynchronizer $scriptFileSynchronizer, Versioning $versioning,
-                                BackupCreator    $backupCreator, DatabaseMigrationBuilder $databaseMigrator,
+    public function __construct(Timer $timer, ScriptFileSynchronizer $scriptFileSynchronizer, Versioning $versioning,
+                                BackupCreator $backupCreator, DatabaseMigrationBuilder $databaseMigrationBuilder,
                                 FileServerCopier $fileServerCopier, StateSynchronizer $stateSynchronizer)
     {
         $this->_timer = $timer;
         $this->_scriptFileSynchronizer = $scriptFileSynchronizer;
         $this->_versioning = $versioning;
         $this->_backupCreator = $backupCreator;
-        $this->_databaseMigrator = $databaseMigrator;
+        $this->_databaseMigrationBuilder = $databaseMigrationBuilder;
         $this->_fileServerCopier = $fileServerCopier;
         $this->_stateSynchronizer = $stateSynchronizer;
     }
@@ -64,7 +64,7 @@ class ReleaseStages
             $this->_versioning->generateNewVersionNumber($actualId);
             $this->_scriptFileSynchronizer->synchronize();
             $this->_backupCreator->create();
-            $this->_databaseMigrator->migrate();
+            $this->_databaseMigrationBuilder->migrate();
             $this->finishWithSuccess($actualId);
         }catch (OldDeploymentStateIsPending $e) {
             $this->finishWithOldStateIsPending($actualId);
