@@ -54,6 +54,11 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer'
         shared: false
 
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\MigrationBuilder:
+        arguments:
+            - '%kernel.project_dir%'
+        shared: false
+
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseCopier:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database'
