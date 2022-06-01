@@ -14,50 +14,38 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\InsertMigrationBuilder;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseProd;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
+use Throwable;
 
-class MigrationBuilder
+class InsertStatementsMigrationBuilder
 {
-    private IO $_io;
+    private Config $_config;
+    private Database $_database;
+    private DatabaseProd $_databaseProd;
 
-    public function __construct(string $path)
+    public function __construct(Config $config, Database $database, DatabaseProd $databaseProd)
     {
-        $this->_io = new IO($path. Constants::DATABASE_MIGRATION_FILE);
+        $this->_config = $config;
+        $this->_database = $database;
+        $this->_databaseProd = $databaseProd;
     }
-
-   public function build(string $table, array $tableScheme): void
-   {
-       $command = $this->buildCreateTableCommand($table, $tableScheme);
-       $this->appendCommandToMigrationFile($command);
-   }
 
     /**
-     * @throws DatabaseQueryEmptyResult
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
+     * @throws InsertMigrationBuilder
      */
-    private function createColumnWithValuesForCommand(TableInformation $tableInformation): array
+    public function build(): array
     {
-        $tableSchemes = $this->_prodDatabaseLogic->getTableSchemes($tableInformation->getName());
-        $values = array();
-        foreach ($tableInformation->getContent() as $column) {
-            if (strcmp($tableInformation->getName(), "tl_page") == 0 &&
-                strcmp($column["type"], "root") == 0) {
-                $column["dns"] = $this->changeDNSEntryForProd($column["alias"]);
-            }
-            $values[] = $this->createColumnWithValueForCommand($column, $tableSchemes, $tableInformation->getName());
+        try {
+            $command = "";
+            return array();
+        }catch (Throwable $e) {
+            throw new InsertMigrationBuilder("Couldn't build insert statements: $e");
         }
-        return $values;
-    }
-
-
-
-    public function buildAndWriteInsertIntoCommands(): void
-    {
-
     }
 
     private function changeDNSEntryForProd(string $alias): string
@@ -150,7 +138,7 @@ class MigrationBuilder
     private function createRowsAndColumnForBinary(string $field, string $tableName, array &$rows,
                                                   array &$columnAndValue, ?string $id): void
     {
-        $req = $this->_databaseLogic->loadHexById($field, $tableName, $id);
+        $req = $this->_database->loadHexById($field, $tableName, $id);
         $rows[] = "UNHEX('" . $req[0]["hex(" . $field . ")"] . "')";
         $columnAndValue[] = $field . "= UNHEX('" . $req[0]["hex(" .
             $field . ")"] . "')";
@@ -180,7 +168,7 @@ class MigrationBuilder
         $commandsToBeExecuted = array();
         foreach ($values as $value) {
             $commandsToBeExecuted[]
-                = 'INSERT INTO '. $this->_prodDatabaseLogic->_databaseName. '.'. $tableName. ' ('. $value["columnName"].
+                = 'INSERT INTO '. $this->_databaseProd->_databaseName. '.'. $tableName. ' ('. $value["columnName"].
                 ') VALUES ('. $value["value"]. ') ON DUPLICATE KEY UPDATE '. $value["updateColumnAndValue"]. ';';
         }
         if ($commandsToBeExecuted == null) return array();
@@ -198,5 +186,24 @@ class MigrationBuilder
             "value" => $value,
             "updateColumnAndValue" => $updateColumnAndValue
         );
+    }
+
+    /**
+     * @throws DatabaseQueryEmptyResult
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function createColumnWithValuesForCommand(TableInformation $tableInformation): array
+    {
+        $tableSchemes = $this->_databaseProd->getTableSchemes($tableInformation->getName());
+        $values = array();
+        foreach ($tableInformation->getContent() as $column) {
+            if (strcmp($tableInformation->getName(), "tl_page") == 0 &&
+                strcmp($column["type"], "root") == 0) {
+                $column["dns"] = $this->changeDNSEntryForProd($column["alias"]);
+            }
+            $values[] = $this->createColumnWithValueForCommand($column, $tableSchemes, $tableInformation->getName());
+        }
+        return $values;
     }
 }

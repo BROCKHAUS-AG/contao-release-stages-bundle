@@ -12,12 +12,14 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator;
 
-class InsertCommandsMigrationBuilder
+use Exception;
+
+class CreateTableMigrationBuilder extends Exception
 {
-    public function build(string $table, array $tableScheme): void
+    public function __construct($message = "", $code = 0)
     {
-        $command = "";
+        parent::__construct($message, $code);
     }
 }

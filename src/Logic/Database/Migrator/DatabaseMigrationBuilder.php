@@ -14,28 +14,29 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseExecutionFailure;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\CreateTableMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigration;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseProd;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DeleteMigrationBuilder;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\InsertMigrationBuilder;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
 use Throwable;
 
 class DatabaseMigrationBuilder
 {
-    private Database $_databaseLogic;
-    private DatabaseProd $_prodDatabaseLogic;
-    private CreateTableCommandsMigrationBuilder $_createTableCommandsMigrationBuilder;
-    private InsertCommandsMigrationBuilder $_insertCommandsMigrationBuilder;
-    private DeleteCommandsMigrationBuilder $_deleteCommandsMigrationBuilder;
+    private CreateTableStatementsMigrationBuilder $_createTableStatementsMigrationBuilder;
+    private InsertStatementsMigrationBuilder $_insertStatementsMigrationBuilder;
+    private DeleteStatementsMigrationBuilder $_deleteStatementsMigrationBuilder;
+    private IO $_io;
 
-    public function __construct(Database $databaseLogic, DatabaseProd $prodDatabaseLogic,
-                                CreateTableCommandsMigrationBuilder $createTableCommandsMigrationBuilder)
+    public function __construct(CreateTableStatementsMigrationBuilder $createTableStatementsMigrationBuilder,
+                                InsertStatementsMigrationBuilder $insertStatementsMigrationBuilder,
+                                DeleteStatementsMigrationBuilder $deleteStatementsMigrationBuilder, string $path)
     {
-        $this->_databaseLogic = $databaseLogic;
-        $this->_prodDatabaseLogic = $prodDatabaseLogic;
-        $this->_createTableCommandsMigrationBuilder = $createTableCommandsMigrationBuilder;
+        $this->_createTableStatementsMigrationBuilder = $createTableStatementsMigrationBuilder;
+        $this->_insertStatementsMigrationBuilder = $insertStatementsMigrationBuilder;
+        $this->_deleteStatementsMigrationBuilder = $deleteStatementsMigrationBuilder;
+        $this->_io = new IO($path. Constants::DATABASE_MIGRATION_FILE);
     }
 
     /**
@@ -54,62 +55,35 @@ class DatabaseMigrationBuilder
     private function createMigrationFile(): void
     {
         try {
-            $tableInformationCollection = $this->_databaseLogic->getFullTableInformation();
-            $createTableCommands = $this->buildCreateTableCommandsIfNotExists($tableInformationCollection);
-
-            $this->checkForDeleteEntriesInTlLogTable();
+            $statements = $this->buildStatements();
+            $this->saveStatementsToMigrationFile($statements);
         } catch (Throwable $e) {
             throw new DatabaseMigration("Couldn't create migration: $e");
         }
     }
 
     /**
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
+     * @throws InsertMigrationBuilder
+     * @throws DeleteMigrationBuilder
+     * @throws CreateTableMigrationBuilder
      */
-    private function buildCreateTableCommandsIfNotExists(TableInformationCollection $tableInformationCollection): array
+    private function buildStatements(): array
     {
-        $commands = array();
-        for ($x = 0; $x != $tableInformationCollection->getLength(); $x++)
-        {
-            $command = $this->buildCreateTableCommandIfNotExists($tableInformationCollection->getByIndex($x)->getName());
-            if ($command != null) {
-                $commands[] = $command;
-            }
-        }
-        return $commands;
+        $createTableStatements = $this->_createTableStatementsMigrationBuilder->build();
+        $insertStatements = $this->_insertStatementsMigrationBuilder->build();
+        $deleteStatements = $this->_deleteStatementsMigrationBuilder->build();
+        return $this->combineStatements($createTableStatements, $insertStatements, $deleteStatements);
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
-     */
-    private function buildCreateTableCommandIfNotExists(string $table): ?string
+    private function combineStatements(array $createTableStatements, array $insertStatements, array $deleteStatements): array
     {
-        if (!$this->_prodDatabaseLogic->checkIfTableExists($table)) {
-            $tableScheme = $this->_databaseLogic->getTableScheme($table);
-            $command = $this->_createTableCommandsMigrationBuilder->build($table, $tableScheme);
-        }
-        return $command ?? null;
+        return array_merge($createTableStatements, $insertStatements, $deleteStatements);
     }
 
-    /**
-     * @throws DatabaseExecutionFailure
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
-     */
-    private function checkForDeleteEntriesInTlLogTable(): void
+    private function saveStatementsToMigrationFile(array $statements): void
     {
-        $lastId = $lastId = $this->_prodDatabaseLogic->getLastIdFromTlLogTable();
-        $res = $this->_databaseLogic->getRowsFromTlLogTableWhereIdIsBiggerThanIdAndTextIsLikeDeleteFrom($lastId);
 
-        $deleteStatements = array();
-        foreach ($res as $statement) {
-            $deleteStatements[] = $statement["text"];
-        }
-        $this->_prodDatabaseLogic->executeCommands($deleteStatements);
     }
-
 
     private function copyMigrationFileToProd(): void
     {
