@@ -16,7 +16,6 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\CreateTableMigrationBuilder;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigration;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DeleteMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\InsertMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
@@ -40,17 +39,16 @@ class DatabaseMigrationBuilder
     }
 
     /**
-     * @throws DatabaseMigration
+     * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder
      */
-    public function migrate(): void
+    public function build(): void
     {
         $this->createMigrationFile();
         $this->copyMigrationFileToProd();
-        $this->runMigrationFile();
     }
 
     /**
-     * @throws DatabaseMigration
+     * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder
      */
     private function createMigrationFile(): void
     {
@@ -58,7 +56,7 @@ class DatabaseMigrationBuilder
             $statements = $this->buildStatements();
             $this->saveStatementsToMigrationFile($statements);
         } catch (Throwable $e) {
-            throw new DatabaseMigration("Couldn't create migration: $e");
+            throw new \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder("Couldn't build migration: $e");
         }
     }
 
@@ -94,7 +92,4 @@ class DatabaseMigrationBuilder
     {
     }
 
-    private function runMigrationFile(): void
-    {
-    }
 }
