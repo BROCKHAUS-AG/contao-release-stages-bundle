@@ -18,7 +18,11 @@ use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\CreateTableMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DeleteMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\InsertMigrationBuilder;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
+use Exception;
 use Throwable;
 
 class DatabaseMigrationBuilder
@@ -26,16 +30,23 @@ class DatabaseMigrationBuilder
     private CreateTableStatementsMigrationBuilder $_createTableStatementsMigrationBuilder;
     private InsertStatementsMigrationBuilder $_insertStatementsMigrationBuilder;
     private DeleteStatementsMigrationBuilder $_deleteStatementsMigrationBuilder;
+    private string $_filePath;
+    private FTPConnector $_ftpConnector;
+    private Config $_config;
     private IO $_io;
 
     public function __construct(CreateTableStatementsMigrationBuilder $createTableStatementsMigrationBuilder,
                                 InsertStatementsMigrationBuilder $insertStatementsMigrationBuilder,
-                                DeleteStatementsMigrationBuilder $deleteStatementsMigrationBuilder, string $path)
+                                DeleteStatementsMigrationBuilder $deleteStatementsMigrationBuilder, string $path,
+                                FTPConnector $ftpConnector, Config $config)
     {
         $this->_createTableStatementsMigrationBuilder = $createTableStatementsMigrationBuilder;
         $this->_insertStatementsMigrationBuilder = $insertStatementsMigrationBuilder;
         $this->_deleteStatementsMigrationBuilder = $deleteStatementsMigrationBuilder;
-        $this->_io = new IO($path. Constants::DATABASE_MIGRATION_FILE);
+        $this->_ftpConnector = $ftpConnector;
+        $this->_filePath = $path. Constants::DATABASE_MIGRATION_FILE;
+        $this->_config = $config;
+        $this->_io = new IO($this->_filePath);
     }
 
     /**
@@ -88,8 +99,19 @@ class DatabaseMigrationBuilder
         $this->_io->write($convertedStatements);
     }
 
+    /**
+     * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder
+     */
     private function copyMigrationFileToProd(): void
     {
+        try {
+            $runner = $this->_ftpConnector->connect();
+            $file = new File($this->_filePath,
+                $this->_config->getFileServerConfiguration()->getPath(). Constants::DATABASE_MIGRATION_FILE_PROD);
+            $runner->copy($file);
+            $this->_ftpConnector->disconnect($runner->getConn());
+        }catch (Exception $e) {
+            throw new \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder("Couldn't copy migration file: $e");
+        }
     }
-
 }
