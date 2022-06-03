@@ -18,7 +18,6 @@ use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldDeploymentStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrationBuilder;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\FileServerCopier;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Timer;
@@ -32,19 +31,17 @@ class ReleaseStages
     private Versioning $_versioning;
     private BackupCreator $_backupCreator;
     private DatabaseMigrationBuilder $_databaseMigrationBuilder;
-    private FileServerCopier $_fileServerCopier;
     private StateSynchronizer $_stateSynchronizer;
 
     public function __construct(Timer $timer, ScriptFileSynchronizer $scriptFileSynchronizer, Versioning $versioning,
                                 BackupCreator $backupCreator, DatabaseMigrationBuilder $databaseMigrationBuilder,
-                                FileServerCopier $fileServerCopier, StateSynchronizer $stateSynchronizer)
+                                StateSynchronizer $stateSynchronizer)
     {
         $this->_timer = $timer;
         $this->_scriptFileSynchronizer = $scriptFileSynchronizer;
         $this->_versioning = $versioning;
         $this->_backupCreator = $backupCreator;
         $this->_databaseMigrationBuilder = $databaseMigrationBuilder;
-        $this->_fileServerCopier = $fileServerCopier;
         $this->_stateSynchronizer = $stateSynchronizer;
     }
 
