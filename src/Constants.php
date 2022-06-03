@@ -47,7 +47,9 @@ abstract class Constants
     public const BACKUP_DATABASE_SCRIPT_PROD = self::BACKUP_DIRECTORY_PROD. "/backup_database.sh";
     public const BACKUP_DATABASE_POLL_FILENAME = self::BACKUP_DIRECTORY_PROD. "/database_backup";
 
-    public const DATABASE_MIGRATION_FILE_PROD = "/migrations/database_migration.sql";
+    public const MIGRATION_DIRECTORY_PROD = "/migrations";
+
+    public const DATABASE_MIGRATION_FILE_PROD = self::MIGRATION_DIRECTORY_PROD. "/%timestamp%_database_migration.sql";
 
     public const STATE_SUCCESS = "SUCCESS";
     public const STATE_FAILURE = "FAILURE";

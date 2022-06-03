@@ -25,7 +25,7 @@ class IO {
     public function write(string $data): void
     {
         $this->createDirectoryIfNotExists();
-        echo file_put_contents($this->filePath, $data);
+        file_put_contents($this->filePath, $data);
     }
 
     private function createDirectoryIfNotExists(): void

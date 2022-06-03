@@ -64,7 +64,7 @@ class ReleaseStages
             $this->_versioning->generateNewVersionNumber($actualId);
             $this->_scriptFileSynchronizer->synchronize();
             $this->_backupCreator->create();
-            $this->_databaseMigrationBuilder->build();
+            $this->_databaseMigrationBuilder->buildAndCopy();
             $this->finishWithSuccess($actualId);
         }catch (OldDeploymentStateIsPending $e) {
             $this->finishWithOldStateIsPending($actualId);

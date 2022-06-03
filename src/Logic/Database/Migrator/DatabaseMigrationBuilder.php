@@ -52,7 +52,7 @@ class DatabaseMigrationBuilder
     /**
      * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder
      */
-    public function build(): void
+    public function buildAndCopy(): void
     {
         $this->createMigrationFile();
         $this->copyMigrationFileToProd();
@@ -84,7 +84,8 @@ class DatabaseMigrationBuilder
         return $this->combineStatements($createTableStatements, $insertStatements, $deleteStatements);
     }
 
-    private function combineStatements(array $createTableStatements, array $insertStatements, array $deleteStatements): array
+    private function combineStatements(array $createTableStatements, array $insertStatements,
+                                       array $deleteStatements): array
     {
         return array_merge($createTableStatements, $insertStatements, $deleteStatements);
     }
@@ -106,12 +107,25 @@ class DatabaseMigrationBuilder
     {
         try {
             $runner = $this->_ftpConnector->connect();
-            $file = new File($this->_filePath,
-                $this->_config->getFileServerConfiguration()->getPath(). Constants::DATABASE_MIGRATION_FILE_PROD);
+            $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
+            $file = $this->buildFile($fileServerConfigurationPath);
+            $runner->createDirectory($fileServerConfigurationPath. Constants::MIGRATION_DIRECTORY_PROD);
             $runner->copy($file);
             $this->_ftpConnector->disconnect($runner->getConn());
         }catch (Exception $e) {
             throw new \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder("Couldn't copy migration file: $e");
         }
+    }
+
+    private function buildFile(string $fileServerConfigurationPath): File
+    {
+        $fileProd = $this->buildFileProdPath($fileServerConfigurationPath);
+        return new File($this->_filePath, $fileProd);
+    }
+
+    private function buildFileProdPath(string $fileServerConfigurationPath): string
+    {
+        $fileProd = $fileServerConfigurationPath. Constants::DATABASE_MIGRATION_FILE_PROD;
+        return str_replace("%timestamp%", (string)time(), $fileProd);
     }
 }
