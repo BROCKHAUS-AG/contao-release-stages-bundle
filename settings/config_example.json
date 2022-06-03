@@ -10,7 +10,6 @@
       "tl_to_be_ignored_too"
     ]
   },
-  "copyTo": "fileServer",
   "fileServer": {
     "server": "mein-server.de",
     "path": "/var/www/html/contao",
@@ -25,9 +24,6 @@
       "password": "admin1234",
       "port": 22
     }
-  },
-  "local": {
-    "contaoProdPath": "/var/www/html/contao"
   },
   "maxSpendTimeWhileCreatingRelease": 120,
   "dnsRecords": [

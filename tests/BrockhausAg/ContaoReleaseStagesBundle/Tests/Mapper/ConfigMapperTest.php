@@ -20,7 +20,6 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecord;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ftp;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ssh;
 use Contao\TestCase\ContaoTestCase;
 
@@ -53,7 +52,6 @@ class ConfigMapperTest extends ContaoTestCase
                   "tl_to_be_ignored_too"
                 ]
               },
-              "copyTo": "fileServer",
               "fileServer": {
                 "server": "192.168.178.23",
                 "path": "test",
@@ -68,9 +66,6 @@ class ConfigMapperTest extends ContaoTestCase
                     "username": "admin",
                     "password": "admin1234"
                 }
-              },
-              "local": {
-                "contaoProdPath": "test"
               },
               "maxSpendTimeWhileCreatingRelease": 0,
               "dnsRecords": [
@@ -96,12 +91,11 @@ class ConfigMapperTest extends ContaoTestCase
         $expectedFtp = new Ftp(1234, "admin", "admin1234", false);
         $expectedSsh = new Ssh(1234, "admin", "admin1234");
         $expectedFileServer = new FileServer("192.168.178.23", "test", $expectedFtp, $expectedSsh);
-        $expectedLocal = new Local("test");
         $expectedDNSRecords = new DNSRecordCollection();
         $expectedDNSRecords->add(new DNSRecord("example-site", "www.example-site.de"));
         $expectedDNSRecords->add(new DNSRecord("example-site-better", "www.example-site-better.de"));
-        $expected = new Config($expectedDatabase, "fileServer", $expectedFileServer, $expectedLocal,
-            0, $expectedDNSRecords, array("jpg", "mp4", "MP4"));
+        $expected = new Config($expectedDatabase, $expectedFileServer, 0, $expectedDNSRecords,
+            array("jpg", "mp4", "MP4"));
         $mapper = new ConfigMapper();
 
         $actual = $mapper->map(json_decode($input));
@@ -112,7 +106,6 @@ class ConfigMapperTest extends ContaoTestCase
         self::assertSame($expectedDatabase->getUsername(), $actual->getDatabase()->getUsername());
         self::assertSame($expectedDatabase->getPassword(), $actual->getDatabase()->getPassword());
         self::assertSame($expectedDatabase->getIgnoredTables(), $actual->getDatabase()->getIgnoredTables());
-        self::assertSame($expected->getCopyTo(), $actual->getCopyTo());
         self::assertSame($expectedFileServer->getServer(), $actual->getFileServer()->getServer());
         self::assertSame($expectedFileServer->getPath(), $actual->getFileServer()->getPath());
         self::assertSame($expectedFtp->getPort(), $actual->getFileServer()->getFtp()->getPort());
@@ -122,7 +115,6 @@ class ConfigMapperTest extends ContaoTestCase
         self::assertSame($expectedFtp->getPort(), $actual->getFileServer()->getSsh()->getPort());
         self::assertSame($expectedFtp->getUsername(), $actual->getFileServer()->getSsh()->getUsername());
         self::assertSame($expectedFtp->getPassword(), $actual->getFileServer()->getSsh()->getPassword());
-        self::assertSame($expectedLocal->getContaoProdPath(), $actual->getLocal()->getContaoProdPath());
         for ($x = 0; $x != $expectedDNSRecords->getLength(); $x++) {
             self::assertSame($expectedDNSRecords->getByIndex($x)->getAlias(),
                 $actual->getDnsRecords()->getByIndex($x)->getAlias());

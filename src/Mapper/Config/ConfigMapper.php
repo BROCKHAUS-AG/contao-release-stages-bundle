@@ -14,13 +14,9 @@ class ConfigMapper extends Mapper {
         $databaseMapper = new DatabaseMapper();
         $database = $databaseMapper->map($data->database);
 
-        $copyTo = $data->copyTo;
 
         $fileServerMapper = new FileServerMapper();
         $fileServer = $fileServerMapper->map($data->fileServer);
-
-        $localMapper = new LocalMapper();
-        $local = $localMapper->map($data->local);
 
         $arrayOfDNSRecordsMapper = new DNSRecordCollectionMapper();
         $dnsRecords = $arrayOfDNSRecordsMapper->mapArray($data->dnsRecords);
@@ -29,7 +25,6 @@ class ConfigMapper extends Mapper {
 
         $fileFormats = $data->fileFormats;
 
-        return new Config($database, $copyTo, $fileServer, $local, $maxSpendTimeWhileCreatingRelease, $dnsRecords,
-            $fileFormats);
+        return new Config($database, $fileServer, $maxSpendTimeWhileCreatingRelease, $dnsRecords, $fileFormats);
     }
 }
