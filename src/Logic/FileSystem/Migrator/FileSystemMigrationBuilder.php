@@ -16,29 +16,64 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\Migrator;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Compress;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnection;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Compressor;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
+use Exception;
 
 class FileSystemMigrationBuilder
 {
     private string $_path;
     private Compressor $_compressor;
     private FTPConnector $_ftpConnector;
+    private Config $_config;
 
-    public function __construct(string $path, Compressor $compressor, FTPConnector $ftpConnector)
+    public function __construct(string $path, Compressor $compressor, FTPConnector $ftpConnector, Config $config)
     {
         $this->_path = $path;
         $this->_compressor = $compressor;
         $this->_ftpConnector = $ftpConnector;
+        $this->_config = $config;
+    }
+
+    /**
+     * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\Migrator\FileSystemMigrationBuilder
+     */
+    public function buildAndCopy(): void
+    {
+        $migrationFile = $this->_path. Constants::MIGRATION_DIRECTORY;
+        try {
+            $this->compressFiles($migrationFile);
+            $this->copy($migrationFile);
+        } catch (Exception $e) {
+            throw new \BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\Migrator\FileSystemMigrationBuilder("Couldn't create file system migration: $e");
+        }
     }
 
     /**
      * @throws Compress
      */
-    public function buildAndCopy(): void
+    private function compressFiles(string $migrationFile): void
     {
         $directory = $this->_path. "/files/content";
-        $migrationFile = $this->_path. Constants::MIGRATION_DIRECTORY;
         $this->_compressor->compress($directory, $migrationFile, Constants::FILE_SYSTEM_MIGRATION_FILE_NAME);
+    }
+
+    /**
+     * @throws FTPCopy
+     * @throws FTPConnection
+     */
+    private function copy(string $migrationFile): void
+    {
+        $runner = $this->_ftpConnector->connect();
+        $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
+        $file = new File(
+            "$migrationFile/". Constants::FILE_SYSTEM_MIGRATION_FILE_NAME,
+            $fileServerConfigurationPath. Constants::FILE_SYSTEM_MIGRATION_FILE_PROD
+        );
+        $runner->copy($file);
     }
 }
