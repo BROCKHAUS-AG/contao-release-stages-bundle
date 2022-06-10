@@ -18,7 +18,8 @@ use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\PollTimeout;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\Poller;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHRunner;
 use Exception;
@@ -29,7 +30,7 @@ class BackupCreator
     private Config $_config;
     private Poller $_poller;
 
-    public function __construct(SSHConnector $sshConnection, Config $config, Poller $poller)
+    public function __construct(SSHConnector $sshConnection, Config $config, RemoteFilePoller $poller)
     {
         $this->_sshConnection = $sshConnection;
         $this->_config = $config;

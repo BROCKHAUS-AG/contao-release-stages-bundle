@@ -17,20 +17,22 @@ use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\PollTimeout;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\SFTPRunner;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\Poller;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller;
 use Contao\TestCase\ContaoTestCase;
 use Exception;
 
 /**
- * Class PollerTest
+ * Class RemoteFilePollerTest
  *
  * @package BrockhausAg\ContaoReleaseStagesBundle\Logic\
  */
-class PollerTest extends ContaoTestCase
+class RemoteFilePollerTest extends ContaoTestCase
 {
     public function testInstantiation(): void
     {
-        self::assertInstanceOf(Poller::class, new Poller(self::createMock(FTPConnector::class)));
+        self::assertInstanceOf(Poller::class,
+            new RemoteFilePoller(self::createMock(FTPConnector::class)));
     }
 
     public function testPollFileWhenSuccessFileExistsBreak(): void
@@ -43,7 +45,7 @@ class PollerTest extends ContaoTestCase
             ->willReturn(true);
         $ftpConnectorMock->method("connect")->willReturn($sftpRunnerMock);
 
-        $poller = new Poller($ftpConnectorMock);
+        $poller = new RemoteFilePoller($ftpConnectorMock);
 
         try {
             $poller->pollFile("file");
@@ -72,7 +74,7 @@ class PollerTest extends ContaoTestCase
             ->willReturn(true);
         $ftpConnectorMock->method("connect")->willReturn($sftpRunnerMock);
 
-        $poller = new Poller($ftpConnectorMock);
+        $poller = new RemoteFilePoller($ftpConnectorMock);
         self::expectException(Poll::class);
         $poller->pollFile("file");
     }

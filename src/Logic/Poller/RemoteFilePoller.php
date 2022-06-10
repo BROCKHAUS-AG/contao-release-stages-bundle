@@ -12,14 +12,15 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\PollTimeout;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 
-class Poller {
+class RemoteFilePoller extends Poller
+{
     private FTPConnector $_ftpConnector;
 
     public function __construct(FTPConnector $ftpConnector)

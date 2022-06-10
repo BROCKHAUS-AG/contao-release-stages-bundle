@@ -120,18 +120,26 @@ services:
             - setUp: []
         shared: false
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\Compressor\Compressor:
-        arguments:
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
-
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller'
         shared: false
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller:
         arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector'
+        shared: false
+
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\LocalFilePoller:
+        shared: false
+
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Compressor:
+
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\Migrator\FileSystemMigrationBuilder:
+        arguments:
+            - '%kernel.project_dir%'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Compressor'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector'
         shared: false
