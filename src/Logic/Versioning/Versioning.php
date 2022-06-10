@@ -41,7 +41,7 @@ class Versioning {
      */
     public function generateNewVersionNumber(int $id): void
     {
-        if ($this->database->isTableEmpty(Constants::DEPLOYMENT_TABLE)) {
+        if ($this->database->hasTableOneRow(Constants::DEPLOYMENT_TABLE)) {
             $latestVersion = $this->createDummyVersion();
         }else {
             $latestVersion = $this->database->getLatestReleaseVersion();
