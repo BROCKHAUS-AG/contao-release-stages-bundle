@@ -54,6 +54,21 @@ class Database
     }
 
     /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws Exception
+     */
+    public function hasTableOneRow(string $table): bool
+    {
+        $result = $this->_dbConnection
+            ->createQueryBuilder()
+            ->select("*")
+            ->from($table)
+            ->execute()
+            ->fetchAllAssociative();
+        return count($result) == 1;
+    }
+
+    /**
      * @throws DatabaseQueryEmptyResult
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws Exception
