@@ -34,7 +34,13 @@ abstract class Constants
     public const BACKUP_FILE_SYSTEM_SCRIPT = self::BACKUP_DIRECTORY. "/backup_file_system.sh";
     public const BACKUP_DATABASE_SCRIPT = self::BACKUP_DIRECTORY. "/backup_database.sh";
 
-    public const DATABASE_MIGRATION_FILE = "/migrations/database_migration.sql";
+    public const LOCAL_DIRECTORY = self::SCRIPT_DIRECTORY. "/local";
+    public const CREATE_ARCHIVE_SCRIPT = self::LOCAL_DIRECTORY. "/create_archive.sh";
+
+    public const MIGRATION_DIRECTORY = "/migrations";
+
+    public const DATABASE_MIGRATION_FILE = self::MIGRATION_DIRECTORY. "/database_migration.sql";
+    public const FILE_SYSTEM_MIGRATION_FILE_NAME = "file_system_migration";
 
 
     public const SCRIPT_DIRECTORY_PROD = "/scripts";

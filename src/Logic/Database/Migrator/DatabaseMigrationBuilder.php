@@ -44,8 +44,8 @@ class DatabaseMigrationBuilder
         $this->_insertStatementsMigrationBuilder = $insertStatementsMigrationBuilder;
         $this->_deleteStatementsMigrationBuilder = $deleteStatementsMigrationBuilder;
         $this->_ftpConnector = $ftpConnector;
-        $this->_filePath = $path. Constants::DATABASE_MIGRATION_FILE;
         $this->_config = $config;
+        $this->_filePath = $path. Constants::DATABASE_MIGRATION_FILE;
         $this->_io = new IO($this->_filePath);
     }
 

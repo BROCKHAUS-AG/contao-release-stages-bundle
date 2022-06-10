@@ -18,6 +18,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldDeploymentStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrationBuilder;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\Migrator\FileSystemMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Timer;
@@ -31,10 +32,12 @@ class ReleaseStages
     private Versioning $_versioning;
     private BackupCreator $_backupCreator;
     private DatabaseMigrationBuilder $_databaseMigrationBuilder;
+    private FileSystemMigrationBuilder $_fileSystemMigrationBuilder;
     private StateSynchronizer $_stateSynchronizer;
 
     public function __construct(Timer $timer, ScriptFileSynchronizer $scriptFileSynchronizer, Versioning $versioning,
                                 BackupCreator $backupCreator, DatabaseMigrationBuilder $databaseMigrationBuilder,
+                                FileSystemMigrationBuilder $fileSystemMigrationBuilder,
                                 StateSynchronizer $stateSynchronizer)
     {
         $this->_timer = $timer;
@@ -42,6 +45,7 @@ class ReleaseStages
         $this->_versioning = $versioning;
         $this->_backupCreator = $backupCreator;
         $this->_databaseMigrationBuilder = $databaseMigrationBuilder;
+        $this->_fileSystemMigrationBuilder = $fileSystemMigrationBuilder;
         $this->_stateSynchronizer = $stateSynchronizer;
     }
 
@@ -62,6 +66,7 @@ class ReleaseStages
             $this->_scriptFileSynchronizer->synchronize();
             $this->_backupCreator->create();
             $this->_databaseMigrationBuilder->buildAndCopy();
+            $this->_fileSystemMigrationBuilder->buildAndCopy();
             $this->finishWithSuccess($actualId);
         }catch (OldDeploymentStateIsPending $e) {
             $this->finishWithOldStateIsPending($actualId);
