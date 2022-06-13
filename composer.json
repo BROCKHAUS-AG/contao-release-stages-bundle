@@ -1,5 +1,5 @@
 {
-    "version": "dev-master",
+    "version": "1.0.7",
     "name": "brockhaus-ag/contao-release-stages-bundle",
     "description": "Mit dem Contao Release Stages Bundle der BROCKHAUS AG kannst DU ganz einfach Releases erstellen und auf Deiner Prod-Stage hochladen.",
     "keywords": [
