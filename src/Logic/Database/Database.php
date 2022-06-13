@@ -232,23 +232,6 @@ class Database
     }
 
     /**
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Driver\Exception
-     */
-    public function getRowsFromTlLogTableWhereIdIsBiggerThanIdAndTextIsLikeDeleteFrom(int $lastId): array
-    {
-        return $this->_dbConnection
-            ->createQueryBuilder()
-            ->select("text")
-            ->from("tl_log")
-            ->where("id > :id")
-            ->andWhere("text LIKE 'DELETE FROM %'")
-            ->setParameter("id", $lastId)
-            ->execute()
-            ->fetchAllAssociative();
-    }
-
-    /**
      * @throws DatabaseQueryEmptyResult
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception

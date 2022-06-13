@@ -81,25 +81,6 @@ class DatabaseProd
         return false;
     }
 
-    /**
-     * @throws DatabaseQueryEmptyResult
-     */
-    public function getLastIdFromTlLogTable(): int
-    {
-        $table = $this->_databaseName. ".tl_log";
-        $statement = $this->_conn
-            ->prepare("SELECT id FROM ? ORDER BY id DESC LIMIT 1");
-
-        try {
-            $statement->execute(array($table));
-            $result = $statement->fetch();
-        }catch (PDOException $e) {
-            throw new DatabaseQueryEmptyResult($e->getMessage());
-        }
-
-        return intval($result["id"]);
-    }
-
     private function getDatabaseConfiguration(): Database
     {
         return $this->_config->getDatabaseConfiguration();

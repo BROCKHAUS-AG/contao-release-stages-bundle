@@ -16,7 +16,6 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\CreateTableMigrationBuilder;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DeleteMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\InsertMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
@@ -29,20 +28,17 @@ class DatabaseMigrationBuilder
 {
     private CreateTableStatementsMigrationBuilder $_createTableStatementsMigrationBuilder;
     private InsertStatementsMigrationBuilder $_insertStatementsMigrationBuilder;
-    private DeleteStatementsMigrationBuilder $_deleteStatementsMigrationBuilder;
     private string $_filePath;
     private FTPConnector $_ftpConnector;
     private Config $_config;
     private IO $_io;
 
     public function __construct(CreateTableStatementsMigrationBuilder $createTableStatementsMigrationBuilder,
-                                InsertStatementsMigrationBuilder $insertStatementsMigrationBuilder,
-                                DeleteStatementsMigrationBuilder $deleteStatementsMigrationBuilder, string $path,
+                                InsertStatementsMigrationBuilder $insertStatementsMigrationBuilder, string $path,
                                 FTPConnector $ftpConnector, Config $config)
     {
         $this->_createTableStatementsMigrationBuilder = $createTableStatementsMigrationBuilder;
         $this->_insertStatementsMigrationBuilder = $insertStatementsMigrationBuilder;
-        $this->_deleteStatementsMigrationBuilder = $deleteStatementsMigrationBuilder;
         $this->_ftpConnector = $ftpConnector;
         $this->_config = $config;
         $this->_filePath = $path. Constants::DATABASE_MIGRATION_FILE;
@@ -73,21 +69,18 @@ class DatabaseMigrationBuilder
 
     /**
      * @throws InsertMigrationBuilder
-     * @throws DeleteMigrationBuilder
      * @throws CreateTableMigrationBuilder
      */
     private function buildStatements(): array
     {
         $createTableStatements = $this->_createTableStatementsMigrationBuilder->build();
         $insertStatements = $this->_insertStatementsMigrationBuilder->build();
-        $deleteStatements = $this->_deleteStatementsMigrationBuilder->build();
-        return $this->combineStatements($createTableStatements, $insertStatements, $deleteStatements);
+        return $this->combineStatements($createTableStatements, $insertStatements);
     }
 
-    private function combineStatements(array $createTableStatements, array $insertStatements,
-                                       array $deleteStatements): array
+    private function combineStatements(array $createTableStatements, array $insertStatements): array
     {
-        return array_merge($createTableStatements, $insertStatements, $deleteStatements);
+        return array_merge($createTableStatements, $insertStatements);
     }
 
     private function saveStatementsToMigrationFile(array $statements): void
