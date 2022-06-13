@@ -1,29 +1,31 @@
 {
-  "contaoPath": "/var/www/html/contao/",
   "database": {
-    "server": "192.168.0.2",
-    "name": "prodContao",
+    "server": "meine-db.de",
+    "name": "contao",
     "port": 3306,
-    "username": "prodContao",
+    "username": "admin",
     "password": "admin1234",
     "ignoredTables": [
       "tl_to_be_ignored",
       "tl_to_be_ignored_too"
-    ],
-    "testStageDatabaseName": "testContao"
+    ]
   },
-  "copyTo": "fileServer",
   "fileServer": {
-    "server": "",
-    "port": "",
-    "username": "",
-    "password": "",
-    "ssl_tsl": false,
-    "path": ""
+    "server": "mein-server.de",
+    "path": "/var/www/html/contao",
+    "ftp": {
+      "username": "admin",
+      "password": "admin1234",
+      "port": 22,
+      "ssl": true
+    },
+    "ssh": {
+      "username": "admin",
+      "password": "admin1234",
+      "port": 22
+    }
   },
-  "local": {
-    "contaoProdPath": "/var/www/html/contao/filesProd/"
-  },
+  "maxSpendTimeWhileCreatingRelease": 120,
   "dnsRecords": [
     {
       "alias": "example-site",

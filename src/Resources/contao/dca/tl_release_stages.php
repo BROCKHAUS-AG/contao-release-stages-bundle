@@ -12,12 +12,10 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\CopyToDatabaseLogic;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseLogic;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileServer\CopyToFileServerLogic;
-use Contao\Backend;
+use BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 
-$GLOBALS['TL_DCA']['tl_release_stages'] = array(
+$GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
     'config' => array(
         'dataContainer' => 'Table',
         'enableVersioning' => true,
@@ -27,8 +25,7 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
             )
         ),
         'onsubmit_callback' => array(
-            array('tl_release_stages', 'changeVersionNumber'),
-            array('tl_release_stages', 'copy')
+            array(ReleaseStages::class, 'onSubmitCallback'),
         )
     ),
     'list' => array(
@@ -45,7 +42,7 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
         ),
         'operations' => array(
             'show' => array(
-                'label'      => &$GLOBALS['TL_LANG']['tl_release_stages']['show'],
+                'label'      => &$GLOBALS['TL_LANG'][Constants::DEPLOYMENT_TABLE]['show'],
                 'href'       => 'act=show',
                 'icon'       => 'show.gif',
                 'attributes' => 'style="margin-right:3px"'
@@ -65,7 +62,7 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
         'kindOfRelease' => array(
             'inputType' => 'select',
             'options' => array('release', 'majorRelease'),
-            'reference' => &$GLOBALS['TL_LANG']['tl_release_stages']['kindOfReleaseOptions'],
+            'reference' => &$GLOBALS['TL_LANG'][Constants::DEPLOYMENT_TABLE]['kindOfReleaseOptions'],
             'exclude' => true,
             'search' => true,
             'filter' => true,
@@ -93,6 +90,9 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
             'flag' => 1,
             'eval' => array('mandatory' => true, 'maxlength' => 1024, 'tl_class' => 'clr w50'),
             'sql' => ['type' => 'string', 'length' => '1024', 'default' => '']
+        ),
+        'state' => array(
+            'sql' => ['type' => 'string', 'length' => '14', 'default' => Constants::STATE_PENDING]
         )
     ),
     'palettes' => array(
@@ -100,60 +100,3 @@ $GLOBALS['TL_DCA']['tl_release_stages'] = array(
         'default' => 'kindOfRelease,title,description'
     )
 );
-
-class tl_release_stages extends Backend
-{
-    private DatabaseLogic $_databaseLogic;
-    private CopyToDatabaseLogic $_copyToDatabaseLogic;
-    private CopyToFileServerLogic $_copyToFileServerLogic;
-
-    public function __construct()
-    {
-        $this->_databaseLogic = new DatabaseLogic();
-        $this->_copyToDatabaseLogic = new CopyToDatabaseLogic();
-        $this->_copyToFileServerLogic = new CopyToFileServerLogic();
-    }
-
-    public function changeVersionNumber() : void
-    {
-        $release_stages = $this->_databaseLogic->getLastRows(2, array("id", "version", "kindOfRelease"),
-            "tl_release_stages");
-        $actualId = $release_stages->id;
-        $kindOfRelease = $release_stages->kindOfRelease;
-
-        $counter = $this->_databaseLogic->countRows($release_stages);
-        $oldVersion = $release_stages->version;
-
-        $newVersion = $this->createVersion($counter, $oldVersion, $kindOfRelease);
-
-        $this->_databaseLogic->updateVersion($actualId, $newVersion);
-    }
-
-    private function createVersion(int $counter, string $oldVersion, string $kindOfRelease) : string
-    {
-        if ($counter > 0) {
-            $version = explode(".", $oldVersion);
-            if (strcmp($kindOfRelease, "release") == 0) {
-                return $this->createRelease($version);
-            }
-            return $this->createMajorRelease($version);
-        }
-        return "1.0";
-    }
-
-    private function createRelease(array $version) : string
-    {
-        return $version[0]. ".". intval($version[1]+1);
-    }
-
-    private function createMajorRelease(array $version) : string
-    {
-        return intval($version[0]+1). ".0";
-    }
-
-    public function copy() : void
-    {
-        $this->_copyToDatabaseLogic->copyToDatabase();
-        $this->_copyToFileServerLogic->copyToFileServer();
-    }
-}

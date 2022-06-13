@@ -12,21 +12,18 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Model;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Contao\Model;
 
 /**
- * Class BrockhausAgContaoReleaseStagesBundle
+ * Class ReleaseStages
+ *
+ * @package BrockhausAg\ContaoReleaseStagesBundle\Model
  */
-class BrockhausAgContaoReleaseStagesBundle extends Bundle
+class ReleaseStages extends Model
 {
-	/**
-	 * {@inheritdoc}
-	 */
-	public function build(ContainerBuilder $container): void
-	{
-		parent::build($container);
-	}
+    protected static $strTable = 'tl_release_stages';
+
 }
+
