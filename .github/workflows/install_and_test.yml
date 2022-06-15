@@ -1,4 +1,4 @@
-name: PHP Composer
+name: Install and test
 
 on:
     push:
