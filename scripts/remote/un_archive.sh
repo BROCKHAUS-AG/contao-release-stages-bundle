@@ -4,7 +4,7 @@
 
 source "$(dirname $0)/../create_state.sh"
 
-while getopts u:p:h:d:t: flag
+while getopts f:e: flag
 do
   case "${flag}" in
     f) file=${OPTARG};;
