@@ -40,6 +40,7 @@ abstract class Constants
     public const MIGRATION_DIRECTORY = "/migrations";
 
     public const DATABASE_MIGRATION_FILE = self::MIGRATION_DIRECTORY. "/database_migration.sql";
+    public const DATABASE_MIGRATION_FILE_COMPRESSED = "database_migration";
     public const FILE_SYSTEM_MIGRATION_FILE_NAME = "file_system_migration";
 
 
@@ -55,7 +56,7 @@ abstract class Constants
 
     public const MIGRATION_DIRECTORY_PROD = "/migrations";
 
-    public const DATABASE_MIGRATION_FILE_PROD = self::MIGRATION_DIRECTORY_PROD. "/%timestamp%_database_migration.sql";
+    public const DATABASE_MIGRATION_FILE_PROD = self::MIGRATION_DIRECTORY_PROD. "/%timestamp%_database_migration.tar.gz";
     public const FILE_SYSTEM_MIGRATION_FILE_PROD = self::MIGRATION_DIRECTORY_PROD. "/%timestamp%_file_system_migration.tar.gz";
 
     public const STATE_SUCCESS = "SUCCESS";
