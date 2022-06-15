@@ -28,8 +28,10 @@ create_pending_file() {
 
 # parameter 1 should be the path
 create_finish_success_file() {
-   delete_file "$1$PENDING_FILE"
-   write_state "$1$SUCCESS_FILE"
+   if [ ! -f "$1$FAILURE_FILE" ]; then
+     delete_file "$1$PENDING_FILE"
+     write_state "$1$SUCCESS_FILE"
+   fi
 }
 
 # parameter 1 should be the path
