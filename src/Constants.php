@@ -30,7 +30,8 @@ abstract class Constants
 
     public const CREATE_STATE_SCRIPT = self::SCRIPT_DIRECTORY. "/create_state.sh";
 
-    public const BACKUP_DIRECTORY = self::SCRIPT_DIRECTORY. "/backup";
+    public const REMOTE_DIRECTORY = self::SCRIPT_DIRECTORY. "/remote";
+    public const BACKUP_DIRECTORY = self::REMOTE_DIRECTORY. "/backup";
     public const BACKUP_FILE_SYSTEM_SCRIPT = self::BACKUP_DIRECTORY. "/backup_file_system.sh";
     public const BACKUP_DATABASE_SCRIPT = self::BACKUP_DIRECTORY. "/backup_database.sh";
 
