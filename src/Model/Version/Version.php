@@ -51,8 +51,8 @@ class Version
      */
     private function checkState(): void
     {
-        if(Constants::STATE_SUCCESS != $this->state && Constants::STATE_FAILURE != $this->state &&
-            Constants::STATE_PENDING != $this->state && Constants::STATE_OLD_PENDING != $this->state)
+        if(Constants::DEPLOYMENT_SUCCESS != $this->state && Constants::DEPLOYMENT_FAILURE != $this->state &&
+            Constants::DEPLOYMENT_PENDING != $this->state && Constants::DEPLOYMENT_OLD_PENDING != $this->state)
         {
             throw new Validation("\"$this->state\" is not a valid state");
         }

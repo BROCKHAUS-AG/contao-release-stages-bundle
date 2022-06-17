@@ -16,7 +16,6 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldDeploymentStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 use Doctrine\DBAL\Exception;
 
@@ -40,15 +39,12 @@ class StateSynchronizer
     }
 
     /**
-     * @throws OldDeploymentStateIsPending
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws Exception
      */
-    public function breakDeploymentIfOldDeploymentIsPending(int $actualId): void
+    public function checkIfOldDeploymentIsPending(int $actualId): bool
     {
-        if ($this->isOldDeploymentPending($actualId)) {
-            throw new OldDeploymentStateIsPending("An old release is pending");
-        }
+        return $this->isOldDeploymentPending($actualId);
     }
 
     /**

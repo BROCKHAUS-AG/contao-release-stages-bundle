@@ -54,7 +54,7 @@ class Versioning {
      */
     private function createDummyVersion(): Version
     {
-        return new Version(0, "majorRelease", "0.0", Constants::STATE_PENDING);
+        return new Version(0, "majorRelease", "0.0", Constants::DEPLOYMENT_PENDING);
     }
 
     /**

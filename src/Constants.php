@@ -60,8 +60,8 @@ abstract class Constants
     public const DATABASE_MIGRATION_FILE_PROD = self::MIGRATION_DIRECTORY_PROD. "/%timestamp%_database_migration.tar.gz";
     public const FILE_SYSTEM_MIGRATION_FILE_PROD = self::MIGRATION_DIRECTORY_PROD. "/%timestamp%_file_system_migration.tar.gz";
 
-    public const STATE_SUCCESS = "SUCCESS";
-    public const STATE_FAILURE = "FAILURE";
-    public const STATE_PENDING = "PENDING";
-    public const STATE_OLD_PENDING = "OLD_PENDING";
+    public const DEPLOYMENT_SUCCESS = "SUCCESS";
+    public const DEPLOYMENT_FAILURE = "FAILURE";
+    public const DEPLOYMENT_PENDING = "PENDING";
+    public const DEPLOYMENT_OLD_PENDING = "OLD_PENDING";
 }

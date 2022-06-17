@@ -32,15 +32,15 @@ class Finisher {
      */
     public function finishWithSuccess(int $actualId): void
     {
-        $this->_stateSynchronizer->updateState(Constants::STATE_SUCCESS, $actualId);
+        $this->_stateSynchronizer->updateState(Constants::DEPLOYMENT_SUCCESS, $actualId);
     }
 
     /**
      * @throws Exception
      */
-    public function finishWithOldStateIsPending(int $actualId): void
+    public function finishWithOldDeploymentIsPending(int $actualId): void
     {
-        $this->_stateSynchronizer->updateState(Constants::STATE_OLD_PENDING, $actualId);
+        $this->_stateSynchronizer->updateState(Constants::DEPLOYMENT_OLD_PENDING, $actualId);
     }
 
     /**
@@ -48,6 +48,6 @@ class Finisher {
      */
     public function finishWithFailure(int $actualId): void
     {
-        $this->_stateSynchronizer->updateState(Constants::STATE_FAILURE, $actualId);
+        $this->_stateSynchronizer->updateState(Constants::DEPLOYMENT_FAILURE, $actualId);
     }
 }

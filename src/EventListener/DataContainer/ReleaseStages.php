@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Constants;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldDeploymentStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\Migrator\FileSystemMigrationBuilder;
@@ -64,17 +62,16 @@ class ReleaseStages
         $this->_timer->start();
         $actualId = $this->_stateSynchronizer->getActualId();
         try {
-            $this->_stateSynchronizer->breakDeploymentIfOldDeploymentIsPending($actualId);
+            if ($this->_stateSynchronizer->checkIfOldDeploymentIsPending($actualId)) {
+                $this->_finisher->finishWithOldDeploymentIsPending($actualId);
+                return;
+            }
             $this->_versioning->generateNewVersionNumber($actualId);
             $this->_scriptFileSynchronizer->synchronize();
             $this->_backupCreator->create();
             $this->_databaseMigrationBuilder->buildAndCopy();
             $this->_fileSystemMigrationBuilder->buildAndCopy();
             $this->_finisher->finishWithSuccess($actualId);
-        }catch (OldDeploymentStateIsPending $e) {
-            $this->_finisher->finishWithOldStateIsPending($actualId);
-            // ToDo: die is only for development
-            die($e);
         }catch (Exception $e) {
             $this->_finisher->finishWithFailure($actualId);
             // ToDo: die is only for development
