@@ -19,6 +19,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldDeploymentStateIsPe
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\Migrator\FileSystemMigrationBuilder;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Finisher;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Timer;
@@ -34,11 +35,12 @@ class ReleaseStages
     private DatabaseMigrationBuilder $_databaseMigrationBuilder;
     private FileSystemMigrationBuilder $_fileSystemMigrationBuilder;
     private StateSynchronizer $_stateSynchronizer;
+    private Finisher $_finisher;
 
     public function __construct(Timer $timer, ScriptFileSynchronizer $scriptFileSynchronizer, Versioning $versioning,
                                 BackupCreator $backupCreator, DatabaseMigrationBuilder $databaseMigrationBuilder,
                                 FileSystemMigrationBuilder $fileSystemMigrationBuilder,
-                                StateSynchronizer $stateSynchronizer)
+                                StateSynchronizer $stateSynchronizer, Finisher $finisher)
     {
         $this->_timer = $timer;
         $this->_scriptFileSynchronizer = $scriptFileSynchronizer;
@@ -47,6 +49,7 @@ class ReleaseStages
         $this->_databaseMigrationBuilder = $databaseMigrationBuilder;
         $this->_fileSystemMigrationBuilder = $fileSystemMigrationBuilder;
         $this->_stateSynchronizer = $stateSynchronizer;
+        $this->_finisher = $finisher;
     }
 
     /**
@@ -67,41 +70,17 @@ class ReleaseStages
             $this->_backupCreator->create();
             $this->_databaseMigrationBuilder->buildAndCopy();
             $this->_fileSystemMigrationBuilder->buildAndCopy();
-            $this->finishWithSuccess($actualId);
+            $this->_finisher->finishWithSuccess($actualId);
         }catch (OldDeploymentStateIsPending $e) {
-            $this->finishWithOldStateIsPending($actualId);
+            $this->_finisher->finishWithOldStateIsPending($actualId);
             // ToDo: die is only for development
             die($e);
         }catch (Exception $e) {
-            $this->finishWithFailure($actualId);
+            $this->_finisher->finishWithFailure($actualId);
             // ToDo: die is only for development
             die($e);
         }
         // ToDo: die is only for development
         die;
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
-    private function finishWithSuccess(int $actualId): void
-    {
-        $this->_stateSynchronizer->updateState(Constants::STATE_SUCCESS, $actualId);
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
-    private function finishWithOldStateIsPending(int $actualId): void
-    {
-        $this->_stateSynchronizer->updateState(Constants::STATE_OLD_PENDING, $actualId);
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
-    private function finishWithFailure(int $actualId): void
-    {
-        $this->_stateSynchronizer->updateState(Constants::STATE_FAILURE, $actualId);
     }
 }
