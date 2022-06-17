@@ -46,6 +46,7 @@ services:
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Finisher:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
 
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages:
         arguments:

@@ -14,6 +14,11 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnection;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Synchronize;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\Migrator\FileSystemMigrationBuilder;
@@ -62,22 +67,37 @@ class ReleaseStages
         $this->_timer->start();
         $actualId = $this->_stateSynchronizer->getActualId();
         try {
-            if ($this->_stateSynchronizer->isOldDeploymentPending($actualId)) {
-                $this->_finisher->finishWithOldDeploymentIsPending($actualId);
+            $buildSucceeded = $this->buildDeployment($actualId);
+            if (!$buildSucceeded) {
                 return;
             }
-            $this->_versioning->generateNewVersionNumber($actualId);
-            $this->_scriptFileSynchronizer->synchronize();
-            $this->_backupCreator->create();
-            $this->_databaseMigrationBuilder->buildAndCopy();
-            $this->_fileSystemMigrationBuilder->buildAndCopy();
+            $this->deployNewRelease();
             $this->_finisher->finishWithSuccess($actualId);
-        }catch (Exception $e) {
-            $this->_finisher->finishWithFailure($actualId);
-            // ToDo: die is only for development
-            die($e);
+        }catch (Exception | \Doctrine\DBAL\Driver\Exception $e) {
+            $this->_finisher->finishWithFailure($actualId, $e);
         }
-        // ToDo: die is only for development
-        die;
+    }
+
+    /**
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    private function buildDeployment(int $actualId): bool
+    {
+        if ($this->_stateSynchronizer->isOldDeploymentPending($actualId)) {
+            $this->_finisher->finishWithOldDeploymentIsPending($actualId);
+            return false;
+        }
+        $this->_versioning->generateNewVersionNumber($actualId);
+        $this->_scriptFileSynchronizer->synchronize();
+        $this->_backupCreator->create();
+        $this->_databaseMigrationBuilder->buildAndCopy();
+        $this->_fileSystemMigrationBuilder->buildAndCopy();
+        return true;
+    }
+
+    private function deployNewRelease(): void
+    {
+
     }
 }

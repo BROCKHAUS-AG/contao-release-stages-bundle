@@ -16,38 +16,44 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer;
-use Doctrine\DBAL\Exception;
+use Exception;
 
 class Finisher {
     private StateSynchronizer $_stateSynchronizer;
+    private Logger $_logger;
 
-    public function __construct(StateSynchronizer $stateSynchronizer)
+    public function __construct(StateSynchronizer $stateSynchronizer, Logger $logger)
     {
         $this->_stateSynchronizer = $stateSynchronizer;
+        $this->_logger = $logger;
     }
 
     /**
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     public function finishWithSuccess(int $actualId): void
     {
         $this->_stateSynchronizer->updateState(Constants::DEPLOYMENT_SUCCESS, $actualId);
+        $this->_logger->info("Successfully deployed new version.");
     }
 
     /**
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     public function finishWithOldDeploymentIsPending(int $actualId): void
     {
         $this->_stateSynchronizer->updateState(Constants::DEPLOYMENT_OLD_PENDING, $actualId);
+        $this->_logger->info("Old deployment is pending, could not create new release.");
     }
 
     /**
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function finishWithFailure(int $actualId): void
+    public function finishWithFailure(int $actualId, $exception): void
     {
         $this->_stateSynchronizer->updateState(Constants::DEPLOYMENT_FAILURE, $actualId);
+        $this->_logger->error("Deployment failed: ". $exception->getMessage());
     }
 }
