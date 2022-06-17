@@ -42,9 +42,9 @@ class StateSynchronizer
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws Exception
      */
-    public function checkIfOldDeploymentIsPending(int $actualId): bool
+    public function isOldDeploymentPending(int $actualId): bool
     {
-        return $this->isOldDeploymentPending($actualId);
+        return $this->_database->isOldDeploymentPending($actualId);
     }
 
     /**
@@ -53,14 +53,5 @@ class StateSynchronizer
     public function updateState(string $state, int $id): void
     {
         $this->_database->updateState($state, $id);
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws Exception
-     */
-    private function isOldDeploymentPending(int $actualId): bool
-    {
-        return $this->_database->isOldDeploymentPending($actualId);
     }
 }

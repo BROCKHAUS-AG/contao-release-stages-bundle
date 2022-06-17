@@ -62,7 +62,7 @@ class ReleaseStages
         $this->_timer->start();
         $actualId = $this->_stateSynchronizer->getActualId();
         try {
-            if ($this->_stateSynchronizer->checkIfOldDeploymentIsPending($actualId)) {
+            if ($this->_stateSynchronizer->isOldDeploymentPending($actualId)) {
                 $this->_finisher->finishWithOldDeploymentIsPending($actualId);
                 return;
             }
