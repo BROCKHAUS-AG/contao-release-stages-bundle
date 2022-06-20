@@ -37,8 +37,8 @@ $GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
             'panelLayout' => 'sort,search,limit'
         ),
         'label' => array(
-            'fields' => array('version', 'title'),
-            'format' => '[ %s ] - %s'
+            'fields' => array('version', 'state', 'title'),
+            'format' => 'v%s - %s - %s'
         ),
         'operations' => array(
             'show' => array(
@@ -51,12 +51,15 @@ $GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
     ),
     'fields' => array(
         'id' => array(
+            'search' => true,
             'sql' => ['type' => 'integer', 'length' => '10', 'unsigned' => true, 'autoincrement' => true]
         ),
         'tstamp' => array(
+            'search' => true,
             'sql' => ['type' => 'integer', 'length' => '10', 'unsigned' => true, 'default' => 0]
         ),
         'version' => array(
+            'search' => true,
             'sql' => ['type' => 'string', 'length' => '255', 'default' => 'None']
         ),
         'kindOfRelease' => array(
@@ -92,6 +95,7 @@ $GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
             'sql' => ['type' => 'string', 'length' => '1024', 'default' => '']
         ),
         'state' => array(
+            'search' => true,
             'sql' => ['type' => 'string', 'length' => '14', 'default' => Constants::DEPLOYMENT_PENDING]
         )
     ),
