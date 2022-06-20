@@ -35,7 +35,7 @@ class FileSystemDeployer
         try {
             $path = $this->_config->getFileServerConfiguration()->getPath();
             $name = Constants::FILE_SYSTEM_MIGRATION_FILE_NAME;
-            $file = $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%_", "*",Constants::FILE_SYSTEM_MIGRATION_FILE_PROD));
+            $file = $this->getFilePath($runner, $path);
             $this->extractFileSystem($file, $path, $runner, $name);
             $this->_poller->pollFile("$path". Constants::SCRIPT_DIRECTORY_PROD. "/un_archive_$name");
         } catch (Exception $e) {
@@ -43,6 +43,12 @@ class FileSystemDeployer
         }finally {
             $this->_sshConnection->disconnect();
         }
+    }
+
+    private function getFilePath(SSHRunner $runner, string $path): string
+    {
+        return $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%_", "*",
+                Constants::FILE_SYSTEM_MIGRATION_FILE_PROD));
     }
 
     private function extractFileSystem(string $file, string $path, SSHRunner $runner, string $name): void
