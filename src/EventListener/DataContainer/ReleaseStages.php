@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseDeployment;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\FileSystemDeployment;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnection;
@@ -21,6 +22,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Synchronize;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseDeployer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\FileSystemDeployer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\Migrator\FileSystemMigrationBuilder;
@@ -41,13 +43,14 @@ class ReleaseStages
     private FileSystemMigrationBuilder $_fileSystemMigrationBuilder;
     private StateSynchronizer $_stateSynchronizer;
     private FileSystemDeployer $_fileSystemDeployer;
+    private DatabaseDeployer $_databaseDeployer;
     private Finisher $_finisher;
 
     public function __construct(Timer $timer, ScriptFileSynchronizer $scriptFileSynchronizer, Versioning $versioning,
                                 BackupCreator $backupCreator, DatabaseMigrationBuilder $databaseMigrationBuilder,
                                 FileSystemMigrationBuilder $fileSystemMigrationBuilder,
                                 StateSynchronizer $stateSynchronizer, FileSystemDeployer $fileSystemDeployer,
-                                Finisher $finisher)
+                                DatabaseDeployer $databaseDeployer, Finisher $finisher)
     {
         $this->_timer = $timer;
         $this->_scriptFileSynchronizer = $scriptFileSynchronizer;
@@ -57,6 +60,7 @@ class ReleaseStages
         $this->_fileSystemMigrationBuilder = $fileSystemMigrationBuilder;
         $this->_stateSynchronizer = $stateSynchronizer;
         $this->_fileSystemDeployer = $fileSystemDeployer;
+        $this->_databaseDeployer = $databaseDeployer;
         $this->_finisher = $finisher;
     }
 
@@ -104,9 +108,11 @@ class ReleaseStages
     /**
      * @throws FileSystemDeployment
      * @throws SSHConnection
+     * @throws DatabaseDeployment
      */
     private function deployNewRelease(): void
     {
         $this->_fileSystemDeployer->deploy();
+        $this->_databaseDeployer->deploy();
     }
 }

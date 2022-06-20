@@ -12,10 +12,10 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\FileSystemDeployment;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseDeployment;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\Poller;
@@ -24,7 +24,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHRunner;
 use Exception;
 
-class FileSystemDeployer
+class DatabaseDeployer
 {
     private SSHConnector $_sshConnection;
     private Poller $_poller;
@@ -39,19 +39,19 @@ class FileSystemDeployer
 
     /**
      * @throws SSHConnection
-     * @throws FileSystemDeployment
+     * @throws DatabaseDeployment
      */
     public function deploy(): void
     {
         $runner = $this->_sshConnection->connect();
         try {
             $path = $this->_config->getFileServerConfiguration()->getPath();
-            $name = Constants::FILE_SYSTEM_MIGRATION_FILE_NAME;
+            $name = Constants::DATABASE_MIGRATION_FILE_PROD;
             $file = $this->getFilePath($runner, $path, $name);
-            $this->extractFileSystem($file, $path, $runner, $name);
+
             $this->_poller->pollFile("$path". Constants::SCRIPT_DIRECTORY_PROD. "/un_archive_$name");
         } catch (Exception $e) {
-            throw new FileSystemDeployment("Couldn't deploy file system: $e");
+            throw new DatabaseDeployment("Couldn't deploy file system: $e");
         }finally {
             $this->_sshConnection->disconnect();
         }
@@ -63,19 +63,4 @@ class FileSystemDeployer
                 $name));
     }
 
-    private function extractFileSystem(string $file, string $path, SSHRunner $runner, string $name): void
-    {
-        $tags = $this->createTags($file, $path, $name);
-        $scriptPath = "$path". Constants::UN_ARCHIVE_SCRIPT_PROD;
-        $runner->executeBackgroundScript($scriptPath, $tags);
-    }
-
-    private function createTags(string $file, string $path, string $name): array
-    {
-        return array(
-            "-f \"$file\"",
-            "-e \"$path/files/content\"",
-            "-n \"$name\""
-        );
-    }
 }
