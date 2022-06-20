@@ -23,7 +23,7 @@ mkdir -p "$final_path"
 
 FILE_SYSTEM_PATH="$final_path/$(date +%s).tar.gz"
 {
-  tar -zcvf $FILE_SYSTEM_PATH $from_path
+  tar czf $FILE_SYSTEM_PATH --directory=$from_path .
 } || {
   create_finish_failure_file "$STATE_FILE"
 }

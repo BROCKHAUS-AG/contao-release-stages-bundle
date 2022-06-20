@@ -93,6 +93,7 @@ class ScriptFileSynchronizer
         $files->add(new File($this->getFullBackupDatabaseScriptPath(), $this->getFullProdBackupDatabaseScriptPath()));
         $files->add(new File($this->getFullFileServerScriptPath(), $this->getFullProdFileServerScriptPath()));
         $files->add(new File($this->getFullCreateStateScriptPath(), $this->getFullProdCreateStateScriptPath()));
+        $files->add(new File($this->getFullUnArchiveScriptPath(), $this->getFullProdUnArchiveScriptPath()));
         return $files;
     }
 
@@ -124,5 +125,15 @@ class ScriptFileSynchronizer
     private function getFullProdCreateStateScriptPath(): string
     {
         return $this->_config->getFileServerConfiguration()->getPath(). Constants::CREATE_STATE_SCRIPT_PROD;
+    }
+
+    private function getFullUnArchiveScriptPath(): string
+    {
+        return $this->_path. Constants::UN_ARCHIVE_SCRIPT;
+    }
+
+    private function getFullProdUnArchiveScriptPath(): string
+    {
+        return $this->_config->getFileServerConfiguration()->getPath(). Constants::UN_ARCHIVE_SCRIPT_PROD;
     }
 }

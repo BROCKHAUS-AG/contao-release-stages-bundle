@@ -39,7 +39,7 @@ class LocalFilePoller extends Poller
             usleep(500000);
             $repetitions = $repetitions + 1;
         }
-        throw new PollTimeout("Backup failed, timeout");
+        throw new PollTimeout("Failed, timeout");
     }
 
     private function checkIfFileExists(string $file): bool

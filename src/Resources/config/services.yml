@@ -48,6 +48,12 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger'
 
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\FileSystemDeployer:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
+
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Timer'
@@ -57,6 +63,7 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrationBuilder'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\Migrator\FileSystemMigrationBuilder'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\FileSystemDeployer'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Finisher'
         shared: false
 

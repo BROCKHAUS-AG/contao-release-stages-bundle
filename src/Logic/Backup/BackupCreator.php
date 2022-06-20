@@ -98,7 +98,7 @@ class BackupCreator
     private function getFileServerTags(string $path): array
     {
         return array(
-            "-f \"$path/files\"",
+            "-f \"$path/files/content\"",
             "-t \"$path/backups\""
         );
     }

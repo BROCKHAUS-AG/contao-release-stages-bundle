@@ -43,4 +43,18 @@ class Compressor {
             throw new Compress("Failed to compress to: \"$compressedFile\". $e");
         }
     }
+
+    /**
+     * @throws Compress
+     */
+    public function compressFile(string $file, string $compressedFile, string $name): void
+    {
+        try {
+            $archiveScriptPath = $this->_path. Constants::CREATE_FILE_ARCHIVE_SCRIPT;
+            shell_exec("bash $archiveScriptPath -f \"$file\" -t \"$compressedFile\" -n \"$name\"");
+            $this->_poller->pollFile( $this->_path. Constants::LOCAL_DIRECTORY. "/$name");
+        }catch (Exception $e) {
+            throw new Compress("Failed to compress file to: \"$compressedFile\". $e");
+        }
+    }
 }
