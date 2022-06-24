@@ -97,6 +97,9 @@ $GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
         'state' => array(
             'search' => true,
             'sql' => ['type' => 'string', 'length' => '14', 'default' => Constants::DEPLOYMENT_PENDING]
+        ),
+        'information' => array(
+            'sql' => ['type' => 'text', 'default' => 'None']
         )
     ),
     'palettes' => array(

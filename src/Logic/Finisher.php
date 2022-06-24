@@ -18,7 +18,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer;
-use Exception;
+use Doctrine\DBAL\Exception;
 
 class Finisher {
     private StateSynchronizer $_stateSynchronizer;
@@ -31,7 +31,7 @@ class Finisher {
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function finishWithSuccess(int $actualId): void
     {
@@ -40,7 +40,7 @@ class Finisher {
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function finishWithOldDeploymentIsPending(int $actualId): void
     {
@@ -49,11 +49,11 @@ class Finisher {
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function finishWithFailure(int $actualId, $exception): void
     {
-        $this->_stateSynchronizer->updateState(Constants::DEPLOYMENT_FAILURE, $actualId);
+        $this->_stateSynchronizer->updateState(Constants::DEPLOYMENT_FAILURE, $actualId, $exception->getMessage());
         $this->_logger->error("Deployment failed: ". $exception->getMessage());
     }
 }
