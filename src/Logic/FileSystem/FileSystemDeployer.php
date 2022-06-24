@@ -59,8 +59,7 @@ class FileSystemDeployer
 
     private function getFilePath(SSHRunner $runner, string $path, string $name): string
     {
-        return $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%_", "*",
-                $name));
+        return $runner->getPathOfLatestFileWithPattern("$path/migrations/*_$name.tar.gz");
     }
 
     private function extractFileSystem(string $file, string $path, SSHRunner $runner, string $name): void
@@ -68,6 +67,7 @@ class FileSystemDeployer
         $tags = $this->createTags($file, $path, $name);
         $scriptPath = "$path". Constants::UN_ARCHIVE_SCRIPT_PROD;
         $runner->executeBackgroundScript($scriptPath, $tags);
+        die;
     }
 
     private function createTags(string $file, string $path, string $name): array
