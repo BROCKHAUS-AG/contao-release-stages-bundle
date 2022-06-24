@@ -7,12 +7,11 @@
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-
-
+<!-- ------------------------------------------------------------------------- -->
 <br />
 <div style="text-align: center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="docs/logo.svg" alt="Logo" width="120">
+  <a href="https://github.com/BROCKHAUS-AG/contao-release-stages-bundle">
+    <img src="images/logo.svg" alt="Logo" width="120">
   </a>
 
 <h3 align="center">Contao Release Stages Bundle</h3>
@@ -23,17 +22,13 @@
     <a href="https://github.com/BROCKHAUS-AG/contao-release-stages-bundle"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
-    ·
     <a href="https://github.com/BROCKHAUS-AG/contao-release-stages-bundle/issues">Report Bug</a>
     ·
     <a href="https://github.com/BROCKHAUS-AG/contao-release-stages-bundle/issues">Request Feature</a>
   </p>
 </div>
+<!-- ------------------------------------------------------------------------- -->
 
-
-
-<!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
   <ol>
@@ -54,15 +49,17 @@
     <li><a href="#roadmap">Roadmap</a></li>
   </ol>
 </details>
+<!-- ------------------------------------------------------------------------- -->
 
 
-
-<!-- ABOUT THE PROJECT -->
 ## About The Project
 
+
+
+Look at the [deployment process](images/deploymentProcess.png) diagram to learn more about the project structure.
+
 <p style="text-align: right">(<a href="#top">back to top</a>)</p>
-
-
+<!-- ------------------------------------------------------------------------- -->
 
 ### Built With
 
@@ -70,8 +67,7 @@
 * [Symfony 4](https://symfony.com/4)
 
 <p style="text-align: right">(<a href="#top">back to top</a>)</p>
-
-
+<!-- ------------------------------------------------------------------------- -->
 
 ## Getting Started
 
@@ -82,31 +78,18 @@
 ### Installation
 
 <p style="text-align: right">(<a href="#top">back to top</a>)</p>
+<!-- ------------------------------------------------------------------------- -->
 
-
-
-<!-- USAGE EXAMPLES -->
 ## Usage
 
 
 
 <p style="text-align: right">(<a href="#top">back to top</a>)</p>
+<!-- ------------------------------------------------------------------------- -->
 
-
-
-<!-- ROADMAP -->
-## Roadmap
-
-- [x] Add Changelog
-- [x] Add back to top links
-- [ ] Add Additional Templates w/ Examples
-- [ ] Add "components" document to easily copy & paste sections of the readme
-- [ ] Multi-language Support
-    - [ ] Chinese
-    - [ ] Spanish
 
 <p style="text-align: right">(<a href="#top">back to top</a>)</p>
-
+<!-- ------------------------------------------------------------------------- -->
 
 [contributors-shield]: https://img.shields.io/github/contributors/BROCKHAUS-AG/contao-release-stages-bundle?style=for-the-badge
 [contributors-url]: https://github.com/BROCKHAUS-AG/contao-release-stages-bundle/graphs/contributors
