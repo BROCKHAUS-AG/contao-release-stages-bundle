@@ -9,14 +9,14 @@
 
 <!-- ------------------------------------------------------------------------- -->
 <br />
-<div style="text-align: center">
+<div align="center">
   <a href="https://github.com/BROCKHAUS-AG/contao-release-stages-bundle">
     <img src="images/logo.svg" alt="Logo" width="120">
   </a>
 
 <h3 align="center">Contao Release Stages Bundle</h3>
 
-  <p style="text-align: center">
+  <p align="center">
     With the Contao release stages bundle you would be able to easily draft and upload new releases to your prod stage.
     <br />
     <a href="https://github.com/BROCKHAUS-AG/contao-release-stages-bundle"><strong>Explore the docs »</strong></a>
@@ -58,7 +58,7 @@
 
 Look at the [deployment process](images/deploymentProcess.png) diagram to learn more about the project structure.
 
-<p style="text-align: right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">back to top</a>)</p>
 <!-- ------------------------------------------------------------------------- -->
 
 ### Built With
@@ -66,7 +66,7 @@ Look at the [deployment process](images/deploymentProcess.png) diagram to learn 
 * [PHP 7.4](https://www.php.net/releases/7_4_0.php)
 * [Symfony 4](https://symfony.com/4)
 
-<p style="text-align: right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">back to top</a>)</p>
 <!-- ------------------------------------------------------------------------- -->
 
 ## Getting Started
@@ -77,18 +77,18 @@ Look at the [deployment process](images/deploymentProcess.png) diagram to learn 
 
 ### Installation
 
-<p style="text-align: right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">back to top</a>)</p>
 <!-- ------------------------------------------------------------------------- -->
 
 ## Usage
 
 
 
-<p style="text-align: right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">back to top</a>)</p>
 <!-- ------------------------------------------------------------------------- -->
 
 
-<p style="text-align: right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">back to top</a>)</p>
 <!-- ------------------------------------------------------------------------- -->
 
 [contributors-shield]: https://img.shields.io/github/contributors/BROCKHAUS-AG/contao-release-stages-bundle?style=for-the-badge
