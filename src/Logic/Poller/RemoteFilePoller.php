@@ -32,15 +32,19 @@ class RemoteFilePoller extends Poller
      * @throws Poll
      * @throws PollTimeout
      *
-     * Run 100 times all 500ms (50s) to check if fail or success file was created. If after 25s no success or fail file
-     * is available, break polling with poll timeout exception
+     * Run 100 times all 500ms (50s) to check if fail or success file was created. If after 25s no success, fail file
+     * or after 4s no pending file is available, break polling with poll timeout exception
      */
     public function pollFile(string $filePath): void
     {
         try {
             $ftpRunner = $this->_ftpConnector->connect();
             $repetitions = 0;
-            while ($repetitions < 100) {
+            $noPendingFileFound = 0;
+            while ($repetitions < 100 && $noPendingFileFound <= 3) {
+                if (!$ftpRunner->checkIfFileExists("$filePath.pending")) {
+                    $noPendingFileFound += 1;
+                }
                 if ($ftpRunner->checkIfFileExists("$filePath.success")) {
                     return;
                 }
