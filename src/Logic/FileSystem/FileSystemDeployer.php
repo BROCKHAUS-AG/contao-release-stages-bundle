@@ -48,7 +48,7 @@ class FileSystemDeployer
             $path = $this->_config->getFileServerConfiguration()->getPath();
             $name = Constants::FILE_SYSTEM_MIGRATION_FILE_NAME;
             $file = $this->getFilePath($runner, $path, $name);
-            $this->extractFileSystem($file, $path, $runner, $name);
+            $this->extractFileSystem($file, $path, $runner, Constants::FILE_SYSTEM_MIGRATION_FILE_PROD);
             $this->_poller->pollFile("$path". Constants::SCRIPT_DIRECTORY_PROD. "/un_archive_$name");
         } catch (Exception $e) {
             throw new FileSystemDeployment("Couldn't deploy file system: $e");
@@ -59,7 +59,8 @@ class FileSystemDeployer
 
     private function getFilePath(SSHRunner $runner, string $path, string $name): string
     {
-        return $runner->getPathOfLatestFileWithPattern("$path/migrations/*_$name.tar.gz");
+        return $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%", "*",
+                $name));
     }
 
     private function extractFileSystem(string $file, string $path, SSHRunner $runner, string $name): void
@@ -67,7 +68,6 @@ class FileSystemDeployer
         $tags = $this->createTags($file, $path, $name);
         $scriptPath = "$path". Constants::UN_ARCHIVE_SCRIPT_PROD;
         $runner->executeBackgroundScript($scriptPath, $tags);
-        die;
     }
 
     private function createTags(string $file, string $path, string $name): array
