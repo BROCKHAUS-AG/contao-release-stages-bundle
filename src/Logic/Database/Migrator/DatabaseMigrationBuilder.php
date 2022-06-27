@@ -16,6 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Compress;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\BuildDatabaseMigration;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\CreateTableMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\InsertMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Compressor;
@@ -52,7 +53,7 @@ class DatabaseMigrationBuilder
     }
 
     /**
-     * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder
+     * @throws BuildDatabaseMigration
      */
     public function buildAndCopy(): void
     {
@@ -61,7 +62,7 @@ class DatabaseMigrationBuilder
     }
 
     /**
-     * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder
+     * @throws BuildDatabaseMigration
      */
     private function createMigrationFile(): void
     {
@@ -70,7 +71,7 @@ class DatabaseMigrationBuilder
             $this->saveStatementsToMigrationFile($statements);
             $this->compressMigrationFile();
         } catch (Throwable $e) {
-            throw new \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder("Couldn't build migration: $e");
+            throw new BuildDatabaseMigration("Couldn't build migration: $e");
         }
     }
 
@@ -110,7 +111,7 @@ class DatabaseMigrationBuilder
     }
 
     /**
-     * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder
+     * @throws BuildDatabaseMigration
      */
     private function copyMigrationFileToProd(): void
     {
@@ -122,7 +123,7 @@ class DatabaseMigrationBuilder
             $runner->copy($file);
             $this->_ftpConnector->disconnect($runner->getConn());
         }catch (Exception $e) {
-            throw new \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder("Couldn't copy migration file: $e");
+            throw new BuildDatabaseMigration("Couldn't copy migration file: $e");
         }
     }
 

@@ -16,6 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\Migrator;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Compress;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\Migrator\BuildFileSystemMigration;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
@@ -41,7 +42,7 @@ class FileSystemMigrationBuilder
     }
 
     /**
-     * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\Migrator\FileSystemMigrationBuilder
+     * @throws BuildFileSystemMigration
      */
     public function buildAndCopy(): void
     {
@@ -50,7 +51,7 @@ class FileSystemMigrationBuilder
             $this->compressFiles($migrationFile);
             $this->copy($migrationFile);
         } catch (Exception $e) {
-            throw new \BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\Migrator\FileSystemMigrationBuilder("Couldn't create file system migration: $e");
+            throw new BuildFileSystemMigration("Couldn't create file system migration: $e");
         }
     }
 

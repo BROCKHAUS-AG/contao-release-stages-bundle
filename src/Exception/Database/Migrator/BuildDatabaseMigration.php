@@ -12,11 +12,11 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\Migrator;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator;
 
 use Exception;
 
-class FileSystemMigrationBuilder extends Exception
+class BuildDatabaseMigration extends Exception
 {
     public function __construct($message = "", $code = 0)
     {
