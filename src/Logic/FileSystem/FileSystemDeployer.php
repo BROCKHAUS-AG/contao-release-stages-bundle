@@ -46,10 +46,10 @@ class FileSystemDeployer
         $runner = $this->_sshConnection->connect();
         try {
             $path = $this->_config->getFileServerConfiguration()->getPath();
-            $name = Constants::FILE_SYSTEM_MIGRATION_FILE_NAME;
-            $file = $this->getFilePath($runner, $path, $name);
-            $this->extractFileSystem($file, $path, $runner, Constants::FILE_SYSTEM_MIGRATION_FILE_PROD);
-            $this->_poller->pollFile("$path". Constants::SCRIPT_DIRECTORY_PROD. "/un_archive_$name");
+            $file = $this->getFilePath($runner, $path, Constants::FILE_SYSTEM_MIGRATION_FILE_PROD);
+            $this->extractFileSystem($file, $path, $runner);
+            $this->_poller->pollFile("$path". Constants::SCRIPT_DIRECTORY_PROD. "/un_archive_".
+                Constants::FILE_SYSTEM_MIGRATION_FILE_NAME);
         } catch (Exception $e) {
             throw new FileSystemDeployment("Couldn't deploy file system: $e");
         }finally {
@@ -63,19 +63,19 @@ class FileSystemDeployer
                 $name));
     }
 
-    private function extractFileSystem(string $file, string $path, SSHRunner $runner, string $name): void
+    private function extractFileSystem(string $file, string $path, SSHRunner $runner): void
     {
-        $tags = $this->createTags($file, $path, $name);
+        $tags = $this->createTags($file, $path);
         $scriptPath = "$path". Constants::UN_ARCHIVE_SCRIPT_PROD;
         $runner->executeBackgroundScript($scriptPath, $tags);
     }
 
-    private function createTags(string $file, string $path, string $name): array
+    private function createTags(string $file, string $path): array
     {
         return array(
             "-f \"$file\"",
             "-e \"$path/files/content\"",
-            "-n \"$name\""
+            "-n \"". Constants::FILE_SYSTEM_MIGRATION_FILE_NAME. "\""
         );
     }
 }
