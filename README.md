@@ -71,22 +71,39 @@ Look at the [deployment process](images/deploymentProcess.png) diagram to learn 
 
 ## Getting Started
 
-
 ### Prerequisites
-
+Before you can install the contao release stages bundle, you have to meet certain prerequisites.
+- An installation of minimum PHP 7.4
+- Contao 4.9 and higher
 
 ### Installation
+
+1. You have to use ```composer``` to install the bundle. The command would be
+```composer require brockhaus-ag/contao-release-stages-bundle```.
+2. Configure the configuration file
+   1. You can find an example configuration here [settings/config_example.json](settings/config_example.json).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 <!-- ------------------------------------------------------------------------- -->
 
 ## Usage
-
-
+- Click in the Contao menu section on the left side on "Release Generator". There you would be able to create a new release.
+- If you clicked on "new"
+  - you could change the kind of release (this is only to show a nicer history)
+  - set a title and a description
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 <!-- ------------------------------------------------------------------------- -->
 
+## Things that work and don't work
+
+### Working
+- Create automatically tables in database
+- Copy database table content
+- Copy directory
+
+### Not working
+- Copy database relationships from test stage to prod stage
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 <!-- ------------------------------------------------------------------------- -->
