@@ -46,10 +46,9 @@ class DatabaseDeployer
         $runner = $this->_sshConnection->connect();
         try {
             $path = $this->_config->getFileServerConfiguration()->getPath();
-            $name = Constants::DATABASE_MIGRATION_FILE_PROD;
-            $file = $this->getFilePath($runner, $path, $name);
-
-            $this->_poller->pollFile("$path". Constants::SCRIPT_DIRECTORY_PROD. "/un_archive_$name");
+            $file = $this->getFilePath($runner, $path);
+            $this->extractFileSystem($file, $path, $runner);
+            $this->_poller->pollFile("$path". Constants::SCRIPT_DIRECTORY_PROD. "/un_archive_". Constants::DATABASE_MIGRATION_FILE_COMPRESSED);
         } catch (Exception $e) {
             throw new DatabaseDeployment("Couldn't deploy file system: $e");
         }finally {
@@ -57,10 +56,25 @@ class DatabaseDeployer
         }
     }
 
-    private function getFilePath(SSHRunner $runner, string $path, string $name): string
+    private function getFilePath(SSHRunner $runner, string $path): string
     {
         return $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%_", "*",
-                $name));
+                Constants::DATABASE_MIGRATION_FILE_PROD));
     }
 
+    private function extractFileSystem(string $file, string $path, SSHRunner $runner): void
+    {
+        $tags = $this->createTags($file, $path);
+        $scriptPath = "$path". Constants::UN_ARCHIVE_SCRIPT_PROD;
+        $runner->executeBackgroundScript($scriptPath, $tags);
+    }
+
+    private function createTags(string $file, string $path): array
+    {
+        return array(
+            "-f \"$file\"",
+            "-e \"$path/migrations/database_migration\"",
+            "-n \"". Constants::DATABASE_MIGRATION_FILE_COMPRESSED. "\""
+        );
+    }
 }
