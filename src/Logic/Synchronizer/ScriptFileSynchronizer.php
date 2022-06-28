@@ -29,14 +29,14 @@ use Exception;
 class ScriptFileSynchronizer
 {
     private string $_path;
+    private string $_fileServerPath;
     private FTPConnector $_ftpConnector;
-    private Config $_config;
 
     public function __construct(string $path, FTPConnector $ftpConnector, Config $config)
     {
         $this->_path = $path;
+        $this->_fileServerPath = $config->getFileServerConfiguration()->getPath();
         $this->_ftpConnector = $ftpConnector;
-        $this->_config = $config;
     }
 
     /**
@@ -69,10 +69,9 @@ class ScriptFileSynchronizer
 
     private function createDirectoryCollection(): array
     {
-        $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
         return array(
-            $fileServerConfigurationPath. Constants::SCRIPT_DIRECTORY_PROD,
-            $fileServerConfigurationPath. Constants::BACKUP_DIRECTORY_PROD
+            $this->_fileServerPath. Constants::SCRIPT_DIRECTORY_PROD,
+            $this->_fileServerPath. Constants::BACKUP_DIRECTORY_PROD
         );
     }
 
@@ -90,50 +89,34 @@ class ScriptFileSynchronizer
     private function createFileCollection(): FileCollection
     {
         $files = new FileCollection();
-        $files->add(new File($this->getFullBackupDatabaseScriptPath(), $this->getFullProdBackupDatabaseScriptPath()));
-        $files->add(new File($this->getFullFileServerScriptPath(), $this->getFullProdFileServerScriptPath()));
-        $files->add(new File($this->getFullCreateStateScriptPath(), $this->getFullProdCreateStateScriptPath()));
-        $files->add(new File($this->getFullUnArchiveScriptPath(), $this->getFullProdUnArchiveScriptPath()));
+        $files->add($this->getDatabaseScriptFile());
+        $files->add($this->getFileServerScriptFile());
+        $files->add($this->getCreateStateScriptFile());
+        $files->add($this->getUnArchiveScriptFile());
         return $files;
     }
 
-    private function getFullBackupDatabaseScriptPath(): string
+    private function getDatabaseScriptFile(): File
     {
-        return $this->_path. Constants::BACKUP_DATABASE_SCRIPT;
+        return new File($this->_path. Constants::BACKUP_DATABASE_SCRIPT,
+            $this->_fileServerPath. Constants::BACKUP_DATABASE_SCRIPT_PROD);
     }
 
-    private function getFullProdBackupDatabaseScriptPath(): string
+    private function getFileServerScriptFile(): File
     {
-        return $this->_config->getFileServerConfiguration()->getPath(). Constants::BACKUP_DATABASE_SCRIPT_PROD;
+        return new File($this->_path. Constants::BACKUP_FILE_SYSTEM_SCRIPT,
+            $this->_fileServerPath. Constants::BACKUP_FILE_SYSTEM_SCRIPT_PROD);
     }
 
-    private function getFullFileServerScriptPath(): string
+    private function getCreateStateScriptFile(): File
     {
-        return $this->_path. Constants::BACKUP_FILE_SYSTEM_SCRIPT;
+        return new File($this->_path. Constants::CREATE_STATE_SCRIPT,
+            $this->_fileServerPath. Constants::CREATE_STATE_SCRIPT_PROD);
     }
 
-    private function getFullProdFileServerScriptPath(): string
+    private function getUnArchiveScriptFile(): File
     {
-        return $this->_config->getFileServerConfiguration()->getPath(). Constants::BACKUP_FILE_SYSTEM_SCRIPT_PROD;
-    }
-
-    private function getFullCreateStateScriptPath(): string
-    {
-        return $this->_path. Constants::CREATE_STATE_SCRIPT;
-    }
-
-    private function getFullProdCreateStateScriptPath(): string
-    {
-        return $this->_config->getFileServerConfiguration()->getPath(). Constants::CREATE_STATE_SCRIPT_PROD;
-    }
-
-    private function getFullUnArchiveScriptPath(): string
-    {
-        return $this->_path. Constants::UN_ARCHIVE_SCRIPT;
-    }
-
-    private function getFullProdUnArchiveScriptPath(): string
-    {
-        return $this->_config->getFileServerConfiguration()->getPath(). Constants::UN_ARCHIVE_SCRIPT_PROD;
+        return new File($this->_path. Constants::UN_ARCHIVE_SCRIPT,
+            $this->_fileServerPath. Constants::UN_ARCHIVE_SCRIPT_PROD);
     }
 }
