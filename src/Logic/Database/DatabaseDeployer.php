@@ -16,6 +16,8 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseDeployment;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\PollTimeout;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\Poller;
@@ -46,14 +48,25 @@ class DatabaseDeployer
         $runner = $this->_sshConnection->connect();
         try {
             $path = $this->_config->getFileServerConfiguration()->getPath();
-            $file = $this->getFilePath($runner, $path);
-            $this->extractMigrationFile($file, $path, $runner);
-            $this->_poller->pollFile("$path". Constants::SCRIPT_DIRECTORY_PROD. "/un_archive_". Constants::DATABASE_MIGRATION_FILE_COMPRESSED);
+            $this->extract($runner, $path);
+            $this->migrate($runner, $path);
         } catch (Exception $e) {
-            throw new DatabaseDeployment("Couldn't deploy file system: $e");
+            throw new DatabaseDeployment("Couldn't deploy database: $e");
         }finally {
             $this->_sshConnection->disconnect();
         }
+    }
+
+    /**
+     * @throws Poll
+     * @throws PollTimeout
+     */
+    private function extract(SSHRunner $runner, string $path): void
+    {
+        $file = $this->getFilePath($runner, $path);
+        $this->extractMigrationFile($file, $path, $runner);
+        $this->_poller->pollFile($path. Constants::SCRIPT_DIRECTORY_PROD. "/un_archive_".
+            Constants::DATABASE_MIGRATION_FILE_COMPRESSED);
     }
 
     private function getFilePath(SSHRunner $runner, string $path): string
@@ -65,7 +78,7 @@ class DatabaseDeployer
     private function extractMigrationFile(string $file, string $path, SSHRunner $runner): void
     {
         $tags = $this->createTags($file, $path);
-        $scriptPath = "$path". Constants::UN_ARCHIVE_SCRIPT_PROD;
+        $scriptPath = $path. Constants::UN_ARCHIVE_SCRIPT_PROD;
         $runner->executeBackgroundScript($scriptPath, $tags);
     }
 
@@ -76,5 +89,16 @@ class DatabaseDeployer
             "-e \"$path/migrations/database_migration\"",
             "-n \"". Constants::DATABASE_MIGRATION_FILE_COMPRESSED. "\""
         );
+    }
+
+    /**
+     * @throws Poll
+     * @throws PollTimeout
+     */
+    private function migrate(SSHRunner $runner, string $path)
+    {
+        $scriptPath = $path. Constants::MIGRATE_DATABASE_SCRIPT_PROD;
+        $runner->executeBackgroundScript($scriptPath);
+        $this->_poller->pollFile($path. Constants::SCRIPT_DIRECTORY_PROD. "/migrate_database");
     }
 }
