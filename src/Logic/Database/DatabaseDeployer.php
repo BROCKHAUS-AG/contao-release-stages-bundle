@@ -47,7 +47,7 @@ class DatabaseDeployer
         try {
             $path = $this->_config->getFileServerConfiguration()->getPath();
             $file = $this->getFilePath($runner, $path);
-            $this->extractFileSystem($file, $path, $runner);
+            $this->extractMigrationFile($file, $path, $runner);
             $this->_poller->pollFile("$path". Constants::SCRIPT_DIRECTORY_PROD. "/un_archive_". Constants::DATABASE_MIGRATION_FILE_COMPRESSED);
         } catch (Exception $e) {
             throw new DatabaseDeployment("Couldn't deploy file system: $e");
@@ -62,7 +62,7 @@ class DatabaseDeployer
                 Constants::DATABASE_MIGRATION_FILE_PROD));
     }
 
-    private function extractFileSystem(string $file, string $path, SSHRunner $runner): void
+    private function extractMigrationFile(string $file, string $path, SSHRunner $runner): void
     {
         $tags = $this->createTags($file, $path);
         $scriptPath = "$path". Constants::UN_ARCHIVE_SCRIPT_PROD;

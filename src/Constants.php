@@ -40,11 +40,11 @@ abstract class Constants
 
     public const LOCAL_DIRECTORY = self::SCRIPT_DIRECTORY. "/local";
     public const CREATE_ARCHIVE_SCRIPT = self::LOCAL_DIRECTORY. "/create_archive.sh";
-    public const CREATE_FILE_ARCHIVE_SCRIPT = self::LOCAL_DIRECTORY. "/create_file_archive.sh";
 
     public const MIGRATION_DIRECTORY = "/migrations";
 
-    public const DATABASE_MIGRATION_FILE = self::MIGRATION_DIRECTORY. "/database_migration.sql";
+    public const DATABASE_MIGRATION_DIRECTORY = self::MIGRATION_DIRECTORY. "/database";
+    public const DATABASE_MIGRATION_FILE = self::DATABASE_MIGRATION_DIRECTORY. "/database_migration.sql";
     public const DATABASE_MIGRATION_FILE_COMPRESSED = "database_migration";
     public const FILE_SYSTEM_MIGRATION_FILE_NAME = "file_system_migration";
 

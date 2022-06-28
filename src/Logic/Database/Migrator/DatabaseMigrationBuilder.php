@@ -31,7 +31,6 @@ class DatabaseMigrationBuilder
 {
     private CreateTableStatementsMigrationBuilder $_createTableStatementsMigrationBuilder;
     private InsertStatementsMigrationBuilder $_insertStatementsMigrationBuilder;
-    private string $_filePath;
     private string $_path;
     private FTPConnector $_ftpConnector;
     private Config $_config;
@@ -48,8 +47,7 @@ class DatabaseMigrationBuilder
         $this->_ftpConnector = $ftpConnector;
         $this->_config = $config;
         $this->_compressor = $compressor;
-        $this->_filePath = $path. Constants::DATABASE_MIGRATION_FILE;
-        $this->_io = new IO($this->_filePath);
+        $this->_io = new IO($path. Constants::DATABASE_MIGRATION_FILE);
     }
 
     /**
@@ -107,7 +105,7 @@ class DatabaseMigrationBuilder
     private function compressMigrationFile(): void
     {
         $migrationFile = $this->_path. Constants::MIGRATION_DIRECTORY;
-        $this->_compressor->compressFile($this->_filePath, $migrationFile, Constants::DATABASE_MIGRATION_FILE_COMPRESSED);
+        $this->_compressor->compress($this->_path. Constants::DATABASE_MIGRATION_DIRECTORY, $migrationFile, Constants::DATABASE_MIGRATION_FILE_COMPRESSED);
     }
 
     /**
