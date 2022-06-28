@@ -14,49 +14,34 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseDeployment;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\FileSystemDeployment;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseDeployer;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrationBuilder;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\FileSystemDeployer;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\Migrator\FileSystemMigrationBuilder;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\ReleaseBuild;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\ReleaseDeployment;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Finisher;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseBuilder;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseDeployer;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseRollbacker;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Timer;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning;
 use Exception;
 
 class ReleaseStages
 {
     private Timer $_timer;
-    private ScriptFileSynchronizer $_scriptFileSynchronizer;
-    private Versioning $_versioning;
-    private BackupCreator $_backupCreator;
-    private DatabaseMigrationBuilder $_databaseMigrationBuilder;
-    private FileSystemMigrationBuilder $_fileSystemMigrationBuilder;
     private StateSynchronizer $_stateSynchronizer;
-    private FileSystemDeployer $_fileSystemDeployer;
-    private DatabaseDeployer $_databaseDeployer;
+    private ReleaseBuilder $_releaseBuilder;
+    private ReleaseDeployer $_releaseDeployer;
+    private ReleaseRollbacker $_releaseRollbacker;
     private Finisher $_finisher;
 
-    public function __construct(Timer $timer, ScriptFileSynchronizer $scriptFileSynchronizer, Versioning $versioning,
-                                BackupCreator $backupCreator, DatabaseMigrationBuilder $databaseMigrationBuilder,
-                                FileSystemMigrationBuilder $fileSystemMigrationBuilder,
-                                StateSynchronizer $stateSynchronizer, FileSystemDeployer $fileSystemDeployer,
-                                DatabaseDeployer $databaseDeployer, Finisher $finisher)
+    public function __construct(Timer $timer, StateSynchronizer $stateSynchronizer, ReleaseBuilder $releaseBuilder,
+                                ReleaseDeployer $releaseDeployer, ReleaseRollbacker $releaseRollbacker,
+                                Finisher $finisher)
     {
         $this->_timer = $timer;
-        $this->_scriptFileSynchronizer = $scriptFileSynchronizer;
-        $this->_versioning = $versioning;
-        $this->_backupCreator = $backupCreator;
-        $this->_databaseMigrationBuilder = $databaseMigrationBuilder;
-        $this->_fileSystemMigrationBuilder = $fileSystemMigrationBuilder;
         $this->_stateSynchronizer = $stateSynchronizer;
-        $this->_fileSystemDeployer = $fileSystemDeployer;
-        $this->_databaseDeployer = $databaseDeployer;
+        $this->_releaseBuilder = $releaseBuilder;
+        $this->_releaseDeployer = $releaseDeployer;
+        $this->_releaseRollbacker = $releaseRollbacker;
         $this->_finisher = $finisher;
     }
 
@@ -72,43 +57,14 @@ class ReleaseStages
         $this->_timer->start();
         $actualId = $this->_stateSynchronizer->getActualId();
         try {
-            $buildSucceeded = $this->buildDeployment($actualId);
-            if (!$buildSucceeded) {
-                return;
-            }
-            $this->deployNewRelease();
+            $this->_releaseBuilder->build($actualId);
+            $this->_releaseDeployer->deploy();
             $this->_finisher->finishWithSuccess($actualId);
-        }catch (Exception | \Doctrine\DBAL\Driver\Exception $e) {
-            $this->_finisher->finishWithFailure($actualId, $e);
+        }catch (ReleaseBuild $exception) {
+            $this->_finisher->finishWithFailure($actualId, $exception);
+        }catch (ReleaseDeployment $exception) {
+            $this->_releaseRollbacker->rollback();
+            $this->_finisher->finishWithFailure($actualId, $exception);
         }
-    }
-
-    /**
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Driver\Exception
-     */
-    private function buildDeployment(int $actualId): bool
-    {
-        if ($this->_stateSynchronizer->isOldDeploymentPending($actualId)) {
-            $this->_finisher->finishWithOldDeploymentIsPending($actualId);
-            return false;
-        }
-        $this->_versioning->generateNewVersionNumber($actualId);
-        $this->_scriptFileSynchronizer->synchronize();
-        $this->_backupCreator->create();
-        $this->_databaseMigrationBuilder->buildAndCopy();
-        $this->_fileSystemMigrationBuilder->buildAndCopy();
-        return true;
-    }
-
-    /**
-     * @throws FileSystemDeployment
-     * @throws SSHConnection
-     * @throws DatabaseDeployment
-     */
-    private function deployNewRelease(): void
-    {
-        $this->_fileSystemDeployer->deploy();
-        $this->_databaseDeployer->deploy();
     }
 }

@@ -60,18 +60,32 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
 
-
-    BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseBuilder:
         arguments:
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Timer'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrationBuilder'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\Migrator\FileSystemMigrationBuilder'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer'
+        shared: false
+
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseDeployer:
+        arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\FileSystemDeployer'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseDeployer'
+        shared: false
+
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseRollbacker:
+        shared: false
+
+    BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Timer'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseBuilder'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseDeployer'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseRollbacker'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Finisher'
         shared: false
 
