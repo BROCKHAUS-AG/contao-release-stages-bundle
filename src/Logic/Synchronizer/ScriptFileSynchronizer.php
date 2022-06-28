@@ -93,6 +93,7 @@ class ScriptFileSynchronizer
         $files->add($this->getFileServerScriptFile());
         $files->add($this->getCreateStateScriptFile());
         $files->add($this->getUnArchiveScriptFile());
+        $files->add($this->getMigrateDatabaseScriptFile());
         return $files;
     }
 
@@ -118,5 +119,11 @@ class ScriptFileSynchronizer
     {
         return new File($this->_path. Constants::UN_ARCHIVE_SCRIPT,
             $this->_fileServerPath. Constants::UN_ARCHIVE_SCRIPT_PROD);
+    }
+
+    private function getMigrateDatabaseScriptFile(): File
+    {
+        return new File($this->_path. Constants::MIGRATE_DATABASE_SCRIPT,
+            $this->_fileServerPath. Constants::MIGRATE_DATABASE_SCRIPT_PROD);
     }
 }

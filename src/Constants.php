@@ -37,6 +37,7 @@ abstract class Constants
     public const BACKUP_DATABASE_SCRIPT = self::BACKUP_DIRECTORY. "/backup_database.sh";
 
     public const UN_ARCHIVE_SCRIPT = self::REMOTE_DIRECTORY. "/un_archive.sh";
+    public const MIGRATE_DATABASE_SCRIPT = self::REMOTE_DIRECTORY. "/migrate_database.sh";
 
     public const LOCAL_DIRECTORY = self::SCRIPT_DIRECTORY. "/local";
     public const CREATE_ARCHIVE_SCRIPT = self::LOCAL_DIRECTORY. "/create_archive.sh";
@@ -59,6 +60,7 @@ abstract class Constants
     public const BACKUP_DATABASE_SCRIPT_PROD = self::BACKUP_DIRECTORY_PROD. "/backup_database.sh";
     public const BACKUP_DATABASE_POLL_FILENAME = self::BACKUP_DIRECTORY_PROD. "/database_backup";
     public const UN_ARCHIVE_SCRIPT_PROD = self::SCRIPT_DIRECTORY_PROD. "/un_archive.sh";
+    public const MIGRATE_DATABASE_SCRIPT_PROD = self::SCRIPT_DIRECTORY_PROD. "/migrate_database.sh";
 
     public const MIGRATION_DIRECTORY_PROD = "/migrations";
 
