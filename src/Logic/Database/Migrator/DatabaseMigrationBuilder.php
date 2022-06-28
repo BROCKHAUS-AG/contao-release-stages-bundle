@@ -105,7 +105,9 @@ class DatabaseMigrationBuilder
     private function compressMigrationFile(): void
     {
         $migrationFile = $this->_path. Constants::MIGRATION_DIRECTORY;
-        $this->_compressor->compress($this->_path. Constants::DATABASE_MIGRATION_DIRECTORY, $migrationFile, Constants::DATABASE_MIGRATION_FILE_COMPRESSED);
+        $directory = $this->_path . Constants::DATABASE_MIGRATION_DIRECTORY;
+        $name = Constants::DATABASE_MIGRATION_FILE_COMPRESSED;
+        $this->_compressor->compress($directory, $migrationFile, $name);
     }
 
     /**
