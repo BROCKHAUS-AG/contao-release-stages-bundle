@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\System;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\File\ConfigNotFound;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\File\FileNotFound;
-use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Mapper\Config\ConfigMapper;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config;

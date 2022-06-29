@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
-use BrockhausAg\ContaoReleaseStagesBundle\ConstantsTestStage;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsTestStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Compress;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\LocalFilePoller;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\Poller;

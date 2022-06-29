@@ -14,9 +14,8 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Constants;
-use BrockhausAg\ContaoReleaseStagesBundle\ConstantsProdStage;
-use BrockhausAg\ContaoReleaseStagesBundle\ConstantsTestStage;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsProdStage;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsTestStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\FileSystemDeployment;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;

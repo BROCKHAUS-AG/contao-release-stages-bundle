@@ -15,8 +15,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
 
 
-use BrockhausAg\ContaoReleaseStagesBundle\Constants;
-use BrockhausAg\ContaoReleaseStagesBundle\DeploymentState;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\DeploymentState;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer;
 use Doctrine\DBAL\Exception;

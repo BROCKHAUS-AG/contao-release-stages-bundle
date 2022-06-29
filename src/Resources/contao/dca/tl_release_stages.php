@@ -12,9 +12,9 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-use BrockhausAg\ContaoReleaseStagesBundle\DeploymentState;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\DeploymentState;
 use BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages;
-use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 
 $GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
     'config' => array(

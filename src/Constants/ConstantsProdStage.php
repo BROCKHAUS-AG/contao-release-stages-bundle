@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Constants;
 
 abstract class ConstantsProdStage
 {

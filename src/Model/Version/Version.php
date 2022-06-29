@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Model\Version;
 
-use BrockhausAg\ContaoReleaseStagesBundle\DeploymentState;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\DeploymentState;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
 
 class Version

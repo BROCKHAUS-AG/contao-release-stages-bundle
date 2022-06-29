@@ -14,9 +14,8 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Constants;
-use BrockhausAg\ContaoReleaseStagesBundle\ConstantsProdStage;
-use BrockhausAg\ContaoReleaseStagesBundle\ConstantsTestStage;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsProdStage;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsTestStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseDeployment;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\PollTimeout;
