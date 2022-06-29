@@ -12,11 +12,11 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Release;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseDeployment;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\FileSystemDeployment;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\ReleaseDeployment;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Release\ReleaseDeployment;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseDeployer;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\FileSystemDeployer;

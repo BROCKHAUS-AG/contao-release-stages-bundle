@@ -12,14 +12,12 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\Exception;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Release;
 
-use Exception;
-
-class ReleaseBuild extends Exception
+class ReleaseRollbacker
 {
-    public function __construct($message = "", $code = 0)
+    public function rollback(): void
     {
-        parent::__construct($message, $code);
+
     }
 }

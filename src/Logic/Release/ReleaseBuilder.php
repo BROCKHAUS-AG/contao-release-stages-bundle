@@ -12,9 +12,9 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\Logic;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Release;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\ReleaseBuild;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Release\ReleaseBuild;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup\BackupCreator;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\Migrator\FileSystemMigrationBuilder;

@@ -60,7 +60,7 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseBuilder:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Release\ReleaseBuilder:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\ScriptFileSynchronizer'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning'
@@ -70,22 +70,22 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer'
         shared: false
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseDeployer:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Release\ReleaseDeployer:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\FileSystemDeployer'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseDeployer'
         shared: false
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseRollbacker:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Release\ReleaseRollbacker:
         shared: false
 
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Timer'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Synchronizer\StateSynchronizer'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseBuilder'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseDeployer'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\ReleaseRollbacker'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Release\ReleaseBuilder'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Release\ReleaseDeployer'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Release\ReleaseRollbacker'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Finisher'
         shared: false
 
