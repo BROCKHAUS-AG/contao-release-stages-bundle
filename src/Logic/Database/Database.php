@@ -111,15 +111,17 @@ class Database
     /**
      * @throws Exception
      */
-    public function updateState(string $state, int $id, string $information){
+    public function updateState(string $state, int $id, int $executionTime, string $information){
         $this->_dbConnection
             ->createQueryBuilder()
             ->update(Constants::DEPLOYMENT_TABLE)
             ->set("state", ":state")
             ->set("information", ":information")
+            ->set("execution_time", ":execution_time")
             ->where("id = :id")
             ->setParameter("state", $state)
             ->setParameter("information", $information)
+            ->setParameter("execution_time", $executionTime)
             ->setParameter("id", $id)
             ->execute();
     }

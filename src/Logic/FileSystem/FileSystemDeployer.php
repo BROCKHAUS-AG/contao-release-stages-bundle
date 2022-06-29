@@ -59,7 +59,6 @@ class FileSystemDeployer
 
     private function getFilePath(SSHRunner $runner, string $path): string
     {
-        echo $path. str_replace("%timestamp%", "*",Constants::FILE_SYSTEM_MIGRATION_FILE_PROD);
         return $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%", "*",
                 Constants::FILE_SYSTEM_MIGRATION_FILE_PROD));
     }

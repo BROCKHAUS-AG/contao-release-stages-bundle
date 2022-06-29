@@ -59,12 +59,12 @@ class ReleaseStages
         try {
             $this->_releaseBuilder->build($actualId);
             $this->_releaseDeployer->deploy();
-            $this->_finisher->finishWithSuccess($actualId);
+            $this->_finisher->finishWithSuccess($actualId, $this->_timer->getSpendTime());
         }catch (ReleaseBuild $exception) {
-            $this->_finisher->finishWithFailure($actualId, $exception);
+            $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(), $exception);
         }catch (ReleaseDeployment $exception) {
             $this->_releaseRollbacker->rollback();
-            $this->_finisher->finishWithFailure($actualId, $exception);
+            $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(), $exception);
         }
     }
 }

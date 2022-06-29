@@ -33,27 +33,27 @@ class Finisher {
     /**
      * @throws Exception
      */
-    public function finishWithSuccess(int $actualId): void
+    public function finishWithSuccess(int $actualId, int $executionTime): void
     {
-        $this->_stateSynchronizer->updateState(Constants::DEPLOYMENT_SUCCESS, $actualId);
+        $this->_stateSynchronizer->updateState(Constants::DEPLOYMENT_SUCCESS, $actualId, $executionTime);
         $this->_logger->info("Successfully deployed new version.");
     }
 
     /**
      * @throws Exception
      */
-    public function finishWithOldDeploymentIsPending(int $actualId): void
+    public function finishWithOldDeploymentIsPending(int $actualId, int $executionTime): void
     {
-        $this->_stateSynchronizer->updateState(Constants::DEPLOYMENT_OLD_PENDING, $actualId);
+        $this->_stateSynchronizer->updateState(Constants::DEPLOYMENT_OLD_PENDING, $actualId, $executionTime);
         $this->_logger->info("Old deployment is pending, could not create new release.");
     }
 
     /**
      * @throws Exception
      */
-    public function finishWithFailure(int $actualId, $exception): void
+    public function finishWithFailure(int $actualId, int $executionTime, $exception): void
     {
-        $this->_stateSynchronizer->updateState(Constants::DEPLOYMENT_FAILURE, $actualId, $exception->getMessage());
+        $this->_stateSynchronizer->updateState(Constants::DEPLOYMENT_FAILURE, $actualId, $executionTime, $exception->getMessage());
         $this->_logger->error("Deployment failed: ". $exception->getMessage());
     }
 }

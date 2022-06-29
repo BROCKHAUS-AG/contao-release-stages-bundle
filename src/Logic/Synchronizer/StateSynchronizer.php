@@ -50,8 +50,8 @@ class StateSynchronizer
     /**
      * @throws Exception
      */
-    public function updateState(string $state, int $id, string $information=""): void
+    public function updateState(string $state, int $id, int $executionTime, string $information=""): void
     {
-        $this->_database->updateState($state, $id, $information);
+        $this->_database->updateState($state, $id, $executionTime, $information);
     }
 }
