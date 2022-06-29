@@ -26,8 +26,7 @@ STATE_FILE="$(dirname $0)/migrate_database"
 create_pending_file "$STATE_FILE"
 
 {
-  # mysql -u"$user" -p"$password" -h"$host" "$database" < "$from_path"
-  touch "test.txt"
+  mysql -u"$user" -p"$password" -h"$host" "$database" < "$from_path"
 } || {
   create_finish_failure_file "$STATE_FILE"
   exit
