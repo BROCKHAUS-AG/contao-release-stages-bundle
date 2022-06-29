@@ -16,6 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Release\ReleaseBuild;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Release\ReleaseDeployment;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Release\ReleaseRollback;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Finisher;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Release\ReleaseBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Release\ReleaseDeployer;
@@ -62,9 +63,22 @@ class ReleaseStages
             $this->_finisher->finishWithSuccess($actualId, $this->_timer->getSpendTime());
         }catch (ReleaseBuild $exception) {
             $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(), $exception);
-        }catch (ReleaseDeployment $exception) {
+        }catch (ReleaseDeployment $releaseDeploymentException) {
+            $this->rollback($actualId, $releaseDeploymentException);
+        }
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function rollback(int $actualId, ReleaseDeployment $releaseDeploymentException): void
+    {
+        try {
             $this->_releaseRollbacker->rollback();
-            $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(), $exception);
+            $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(), $releaseDeploymentException);
+        }catch (ReleaseRollback $releaseRollbackException) {
+            $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(),
+                "$releaseDeploymentException $releaseRollbackException");
         }
     }
 }

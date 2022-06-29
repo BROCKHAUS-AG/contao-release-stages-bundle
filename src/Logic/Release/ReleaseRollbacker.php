@@ -14,10 +14,32 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Release;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Release\ReleaseRollback;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseRollbacker;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\FileSystemRollbacker;
+use Exception;
+
 class ReleaseRollbacker
 {
+    private FileSystemRollbacker $_fileSystemRollbacker;
+    private DatabaseRollbacker $_databaseRollbacker;
+
+    public function __construct(FileSystemRollbacker $fileSystemRollbacker, DatabaseRollbacker $databaseRollbacker)
+    {
+        $this->_fileSystemRollbacker = $fileSystemRollbacker;
+        $this->_databaseRollbacker = $databaseRollbacker;
+    }
+
+    /**
+     * @throws ReleaseRollback
+     */
     public function rollback(): void
     {
-
+        try {
+            $this->_fileSystemRollbacker->rollback();
+            $this->_databaseRollbacker->rollback();
+        }catch (Exception $exception) {
+            throw new ReleaseRollback("Couldn't rollback release: $exception");
+        }
     }
 }

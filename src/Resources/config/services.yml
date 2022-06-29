@@ -76,7 +76,24 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseDeployer'
         shared: false
 
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\FileSystemRollbacker:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
+        shared: false
+
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseRollbacker:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
+        shared: false
+
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Release\ReleaseRollbacker:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\FileSystemRollbacker'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseRollbacker'
         shared: false
 
     BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages:
