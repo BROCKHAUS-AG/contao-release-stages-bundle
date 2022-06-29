@@ -54,6 +54,8 @@ abstract class Constants
 
     public const CREATE_STATE_SCRIPT_PROD = self::SCRIPT_DIRECTORY_PROD. "/create_state.sh";
 
+    public const MIGRATE_DATABASE_POLL_FILE = self::SCRIPT_DIRECTORY_PROD. "/migrate_database";
+
     public const BACKUP_DIRECTORY_PROD = self::SCRIPT_DIRECTORY_PROD. "/backup";
     public const BACKUP_FILE_SYSTEM_SCRIPT_PROD = self::BACKUP_DIRECTORY_PROD. "/backup_file_system.sh";
     public const BACKUP_FILE_SYSTEM_POLL_FILENAME = self::BACKUP_DIRECTORY_PROD. "/file_system_backup";

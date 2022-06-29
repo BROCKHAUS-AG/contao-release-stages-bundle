@@ -77,16 +77,16 @@ class DatabaseDeployer
 
     private function extractMigrationFile(string $file, string $path, SSHRunner $runner): void
     {
-        $tags = $this->createTags($file, $path);
+        $tags = $this->createTagsToExtract($file, $path);
         $scriptPath = $path. Constants::UN_ARCHIVE_SCRIPT_PROD;
         $runner->executeBackgroundScript($scriptPath, $tags);
     }
 
-    private function createTags(string $file, string $path): array
+    private function createTagsToExtract(string $file, string $path): array
     {
         return array(
             "-f \"$file\"",
-            "-e \"$path/migrations/database_migration\"",
+            "-e \"$path". Constants::DATABASE_MIGRATION_DIRECTORY. "\"",
             "-n \"". Constants::DATABASE_MIGRATION_FILE_COMPRESSED. "\""
         );
     }
@@ -98,7 +98,25 @@ class DatabaseDeployer
     private function migrate(SSHRunner $runner, string $path)
     {
         $scriptPath = $path. Constants::MIGRATE_DATABASE_SCRIPT_PROD;
-        $runner->executeBackgroundScript($scriptPath);
-        $this->_poller->pollFile($path. Constants::SCRIPT_DIRECTORY_PROD. "/migrate_database");
+        $tags = $this->createTagsToMigrate($path);
+        $runner->executeBackgroundScript($scriptPath, $tags);
+        $this->_poller->pollFile($path. Constants::MIGRATE_DATABASE_POLL_FILE);
+    }
+
+    private function createTagsToMigrate(string $path): array
+    {
+        $config = $this->_config->getDatabaseConfiguration();
+        $username = $config->getUsername();
+        $password = $config->getPassword();
+        $host = $config->getServer();
+        $database = $config->getName();
+
+        return array(
+            "-u \"$username\"",
+            "-p \"$password\"",
+            "-h \"$host\"",
+            "-d \"$database\"",
+            "-f \"$path". Constants::DATABASE_MIGRATION_FILE. "\""
+        );
     }
 }
