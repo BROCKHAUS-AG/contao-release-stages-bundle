@@ -12,6 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
+use BrockhausAg\ContaoReleaseStagesBundle\DeploymentState;
 use BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 
@@ -96,7 +97,7 @@ $GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
         ),
         'state' => array(
             'search' => true,
-            'sql' => ['type' => 'string', 'length' => '14', 'default' => Constants::DEPLOYMENT_PENDING]
+            'sql' => ['type' => 'string', 'length' => '14', 'default' => DeploymentState::PENDING]
         ),
         'information' => array(
             'sql' => ['type' => 'text', 'notnull' => false]

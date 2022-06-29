@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\Migrator;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\ConstantsProdStage;
+use BrockhausAg\ContaoReleaseStagesBundle\ConstantsTestStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Compress;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\Migrator\BuildFileSystemMigration;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnection;
@@ -46,7 +48,7 @@ class FileSystemMigrationBuilder
      */
     public function buildAndCopy(): void
     {
-        $migrationFile = $this->_path. Constants::MIGRATION_DIRECTORY;
+        $migrationFile = $this->_path. ConstantsTestStage::MIGRATION_DIRECTORY;
         try {
             $this->compressFiles($migrationFile);
             $this->copy($migrationFile);
@@ -61,7 +63,7 @@ class FileSystemMigrationBuilder
     private function compressFiles(string $migrationFile): void
     {
         $directory = $this->_path. "/files/content";
-        $this->_compressor->compress($directory, $migrationFile, Constants::FILE_SYSTEM_MIGRATION_FILE_NAME);
+        $this->_compressor->compress($directory, $migrationFile, ConstantsTestStage::FILE_SYSTEM_MIGRATION_FILE_NAME);
     }
 
     /**
@@ -75,15 +77,14 @@ class FileSystemMigrationBuilder
         $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
         $prodPath = $this->buildPathForProd($fileServerConfigurationPath);
         $file = new File(
-            "$migrationFile/". Constants::FILE_SYSTEM_MIGRATION_FILE_NAME. ".tar.gz",
+            "$migrationFile/". ConstantsTestStage::FILE_SYSTEM_MIGRATION_FILE_NAME. ".tar.gz",
             $prodPath
         );
-        $runner->createDirectory($fileServerConfigurationPath. Constants::FILE_SYSTEM_MIGRATION_FOLDER_PROD);
         $runner->copy($file);
     }
 
     private function buildPathForProd(string $fileServerConfigurationPath): string {
-        $fileProd = $fileServerConfigurationPath. Constants::FILE_SYSTEM_MIGRATION_FILE_PROD;
+        $fileProd = $fileServerConfigurationPath. ConstantsProdStage::FILE_SYSTEM_MIGRATION_FILE;
         return str_replace("%timestamp%", (string)time(), $fileProd);
     }
 }

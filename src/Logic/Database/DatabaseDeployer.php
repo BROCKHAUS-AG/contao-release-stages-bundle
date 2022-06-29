@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\ConstantsProdStage;
+use BrockhausAg\ContaoReleaseStagesBundle\ConstantsTestStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseDeployment;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\PollTimeout;
@@ -65,20 +67,20 @@ class DatabaseDeployer
     {
         $file = $this->getFilePath($runner, $path);
         $this->extractMigrationFile($file, $path, $runner);
-        $this->_poller->pollFile($path. Constants::SCRIPT_DIRECTORY_PROD. "/un_archive_".
-            Constants::DATABASE_MIGRATION_FILE_COMPRESSED);
+        $this->_poller->pollFile($path. ConstantsProdStage::SCRIPT_DIRECTORY. "/un_archive_".
+            ConstantsTestStage::DATABASE_MIGRATION_FILE_COMPRESSED);
     }
 
     private function getFilePath(SSHRunner $runner, string $path): string
     {
         return $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%", "*",
-                Constants::DATABASE_MIGRATION_FILE_PROD));
+                ConstantsProdStage::DATABASE_MIGRATION_FILE));
     }
 
     private function extractMigrationFile(string $file, string $path, SSHRunner $runner): void
     {
         $tags = $this->createTagsToExtract($file, $path);
-        $scriptPath = $path. Constants::UN_ARCHIVE_SCRIPT_PROD;
+        $scriptPath = $path. ConstantsProdStage::UN_ARCHIVE_SCRIPT;
         $runner->executeBackgroundScript($scriptPath, $tags);
     }
 
@@ -86,8 +88,8 @@ class DatabaseDeployer
     {
         return array(
             "-f \"$file\"",
-            "-e \"$path". Constants::DATABASE_EXTRACTED_MIGRATION_DIRECTORY_PROD. "\"",
-            "-n \"". Constants::DATABASE_MIGRATION_FILE_COMPRESSED. "\""
+            "-e \"$path". ConstantsProdStage::DATABASE_EXTRACTED_MIGRATION_DIRECTORY. "\"",
+            "-n \"". ConstantsTestStage::DATABASE_MIGRATION_FILE_COMPRESSED. "\""
         );
     }
 
@@ -97,10 +99,10 @@ class DatabaseDeployer
      */
     private function migrate(SSHRunner $runner, string $path)
     {
-        $scriptPath = $path. Constants::MIGRATE_DATABASE_SCRIPT_PROD;
+        $scriptPath = $path. ConstantsProdStage::MIGRATE_DATABASE_SCRIPT;
         $tags = $this->createTagsToMigrate($path);
         $runner->executeBackgroundScript($scriptPath, $tags);
-        $this->_poller->pollFile($path. Constants::MIGRATE_DATABASE_POLL_FILE);
+        $this->_poller->pollFile($path. ConstantsProdStage::MIGRATE_DATABASE_POLL_FILE);
     }
 
     private function createTagsToMigrate(string $path): array
@@ -116,7 +118,7 @@ class DatabaseDeployer
             "-p \"$password\"",
             "-h \"$host\"",
             "-d \"$database\"",
-            "-f \"$path". Constants::DATABASE_MIGRATION_FILE. "\""
+            "-f \"$path". ConstantsTestStage::DATABASE_MIGRATION_FILE. "\""
         );
     }
 }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Backup;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\ConstantsProdStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\PollTimeout;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
@@ -63,8 +64,8 @@ class BackupCreator
     private function createDatabaseBackup(string $path, SSHRunner $runner): void
     {
         $tags = $this->getDatabaseTags($path);
-        $runner->executeBackgroundScript($path. Constants::BACKUP_DATABASE_SCRIPT_PROD, $tags);
-        $this->_poller->pollFile($path. Constants::BACKUP_DATABASE_POLL_FILENAME);
+        $runner->executeBackgroundScript($path. ConstantsProdStage::BACKUP_DATABASE_SCRIPT, $tags);
+        $this->_poller->pollFile($path. ConstantsProdStage::BACKUP_DATABASE_POLL_FILENAME);
     }
 
     private function getDatabaseTags($path): array
@@ -91,8 +92,8 @@ class BackupCreator
     private function createFileServerBackup(string $path, SSHRunner $runner): void
     {
         $tags = $this->getFileServerTags($path);
-        $runner->executeBackgroundScript($path. Constants::BACKUP_FILE_SYSTEM_SCRIPT_PROD, $tags);
-        $this->_poller->pollFile($path. Constants::BACKUP_FILE_SYSTEM_POLL_FILENAME);
+        $runner->executeBackgroundScript($path. ConstantsProdStage::BACKUP_FILE_SYSTEM_SCRIPT, $tags);
+        $this->_poller->pollFile($path. ConstantsProdStage::BACKUP_FILE_SYSTEM_POLL_FILENAME);
     }
 
     private function getFileServerTags(string $path): array

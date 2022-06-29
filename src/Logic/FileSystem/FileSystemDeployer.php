@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\ConstantsProdStage;
+use BrockhausAg\ContaoReleaseStagesBundle\ConstantsTestStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\FileSystemDeployment;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
@@ -48,8 +50,8 @@ class FileSystemDeployer
             $path = $this->_config->getFileServerConfiguration()->getPath();
             $file = $this->getFilePath($runner, $path);
             $this->extractFileSystem($file, $path, $runner);
-            $this->_poller->pollFile("$path". Constants::SCRIPT_DIRECTORY_PROD. "/un_archive_".
-                Constants::FILE_SYSTEM_MIGRATION_FILE_NAME);
+            $this->_poller->pollFile("$path". ConstantsProdStage::SCRIPT_DIRECTORY. "/un_archive_".
+                ConstantsTestStage::FILE_SYSTEM_MIGRATION_FILE_NAME);
         } catch (Exception $e) {
             throw new FileSystemDeployment("Couldn't deploy file system: $e");
         }finally {
@@ -60,13 +62,13 @@ class FileSystemDeployer
     private function getFilePath(SSHRunner $runner, string $path): string
     {
         return $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%", "*",
-                Constants::FILE_SYSTEM_MIGRATION_FILE_PROD));
+                ConstantsProdStage::FILE_SYSTEM_MIGRATION_FILE));
     }
 
     private function extractFileSystem(string $file, string $path, SSHRunner $runner): void
     {
         $tags = $this->createTags($file, $path);
-        $scriptPath = "$path". Constants::UN_ARCHIVE_SCRIPT_PROD;
+        $scriptPath = "$path". ConstantsProdStage::UN_ARCHIVE_SCRIPT;
         $runner->executeBackgroundScript($scriptPath, $tags);
     }
 
@@ -75,7 +77,7 @@ class FileSystemDeployer
         return array(
             "-f \"$file\"",
             "-e \"$path/files/content\"",
-            "-n \"". Constants::FILE_SYSTEM_MIGRATION_FILE_NAME. "\""
+            "-n \"". ConstantsTestStage::FILE_SYSTEM_MIGRATION_FILE_NAME. "\""
         );
     }
 }

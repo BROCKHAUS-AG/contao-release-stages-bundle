@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle;
 
-abstract class Constants
+abstract class DeploymentState
 {
-    public const DEPLOYMENT_TABLE = "tl_release_stages";
-    public const PATH_TO_VENDOR = "/vendor/brockhaus-ag/contao-release-stages-bundle";
-    public const SETTINGS_DIRECTORY = "/settings/brockhaus-ag/contao-release-stages-bundle";
-    public const CONFIG_FILE = self::SETTINGS_DIRECTORY. "/config.json";
+    public const SUCCESS = "SUCCESS";
+    public const FAILURE = "FAILURE";
+    public const PENDING = "PENDING";
+    public const OLD_PENDING = "OLD_PENDING";
 }

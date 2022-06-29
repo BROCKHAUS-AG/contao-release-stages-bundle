@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning;
 
+use BrockhausAg\ContaoReleaseStagesBundle\DeploymentState;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
@@ -54,7 +55,7 @@ class Versioning {
      */
     private function createDummyVersion(): Version
     {
-        return new Version(0, "majorRelease", "0.0", Constants::DEPLOYMENT_PENDING);
+        return new Version(0, "majorRelease", "0.0", DeploymentState::PENDING);
     }
 
     /**

@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\ConstantsProdStage;
+use BrockhausAg\ContaoReleaseStagesBundle\ConstantsTestStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Compress;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\BuildDatabaseMigration;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\CreateTableMigrationBuilder;
@@ -47,7 +49,7 @@ class DatabaseMigrationBuilder
         $this->_ftpConnector = $ftpConnector;
         $this->_config = $config;
         $this->_compressor = $compressor;
-        $this->_io = new IO($path. Constants::DATABASE_MIGRATION_FILE);
+        $this->_io = new IO($path. ConstantsTestStage::DATABASE_MIGRATION_FILE);
     }
 
     /**
@@ -104,9 +106,9 @@ class DatabaseMigrationBuilder
      */
     private function compressMigrationFile(): void
     {
-        $migrationFile = $this->_path. Constants::MIGRATION_DIRECTORY;
-        $directory = $this->_path . Constants::DATABASE_MIGRATION_DIRECTORY;
-        $name = Constants::DATABASE_MIGRATION_FILE_COMPRESSED;
+        $migrationFile = $this->_path. ConstantsTestStage::MIGRATION_DIRECTORY;
+        $directory = $this->_path . ConstantsTestStage::DATABASE_MIGRATION_DIRECTORY;
+        $name = ConstantsTestStage::DATABASE_MIGRATION_FILE_COMPRESSED;
         $this->_compressor->compress($directory, $migrationFile, $name);
     }
 
@@ -119,8 +121,6 @@ class DatabaseMigrationBuilder
             $runner = $this->_ftpConnector->connect();
             $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
             $file = $this->buildFile($fileServerConfigurationPath);
-            $runner->createDirectory($fileServerConfigurationPath. Constants::MIGRATION_DIRECTORY_PROD);
-            $runner->createDirectory($fileServerConfigurationPath. Constants::DATABASE_MIGRATION_FOLDER_PROD);
             $runner->copy($file);
             $this->_ftpConnector->disconnect($runner->getConn());
         }catch (Exception $e) {
@@ -131,13 +131,13 @@ class DatabaseMigrationBuilder
     private function buildFile(string $fileServerConfigurationPath): File
     {
         $fileProd = $this->buildFileProdPath($fileServerConfigurationPath);
-        $fileLocal = $this->_path. Constants::MIGRATION_DIRECTORY. "/". Constants::DATABASE_MIGRATION_FILE_COMPRESSED. ".tar.gz";
+        $fileLocal = $this->_path. ConstantsTestStage::MIGRATION_DIRECTORY. "/". ConstantsTestStage::DATABASE_MIGRATION_FILE_COMPRESSED. ".tar.gz";
         return new File($fileLocal, $fileProd);
     }
 
     private function buildFileProdPath(string $fileServerConfigurationPath): string
     {
-        $fileProd = $fileServerConfigurationPath. Constants::DATABASE_MIGRATION_FILE_PROD;
+        $fileProd = $fileServerConfigurationPath. ConstantsProdStage::DATABASE_MIGRATION_FILE;
         return str_replace("%timestamp%", (string)time(), $fileProd);
     }
 }

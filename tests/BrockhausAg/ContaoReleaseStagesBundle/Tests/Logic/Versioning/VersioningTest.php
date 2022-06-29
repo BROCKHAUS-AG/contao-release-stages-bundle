@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic\Versioning;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\DeploymentState;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Versioning\Versioning;
@@ -48,7 +48,7 @@ class VersioningTest extends ContaoTestCase
     {
         $expected = "1.1";
 
-        $version = new Version(1, "release", "1.0", Constants::DEPLOYMENT_PENDING);
+        $version = new Version(1, "release", "1.0", DeploymentState::PENDING);
         $actual = $this->versioning->createVersionNumber($version, "release");
         self::assertSame($expected, $actual);
     }
@@ -57,7 +57,7 @@ class VersioningTest extends ContaoTestCase
     {
         $expected = "2.0";
 
-        $version = new Version(1, "release", "1.3", Constants::DEPLOYMENT_PENDING);
+        $version = new Version(1, "release", "1.3", DeploymentState::PENDING);
         $actual = $this->versioning->createVersionNumber($version, "majorRelease");
         self::assertSame($expected, $actual);
     }

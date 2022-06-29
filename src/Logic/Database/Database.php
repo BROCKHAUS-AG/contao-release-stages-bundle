@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
+use BrockhausAg\ContaoReleaseStagesBundle\DeploymentState;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants;
@@ -89,7 +90,7 @@ class Database
 
         $latestVersion = $result[1];
         return new Version(intval($latestVersion["id"]), $latestVersion["kindOfRelease"], $latestVersion["version"],
-            Constants::DEPLOYMENT_PENDING);
+            DeploymentState::PENDING);
     }
 
 
@@ -267,7 +268,7 @@ class Database
             ->from(Constants::DEPLOYMENT_TABLE)
             ->where("state = :state")
             ->andWhere("id != :id")
-            ->setParameter("state", Constants::DEPLOYMENT_PENDING)
+            ->setParameter("state", DeploymentState::PENDING)
             ->setParameter("id", $actualId)
             ->execute()
             ->fetchAllAssociative();
@@ -275,6 +276,6 @@ class Database
             return false;
         }
         $state = $result[0]["state"];
-        return $state == Constants::DEPLOYMENT_PENDING;
+        return $state == DeploymentState::PENDING;
     }
 }
