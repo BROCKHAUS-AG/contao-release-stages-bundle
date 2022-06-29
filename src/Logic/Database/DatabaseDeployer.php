@@ -71,7 +71,7 @@ class DatabaseDeployer
 
     private function getFilePath(SSHRunner $runner, string $path): string
     {
-        return $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%_", "*",
+        return $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%", "*",
                 Constants::DATABASE_MIGRATION_FILE_PROD));
     }
 
@@ -86,7 +86,7 @@ class DatabaseDeployer
     {
         return array(
             "-f \"$file\"",
-            "-e \"$path". Constants::DATABASE_MIGRATION_DIRECTORY. "\"",
+            "-e \"$path". Constants::DATABASE_EXTRACTED_MIGRATION_DIRECTORY_PROD. "\"",
             "-n \"". Constants::DATABASE_MIGRATION_FILE_COMPRESSED. "\""
         );
     }

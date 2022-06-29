@@ -67,20 +67,22 @@ class FileSystemMigrationBuilder
     /**
      * @throws FTPCopy
      * @throws FTPConnection
+     * @throws FTPCreateDirectory
      */
     private function copy(string $migrationFile): void
     {
         $runner = $this->_ftpConnector->connect();
-        $prodPath = $this->buildPathForProd();
+        $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
+        $prodPath = $this->buildPathForProd($fileServerConfigurationPath);
         $file = new File(
             "$migrationFile/". Constants::FILE_SYSTEM_MIGRATION_FILE_NAME. ".tar.gz",
             $prodPath
         );
+        $runner->createDirectory($fileServerConfigurationPath. Constants::FILE_SYSTEM_MIGRATION_FOLDER_PROD);
         $runner->copy($file);
     }
 
-    private function buildPathForProd(): string {
-        $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
+    private function buildPathForProd(string $fileServerConfigurationPath): string {
         $fileProd = $fileServerConfigurationPath. Constants::FILE_SYSTEM_MIGRATION_FILE_PROD;
         return str_replace("%timestamp%", (string)time(), $fileProd);
     }

@@ -17,14 +17,12 @@ namespace BrockhausAg\ContaoReleaseStagesBundle;
 abstract class Constants
 {
     public const DEPLOYMENT_TABLE = "tl_release_stages";
-
-
     public const PATH_TO_VENDOR = "/vendor/brockhaus-ag/contao-release-stages-bundle";
-
-
     public const SETTINGS_DIRECTORY = "/settings/brockhaus-ag/contao-release-stages-bundle";
-    public const CONFIG_FILE = self::SETTINGS_DIRECTORY. "/config.json";
 
+    /* ---------------------------------------------------------------------------------------------------------- */
+
+    public const CONFIG_FILE = self::SETTINGS_DIRECTORY. "/config.json";
 
     public const SCRIPT_DIRECTORY = self::PATH_TO_VENDOR. "/scripts";
 
@@ -49,6 +47,7 @@ abstract class Constants
     public const DATABASE_MIGRATION_FILE_COMPRESSED = "database_migration";
     public const FILE_SYSTEM_MIGRATION_FILE_NAME = "file_system_migration";
 
+    /* ---------------------------------------------------------------------------------------------------------- */
 
     public const SCRIPT_DIRECTORY_PROD = "/scripts";
 
@@ -65,9 +64,12 @@ abstract class Constants
     public const MIGRATE_DATABASE_SCRIPT_PROD = self::SCRIPT_DIRECTORY_PROD. "/migrate_database.sh";
 
     public const MIGRATION_DIRECTORY_PROD = "/migrations";
-
-    public const DATABASE_MIGRATION_FILE_PROD = self::MIGRATION_DIRECTORY_PROD. "/%timestamp%_database_migration.tar.gz";
-    public const FILE_SYSTEM_MIGRATION_FILE_PROD = self::MIGRATION_DIRECTORY_PROD. "/%timestamp%_file_system_migration.tar.gz";
+    public const DATABASE_EXTRACTED_MIGRATION_DIRECTORY_PROD = self::MIGRATION_DIRECTORY_PROD. "/database";
+    public const DATABASE_EXTRACTED_MIGRATION_FILE_PROD = self::DATABASE_EXTRACTED_MIGRATION_DIRECTORY_PROD. "/database_migration.sql";
+    public const DATABASE_MIGRATION_FOLDER_PROD = self::MIGRATION_DIRECTORY_PROD. "/database_migration";
+    public const DATABASE_MIGRATION_FILE_PROD = self::DATABASE_MIGRATION_FOLDER_PROD. "/%timestamp%.tar.gz";
+    public const FILE_SYSTEM_MIGRATION_FOLDER_PROD = self::MIGRATION_DIRECTORY_PROD. "/file_system_migration";
+    public const FILE_SYSTEM_MIGRATION_FILE_PROD = self::FILE_SYSTEM_MIGRATION_FOLDER_PROD. "/%timestamp%.tar.gz";
 
     public const DEPLOYMENT_SUCCESS = "SUCCESS";
     public const DEPLOYMENT_FAILURE = "FAILURE";

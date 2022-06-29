@@ -45,7 +45,7 @@ class SSHRunner
     }
 
     /**
-     * Pattern would be something like this /root/migrations/*file_system_migration.tar.gz
+     * Pattern would be something like this /root/migrations/files_system_migration/*.tar.gz
      * The * is the placeholder to search
      */
     public function getPathOfLatestFileWithPattern(string $patternToSearch): string

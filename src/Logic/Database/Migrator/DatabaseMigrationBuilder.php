@@ -120,6 +120,7 @@ class DatabaseMigrationBuilder
             $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
             $file = $this->buildFile($fileServerConfigurationPath);
             $runner->createDirectory($fileServerConfigurationPath. Constants::MIGRATION_DIRECTORY_PROD);
+            $runner->createDirectory($fileServerConfigurationPath. Constants::DATABASE_MIGRATION_FOLDER_PROD);
             $runner->copy($file);
             $this->_ftpConnector->disconnect($runner->getConn());
         }catch (Exception $e) {

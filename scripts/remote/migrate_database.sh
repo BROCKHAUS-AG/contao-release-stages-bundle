@@ -21,7 +21,7 @@ do
   esac
 done
 
-STATE_FILE="$(dirname $0)/database"
+STATE_FILE="$(dirname $0)/migrate_database"
 
 create_pending_file "$STATE_FILE"
 
