@@ -16,7 +16,7 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator;
 
 use Exception;
 
-class DatabaseMigrationBuilder extends Exception
+class BuildDatabaseMigration extends Exception
 {
     public function __construct($message = "", $code = 0)
     {

@@ -14,10 +14,13 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\Migrator;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsProdStage;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsTestStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Compress;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\Migrator\BuildFileSystemMigration;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCopy;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FTP\FTPCreateDirectory;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Compressor;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
@@ -40,16 +43,16 @@ class FileSystemMigrationBuilder
     }
 
     /**
-     * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\Migrator\FileSystemMigrationBuilder
+     * @throws BuildFileSystemMigration
      */
     public function buildAndCopy(): void
     {
-        $migrationFile = $this->_path. Constants::MIGRATION_DIRECTORY;
+        $migrationFile = $this->_path. ConstantsTestStage::MIGRATION_DIRECTORY;
         try {
             $this->compressFiles($migrationFile);
             $this->copy($migrationFile);
         } catch (Exception $e) {
-            throw new \BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\Migrator\FileSystemMigrationBuilder("Couldn't create file system migration: $e");
+            throw new BuildFileSystemMigration("Couldn't create file system migration: $e");
         }
     }
 
@@ -59,27 +62,28 @@ class FileSystemMigrationBuilder
     private function compressFiles(string $migrationFile): void
     {
         $directory = $this->_path. "/files/content";
-        $this->_compressor->compress($directory, $migrationFile, Constants::FILE_SYSTEM_MIGRATION_FILE_NAME);
+        $this->_compressor->compress($directory, $migrationFile, ConstantsProdStage::FILE_SYSTEM_MIGRATION_FILE_NAME);
     }
 
     /**
      * @throws FTPCopy
      * @throws FTPConnection
+     * @throws FTPCreateDirectory
      */
     private function copy(string $migrationFile): void
     {
         $runner = $this->_ftpConnector->connect();
-        $prodPath = $this->buildPathForProd();
+        $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
+        $prodPath = $this->buildPathForProd($fileServerConfigurationPath);
         $file = new File(
-            "$migrationFile/". Constants::FILE_SYSTEM_MIGRATION_FILE_NAME. ".tar.gz",
+            "$migrationFile/". ConstantsProdStage::FILE_SYSTEM_MIGRATION_FILE_NAME. ".tar.gz",
             $prodPath
         );
         $runner->copy($file);
     }
 
-    private function buildPathForProd(): string {
-        $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
-        $fileProd = $fileServerConfigurationPath. Constants::FILE_SYSTEM_MIGRATION_FILE_PROD;
+    private function buildPathForProd(string $fileServerConfigurationPath): string {
+        $fileProd = $fileServerConfigurationPath. ConstantsProdStage::FILE_SYSTEM_MIGRATION_FILE;
         return str_replace("%timestamp%", (string)time(), $fileProd);
     }
 }

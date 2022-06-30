@@ -23,13 +23,17 @@ class LocalFilePoller extends Poller
      * @throws PollTimeout
      * @throws Poll
      *
-     * Run 50 times all 500ms (25s) to check if fail or success file was created. If after 25s no success or fail file
-     * is available, break polling with poll timeout exception
+     * Run 50 times all 500ms (25s) to check if fail or success file was created. If after 25s no success, fail file
+     * or after 4s no pending file is available, break polling with poll timeout exception
      */
     public function pollFile(string $filePath): void
     {
         $repetitions = 0;
-        while ($repetitions < 50) {
+        $noPendingFileFound = 0;
+        while ($repetitions < 50 && $noPendingFileFound <= 3) {
+            if (!$this->checkIfFileExists("$filePath.pending")) {
+                $noPendingFileFound += 1;
+            }
             if ($this->checkIfFileExists("$filePath.success")) {
                 return;
             }
@@ -39,7 +43,7 @@ class LocalFilePoller extends Poller
             usleep(500000);
             $repetitions = $repetitions + 1;
         }
-        throw new PollTimeout("Backup failed, timeout");
+        throw new PollTimeout("Failed, timeout");
     }
 
     private function checkIfFileExists(string $file): bool

@@ -47,6 +47,11 @@
                 <source>Enter a description</source>
                 <target>Geben Sie eine Beschreibung ein</target>
             </trans-unit>
+
+            <trans-unit id="tl_release_stages.state.0">
+                <source>State</source>
+                <target>Status</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -1,0 +1,48 @@
+name: Release
+
+on:
+    push:
+        branches: [ "master" ]
+
+permissions:
+    contents: read
+
+jobs:
+    create-release:
+        runs-on: ubuntu-latest
+
+        if: contains( github.event.head_commit.message, 'release' )
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Set up PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '7.4'
+            - name: Create release notes
+              env:
+                  COMMITTEXT: "${{ github.event.head_commit.message }}"
+              run: |
+                php create-release-notes.php
+            - name: Set Tag Output
+              id: set-tag
+              run: echo "::set-output name=tag_name::$(sh get-version.sh)"
+            - name: Create Tag
+              uses: actions/github-script@3
+              env:
+                  TAG: ${{ steps.set-tag.outputs.tag_name }}
+              with:
+                  github-token: ${{ github.token }}
+                  script: |
+                      github.git.createRef({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                       ref: "refs/tags/${{ steps.set-tag.outputs.tag_name }}",
+                        sha: context.sha
+                      })
+            - name: Create release
+              uses: ncipollo/release-action@v1
+              with:
+                  tag: ${{ steps.set-tag.outputs.tag_name }}
+                  bodyFile: './release_notes.txt'
+                  token: ${{ secrets.GITHUB_TOKEN }}

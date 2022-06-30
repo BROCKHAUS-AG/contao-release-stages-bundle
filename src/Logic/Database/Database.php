@@ -14,11 +14,10 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\DeploymentState;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseQueryEmptyResult;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\NoSubmittedPendingState;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\State\OldDeploymentStateIsPending;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
-use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformation;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Database\TableInformationCollection;
@@ -91,7 +90,7 @@ class Database
 
         $latestVersion = $result[1];
         return new Version(intval($latestVersion["id"]), $latestVersion["kindOfRelease"], $latestVersion["version"],
-            Constants::STATE_PENDING);
+            DeploymentState::PENDING);
     }
 
 
@@ -113,13 +112,17 @@ class Database
     /**
      * @throws Exception
      */
-    public function updateState(string $state, int $id){
+    public function updateState(string $state, int $id, int $executionTime, string $information){
         $this->_dbConnection
             ->createQueryBuilder()
             ->update(Constants::DEPLOYMENT_TABLE)
             ->set("state", ":state")
+            ->set("information", ":information")
+            ->set("execution_time", ":execution_time")
             ->where("id = :id")
             ->setParameter("state", $state)
+            ->setParameter("information", $information)
+            ->setParameter("execution_time", $executionTime)
             ->setParameter("id", $id)
             ->execute();
     }
@@ -232,23 +235,6 @@ class Database
     }
 
     /**
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Driver\Exception
-     */
-    public function getRowsFromTlLogTableWhereIdIsBiggerThanIdAndTextIsLikeDeleteFrom(int $lastId): array
-    {
-        return $this->_dbConnection
-            ->createQueryBuilder()
-            ->select("text")
-            ->from("tl_log")
-            ->where("id > :id")
-            ->andWhere("text LIKE 'DELETE FROM %'")
-            ->setParameter("id", $lastId)
-            ->execute()
-            ->fetchAllAssociative();
-    }
-
-    /**
      * @throws DatabaseQueryEmptyResult
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
@@ -282,7 +268,7 @@ class Database
             ->from(Constants::DEPLOYMENT_TABLE)
             ->where("state = :state")
             ->andWhere("id != :id")
-            ->setParameter("state", Constants::STATE_PENDING)
+            ->setParameter("state", DeploymentState::PENDING)
             ->setParameter("id", $actualId)
             ->execute()
             ->fetchAllAssociative();
@@ -290,6 +276,6 @@ class Database
             return false;
         }
         $state = $result[0]["state"];
-        return $state == Constants::STATE_PENDING;
+        return $state == DeploymentState::PENDING;
     }
 }

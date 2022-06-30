@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Model\Version;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\DeploymentState;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Validation;
-use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 
 class Version
 {
@@ -51,8 +51,8 @@ class Version
      */
     private function checkState(): void
     {
-        if(Constants::STATE_SUCCESS != $this->state && Constants::STATE_FAILURE != $this->state &&
-            Constants::STATE_PENDING != $this->state && Constants::STATE_OLD_PENDING != $this->state)
+        if(DeploymentState::SUCCESS != $this->state && DeploymentState::FAILURE != $this->state &&
+            DeploymentState::PENDING != $this->state && DeploymentState::OLD_PENDING != $this->state)
         {
             throw new Validation("\"$this->state\" is not a valid state");
         }

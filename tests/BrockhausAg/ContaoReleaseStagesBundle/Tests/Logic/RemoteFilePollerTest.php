@@ -41,7 +41,6 @@ class RemoteFilePollerTest extends ContaoTestCase
         $sftpRunnerMock = self::createMock(SFTPRunner::class);
         $sftpRunnerMock
             ->method("checkIfFileExists")
-            ->with("file.success")
             ->willReturn(true);
         $ftpConnectorMock->method("connect")->willReturn($sftpRunnerMock);
 
@@ -65,10 +64,15 @@ class RemoteFilePollerTest extends ContaoTestCase
         $sftpRunnerMock
             ->expects(self::at(0))
             ->method("checkIfFileExists")
+            ->with("file.pending")
+            ->willReturn(true);
+        $sftpRunnerMock
+            ->expects(self::at(1))
+            ->method("checkIfFileExists")
             ->with("file.success")
             ->willReturn(false);
         $sftpRunnerMock
-            ->expects(self::at(1))
+            ->expects(self::at(2))
             ->method("checkIfFileExists")
             ->with("file.fail")
             ->willReturn(true);

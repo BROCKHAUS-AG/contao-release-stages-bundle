@@ -44,6 +44,16 @@ class SSHRunner
         return $this->getResourceId($data);
     }
 
+    /**
+     * Pattern would be something like this /root/migrations/files_system_migration/*.tar.gz
+     * The * is the placeholder to search
+     */
+    public function getPathOfLatestFileWithPattern(string $patternToSearch): string
+    {
+        $data = $this->execute("ls -t $patternToSearch | head -1");
+        return strval($data);
+    }
+
     private function getResourceId($data): int
     {
         return intval(substr($data, strpos($data, " ") + 0));

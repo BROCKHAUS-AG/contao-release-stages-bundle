@@ -12,8 +12,9 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\DeploymentState;
 use BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseStages;
-use BrockhausAg\ContaoReleaseStagesBundle\Constants;
 
 $GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
     'config' => array(
@@ -37,8 +38,8 @@ $GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
             'panelLayout' => 'sort,search,limit'
         ),
         'label' => array(
-            'fields' => array('version', 'title'),
-            'format' => '[ %s ] - %s'
+            'fields' => array('version', 'state', 'title'),
+            'format' => 'v%s - %s - %s'
         ),
         'operations' => array(
             'show' => array(
@@ -51,12 +52,15 @@ $GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
     ),
     'fields' => array(
         'id' => array(
+            'search' => true,
             'sql' => ['type' => 'integer', 'length' => '10', 'unsigned' => true, 'autoincrement' => true]
         ),
         'tstamp' => array(
+            'search' => true,
             'sql' => ['type' => 'integer', 'length' => '10', 'unsigned' => true, 'default' => 0]
         ),
         'version' => array(
+            'search' => true,
             'sql' => ['type' => 'string', 'length' => '255', 'default' => 'None']
         ),
         'kindOfRelease' => array(
@@ -92,7 +96,14 @@ $GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
             'sql' => ['type' => 'string', 'length' => '1024', 'default' => '']
         ),
         'state' => array(
-            'sql' => ['type' => 'string', 'length' => '14', 'default' => Constants::STATE_PENDING]
+            'search' => true,
+            'sql' => ['type' => 'string', 'length' => '14', 'default' => DeploymentState::PENDING]
+        ),
+        'information' => array(
+            'sql' => ['type' => 'text', 'notnull' => false]
+        ),
+        'execution_time' => array(
+            'sql' => ['type' => 'integer', 'notnull' => false]
         )
     ),
     'palettes' => array(

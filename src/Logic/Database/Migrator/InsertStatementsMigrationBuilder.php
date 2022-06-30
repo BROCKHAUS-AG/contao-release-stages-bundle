@@ -69,7 +69,6 @@ class InsertStatementsMigrationBuilder
     }
 
     /**
-     * @throws DatabaseQueryEmptyResult
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws Exception
      */
@@ -113,6 +112,7 @@ class InsertStatementsMigrationBuilder
                 $tableSchemeFields, $row, $column["id"]);
             $index++;
         }
+
         return $this->createReturnValue($rows, $tableSchemeFields, $columnAndValue);
     }
 
@@ -123,23 +123,23 @@ class InsertStatementsMigrationBuilder
     private function createRowsAndColumn(array $tableSchemes, array &$rows, array &$columnAndValue,
                                          string $tableName, array &$tableSchemeFields, ?string $row, ?string $id): void
     {
-        $type = $tableSchemes["type"];
+        $type = $tableSchemes["Type"];
         if ($type == null) {
             return;
         }
         if ($this->checkIfColumnTypeIsText($type)) {
-            $this->createRowsAndColumnValuesForText($rows, $tableSchemes["field"], $columnAndValue, $row);
-        } else if ($this->checkIfColumnIsNullable($tableSchemes["nullable"], $row)) {
-            $this->setRowsAndColumnsNull($rows, $tableSchemes["field"], $columnAndValue);
+            $this->createRowsAndColumnValuesForText($rows, $tableSchemes["Field"], $columnAndValue, $row);
+        } else if ($this->checkIfColumnIsNullable($tableSchemes["Null"], $row)) {
+            $this->setRowsAndColumnsNull($rows, $tableSchemes["Field"], $columnAndValue);
         } else if ($this->checkIfColumnTypeIsBinary($type)) {
-            $this->createRowsAndColumnForBinary($tableSchemes["field"], $tableName, $rows, $columnAndValue, $id);
+            $this->createRowsAndColumnForBinary($tableSchemes["Field"], $tableName, $rows, $columnAndValue, $id);
         } else if ($this->checkIfColumnTypeIsBlob($type)) {
-            $this->createRowsAndColumnForBlob($rows, $tableSchemes["field"], $columnAndValue, $row);
+            $this->createRowsAndColumnForBlob($rows, $tableSchemes["Field"], $columnAndValue, $row);
         } else {
-            $this->createRowsAndColumnForNothing($rows, $tableSchemes["field"], $columnAndValue, $row);
+            $this->createRowsAndColumnForNothing($rows, $tableSchemes["Field"], $columnAndValue, $row);
         }
 
-        $tableSchemeFields[] = $tableSchemes["field"];
+        $tableSchemeFields[] = $tableSchemes["Field"];
     }
 
     private function checkIfColumnTypeIsText(string $type): bool

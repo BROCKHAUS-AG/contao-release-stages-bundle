@@ -14,10 +14,13 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsProdStage;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsTestStage;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Compress;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\BuildDatabaseMigration;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\CreateTableMigrationBuilder;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DeleteMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\InsertMigrationBuilder;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Compressor;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
@@ -29,28 +32,27 @@ class DatabaseMigrationBuilder
 {
     private CreateTableStatementsMigrationBuilder $_createTableStatementsMigrationBuilder;
     private InsertStatementsMigrationBuilder $_insertStatementsMigrationBuilder;
-    private DeleteStatementsMigrationBuilder $_deleteStatementsMigrationBuilder;
-    private string $_filePath;
+    private string $_path;
     private FTPConnector $_ftpConnector;
     private Config $_config;
+    private Compressor $_compressor;
     private IO $_io;
 
     public function __construct(CreateTableStatementsMigrationBuilder $createTableStatementsMigrationBuilder,
-                                InsertStatementsMigrationBuilder $insertStatementsMigrationBuilder,
-                                DeleteStatementsMigrationBuilder $deleteStatementsMigrationBuilder, string $path,
-                                FTPConnector $ftpConnector, Config $config)
+                                InsertStatementsMigrationBuilder $insertStatementsMigrationBuilder, string $path,
+                                FTPConnector $ftpConnector, Config $config, Compressor $compressor)
     {
         $this->_createTableStatementsMigrationBuilder = $createTableStatementsMigrationBuilder;
         $this->_insertStatementsMigrationBuilder = $insertStatementsMigrationBuilder;
-        $this->_deleteStatementsMigrationBuilder = $deleteStatementsMigrationBuilder;
+        $this->_path = $path;
         $this->_ftpConnector = $ftpConnector;
         $this->_config = $config;
-        $this->_filePath = $path. Constants::DATABASE_MIGRATION_FILE;
-        $this->_io = new IO($this->_filePath);
+        $this->_compressor = $compressor;
+        $this->_io = new IO($path. ConstantsTestStage::DATABASE_MIGRATION_FILE);
     }
 
     /**
-     * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder
+     * @throws BuildDatabaseMigration
      */
     public function buildAndCopy(): void
     {
@@ -59,35 +61,33 @@ class DatabaseMigrationBuilder
     }
 
     /**
-     * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder
+     * @throws BuildDatabaseMigration
      */
     private function createMigrationFile(): void
     {
         try {
             $statements = $this->buildStatements();
             $this->saveStatementsToMigrationFile($statements);
+            $this->compressMigrationFile();
         } catch (Throwable $e) {
-            throw new \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder("Couldn't build migration: $e");
+            throw new BuildDatabaseMigration("Couldn't build migration: $e");
         }
     }
 
     /**
      * @throws InsertMigrationBuilder
-     * @throws DeleteMigrationBuilder
      * @throws CreateTableMigrationBuilder
      */
     private function buildStatements(): array
     {
         $createTableStatements = $this->_createTableStatementsMigrationBuilder->build();
         $insertStatements = $this->_insertStatementsMigrationBuilder->build();
-        $deleteStatements = $this->_deleteStatementsMigrationBuilder->build();
-        return $this->combineStatements($createTableStatements, $insertStatements, $deleteStatements);
+        return $this->combineStatements($createTableStatements, $insertStatements);
     }
 
-    private function combineStatements(array $createTableStatements, array $insertStatements,
-                                       array $deleteStatements): array
+    private function combineStatements(array $createTableStatements, array $insertStatements): array
     {
-        return array_merge($createTableStatements, $insertStatements, $deleteStatements);
+        return array_merge($createTableStatements, $insertStatements);
     }
 
     private function saveStatementsToMigrationFile(array $statements): void
@@ -101,7 +101,18 @@ class DatabaseMigrationBuilder
     }
 
     /**
-     * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder
+     * @throws Compress
+     */
+    private function compressMigrationFile(): void
+    {
+        $migrationFile = $this->_path. ConstantsTestStage::MIGRATION_DIRECTORY;
+        $directory = $this->_path . ConstantsTestStage::DATABASE_MIGRATION_DIRECTORY;
+        $name = ConstantsProdStage::DATABASE_MIGRATION_FILE_COMPRESSED;
+        $this->_compressor->compress($directory, $migrationFile, $name);
+    }
+
+    /**
+     * @throws BuildDatabaseMigration
      */
     private function copyMigrationFileToProd(): void
     {
@@ -109,23 +120,23 @@ class DatabaseMigrationBuilder
             $runner = $this->_ftpConnector->connect();
             $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
             $file = $this->buildFile($fileServerConfigurationPath);
-            $runner->createDirectory($fileServerConfigurationPath. Constants::MIGRATION_DIRECTORY_PROD);
             $runner->copy($file);
             $this->_ftpConnector->disconnect($runner->getConn());
         }catch (Exception $e) {
-            throw new \BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DatabaseMigrationBuilder("Couldn't copy migration file: $e");
+            throw new BuildDatabaseMigration("Couldn't copy migration file: $e");
         }
     }
 
     private function buildFile(string $fileServerConfigurationPath): File
     {
         $fileProd = $this->buildFileProdPath($fileServerConfigurationPath);
-        return new File($this->_filePath, $fileProd);
+        $fileLocal = $this->_path. ConstantsTestStage::MIGRATION_DIRECTORY. "/". ConstantsProdStage::DATABASE_MIGRATION_FILE_COMPRESSED. ".tar.gz";
+        return new File($fileLocal, $fileProd);
     }
 
     private function buildFileProdPath(string $fileServerConfigurationPath): string
     {
-        $fileProd = $fileServerConfigurationPath. Constants::DATABASE_MIGRATION_FILE_PROD;
+        $fileProd = $fileServerConfigurationPath. ConstantsProdStage::DATABASE_MIGRATION_FILE;
         return str_replace("%timestamp%", (string)time(), $fileProd);
     }
 }

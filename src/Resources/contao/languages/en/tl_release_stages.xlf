@@ -36,6 +36,10 @@
             <trans-unit id="tl_release_stages.description.1">
                 <source>Enter a description</source>
             </trans-unit>
+
+            <trans-unit id="tl_release_stages.state.0">
+                <source>State</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

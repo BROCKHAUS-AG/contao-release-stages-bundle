@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Tests\Logic;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Logger\Logger;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecord;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ftp;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ssh;
