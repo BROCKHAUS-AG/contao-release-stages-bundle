@@ -21,6 +21,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\PollTimeout;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Extractor;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\Poller;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
@@ -30,12 +31,15 @@ use Exception;
 class DatabaseDeployer
 {
     private SSHConnector $_sshConnection;
+    private Extractor $_extractor;
     private Poller $_poller;
     private Config $_config;
 
-    public function __construct(SSHConnector $sshConnection, RemoteFilePoller $poller,  Config $config)
+    public function __construct(SSHConnector $sshConnection, Extractor $extractor, RemoteFilePoller $poller,
+                                Config $config)
     {
         $this->_sshConnection = $sshConnection;
+        $this->_extractor = $extractor;
         $this->_poller = $poller;
         $this->_config = $config;
     }
@@ -58,38 +62,18 @@ class DatabaseDeployer
         }
     }
 
-    /**
-     * @throws Poll
-     * @throws PollTimeout
-     */
     private function extract(SSHRunner $runner, string $path): void
     {
         $file = $this->getFilePath($runner, $path);
-        $this->extractMigrationFile($file, $path, $runner);
-        $this->_poller->pollFile($path. ConstantsProdStage::SCRIPT_DIRECTORY. "/un_archive_".
-            ConstantsTestStage::DATABASE_MIGRATION_FILE_COMPRESSED);
+        $extractedPath = $path. ConstantsProdStage::DATABASE_EXTRACTED_MIGRATION_DIRECTORY;
+        $this->_extractor->extract($runner, $file, $extractedPath,
+            ConstantsProdStage::DATABASE_MIGRATION_FILE_COMPRESSED, $path);
     }
 
     private function getFilePath(SSHRunner $runner, string $path): string
     {
-        return $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%", "*",
-                ConstantsProdStage::DATABASE_MIGRATION_FILE));
-    }
-
-    private function extractMigrationFile(string $file, string $path, SSHRunner $runner): void
-    {
-        $tags = $this->createTagsToExtract($file, $path);
-        $scriptPath = $path. ConstantsProdStage::UN_ARCHIVE_SCRIPT;
-        $runner->executeBackgroundScript($scriptPath, $tags);
-    }
-
-    private function createTagsToExtract(string $file, string $path): array
-    {
-        return array(
-            "-f \"$file\"",
-            "-e \"$path". ConstantsProdStage::DATABASE_EXTRACTED_MIGRATION_DIRECTORY. "\"",
-            "-n \"". ConstantsTestStage::DATABASE_MIGRATION_FILE_COMPRESSED. "\""
-        );
+        return $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%",
+                "*", ConstantsProdStage::DATABASE_MIGRATION_FILE));
     }
 
     /**

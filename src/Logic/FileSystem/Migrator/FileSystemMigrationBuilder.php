@@ -62,7 +62,7 @@ class FileSystemMigrationBuilder
     private function compressFiles(string $migrationFile): void
     {
         $directory = $this->_path. "/files/content";
-        $this->_compressor->compress($directory, $migrationFile, ConstantsTestStage::FILE_SYSTEM_MIGRATION_FILE_NAME);
+        $this->_compressor->compress($directory, $migrationFile, ConstantsProdStage::FILE_SYSTEM_MIGRATION_FILE_NAME);
     }
 
     /**
@@ -76,7 +76,7 @@ class FileSystemMigrationBuilder
         $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
         $prodPath = $this->buildPathForProd($fileServerConfigurationPath);
         $file = new File(
-            "$migrationFile/". ConstantsTestStage::FILE_SYSTEM_MIGRATION_FILE_NAME. ".tar.gz",
+            "$migrationFile/". ConstantsProdStage::FILE_SYSTEM_MIGRATION_FILE_NAME. ".tar.gz",
             $prodPath
         );
         $runner->copy($file);

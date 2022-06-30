@@ -62,7 +62,7 @@ class ReleaseStages
             $this->_releaseDeployer->deploy();
             $this->_finisher->finishWithSuccess($actualId, $this->_timer->getSpendTime());
         }catch (ReleaseBuild $exception) {
-            $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(), $exception);
+            $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(), $exception->getMessage());
         }catch (ReleaseDeployment $releaseDeploymentException) {
             $this->rollback($actualId, $releaseDeploymentException);
         }
@@ -75,10 +75,11 @@ class ReleaseStages
     {
         try {
             $this->_releaseRollbacker->rollback();
-            $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(), $releaseDeploymentException);
+            $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(),
+                $releaseDeploymentException->getMessage());
         }catch (ReleaseRollback $releaseRollbackException) {
             $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(),
-                "$releaseDeploymentException $releaseRollbackException");
+                $releaseDeploymentException->getMessage(). $releaseRollbackException->getMessage());
         }
     }
 }

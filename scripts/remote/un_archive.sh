@@ -14,7 +14,7 @@ do
   esac
 done
 
-STATE_FILE="$(dirname $0)/un_archive_$name"
+STATE_FILE="$(dirname $0)/$name"
 
 create_pending_file "$STATE_FILE"
 

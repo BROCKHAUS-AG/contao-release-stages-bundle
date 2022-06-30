@@ -51,9 +51,9 @@ class Finisher {
     /**
      * @throws Exception
      */
-    public function finishWithFailure(int $actualId, int $executionTime, $exception): void
+    public function finishWithFailure(int $actualId, int $executionTime, string $exception): void
     {
-        $this->_stateSynchronizer->updateState(DeploymentState::FAILURE, $actualId, $executionTime, $exception->getMessage());
-        $this->_logger->error("Deployment failed: ". $exception->getMessage());
+        $this->_stateSynchronizer->updateState(DeploymentState::FAILURE, $actualId, $executionTime, $exception);
+        $this->_logger->error("Deployment failed: ". $exception);
     }
 }

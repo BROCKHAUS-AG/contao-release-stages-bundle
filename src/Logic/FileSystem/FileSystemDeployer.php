@@ -15,12 +15,10 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsProdStage;
-use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsTestStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\FileSystemDeployment;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\Poller;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Extractor;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHRunner;
 use Exception;
@@ -28,13 +26,13 @@ use Exception;
 class FileSystemDeployer
 {
     private SSHConnector $_sshConnection;
-    private Poller $_poller;
+    private Extractor $_extractor;
     private Config $_config;
 
-    public function __construct(SSHConnector $sshConnection, RemoteFilePoller $poller,  Config $config)
+    public function __construct(SSHConnector $sshConnection, Extractor $extractor, Config $config)
     {
         $this->_sshConnection = $sshConnection;
-        $this->_poller = $poller;
+        $this->_extractor = $extractor;
         $this->_config = $config;
     }
 
@@ -47,10 +45,9 @@ class FileSystemDeployer
         $runner = $this->_sshConnection->connect();
         try {
             $path = $this->_config->getFileServerConfiguration()->getPath();
-            $file = $this->getFilePath($runner, $path);
-            $this->extractFileSystem($file, $path, $runner);
-            $this->_poller->pollFile("$path". ConstantsProdStage::SCRIPT_DIRECTORY. "/un_archive_".
-                ConstantsTestStage::FILE_SYSTEM_MIGRATION_FILE_NAME);
+            $toBeExtracted = $this->getFilePath($runner, $path);
+            $extractedPath = $path. ConstantsProdStage::FILE_SYSTEM_PATH;
+            $this->_extractor->extract($runner, $toBeExtracted, $extractedPath, ConstantsProdStage::FILE_SYSTEM_MIGRATION_FILE_NAME, $path);
         } catch (Exception $e) {
             throw new FileSystemDeployment("Couldn't deploy file system: $e");
         }finally {
@@ -60,23 +57,7 @@ class FileSystemDeployer
 
     private function getFilePath(SSHRunner $runner, string $path): string
     {
-        return $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%", "*",
-                ConstantsProdStage::FILE_SYSTEM_MIGRATION_FILE));
-    }
-
-    private function extractFileSystem(string $file, string $path, SSHRunner $runner): void
-    {
-        $tags = $this->createTags($file, $path);
-        $scriptPath = "$path". ConstantsProdStage::UN_ARCHIVE_SCRIPT;
-        $runner->executeBackgroundScript($scriptPath, $tags);
-    }
-
-    private function createTags(string $file, string $path): array
-    {
-        return array(
-            "-f \"$file\"",
-            "-e \"$path/files/content\"",
-            "-n \"". ConstantsTestStage::FILE_SYSTEM_MIGRATION_FILE_NAME. "\""
-        );
+        return $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%",
+                "*", ConstantsProdStage::FILE_SYSTEM_MIGRATION_FILE));
     }
 }

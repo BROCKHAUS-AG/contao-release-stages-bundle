@@ -107,7 +107,7 @@ class DatabaseMigrationBuilder
     {
         $migrationFile = $this->_path. ConstantsTestStage::MIGRATION_DIRECTORY;
         $directory = $this->_path . ConstantsTestStage::DATABASE_MIGRATION_DIRECTORY;
-        $name = ConstantsTestStage::DATABASE_MIGRATION_FILE_COMPRESSED;
+        $name = ConstantsProdStage::DATABASE_MIGRATION_FILE_COMPRESSED;
         $this->_compressor->compress($directory, $migrationFile, $name);
     }
 
@@ -130,7 +130,7 @@ class DatabaseMigrationBuilder
     private function buildFile(string $fileServerConfigurationPath): File
     {
         $fileProd = $this->buildFileProdPath($fileServerConfigurationPath);
-        $fileLocal = $this->_path. ConstantsTestStage::MIGRATION_DIRECTORY. "/". ConstantsTestStage::DATABASE_MIGRATION_FILE_COMPRESSED. ".tar.gz";
+        $fileLocal = $this->_path. ConstantsTestStage::MIGRATION_DIRECTORY. "/". ConstantsProdStage::DATABASE_MIGRATION_FILE_COMPRESSED. ".tar.gz";
         return new File($fileLocal, $fileProd);
     }
 
