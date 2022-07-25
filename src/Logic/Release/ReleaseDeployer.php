@@ -49,6 +49,7 @@ class ReleaseDeployer
      * @throws FileSystemDeployment
      * @throws SSHConnection
      * @throws DatabaseDeployment
+     * @throws Exception
      */
     private function deployNewRelease(): void
     {
