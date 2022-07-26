@@ -68,5 +68,8 @@
     },
     "extra": {
         "contao-manager-plugin": "BrockhausAg\\ContaoReleaseStagesBundle\\ContaoManager\\Plugin"
+    },
+    "config": {
+        "allow-plugins": true
     }
 }
