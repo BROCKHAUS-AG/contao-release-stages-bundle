@@ -76,7 +76,7 @@ class ReleaseStages
         try {
             $this->_releaseRollbacker->rollback();
             $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(),
-                $releaseDeploymentException->getMessage());
+                $releaseDeploymentException->getMessage(), true);
         }catch (ReleaseRollback $releaseRollbackException) {
             $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(),
                 $releaseDeploymentException->getMessage(). $releaseRollbackException->getMessage());

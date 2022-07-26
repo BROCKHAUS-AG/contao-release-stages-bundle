@@ -27,7 +27,8 @@ class Extractor
         $this->_poller = $poller;
     }
 
-    public function extract(SSHRunner $runner, string $toBeExtracted, string $extractedPath, string $pollName, string $path): void
+    public function extract(SSHRunner $runner, string $toBeExtracted, string $extractedPath, string $pollName,
+                            string $path): void
     {
         $tags = $this->createTags($toBeExtracted, $extractedPath, $pollName);
         $runner->executeBackgroundScript($path. ConstantsProdStage::UN_ARCHIVE_SCRIPT, $tags);

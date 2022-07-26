@@ -51,9 +51,15 @@ class Finisher {
     /**
      * @throws Exception
      */
-    public function finishWithFailure(int $actualId, int $executionTime, string $exception): void
+    public function finishWithFailure(int $actualId, int $executionTime, string $exception, bool $rollback = false): void
     {
-        $this->_stateSynchronizer->updateState(DeploymentState::FAILURE, $actualId, $executionTime, $exception);
-        $this->_logger->error("Deployment failed: ". $exception);
+        $this->_stateSynchronizer->updateState(DeploymentState::FAILURE, $actualId, $executionTime, $exception,
+            $rollback);
+        if ($rollback) {
+            $message = "Deployment and rollback failed";
+        }else {
+            $message = "Deployment failed";
+        }
+        $this->_logger->error("$message: ". $exception);
     }
 }

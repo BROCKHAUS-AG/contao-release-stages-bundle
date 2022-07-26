@@ -15,20 +15,19 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\Poller;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Extractor;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
 
 class DatabaseRollbacker
 {
     private SSHConnector $_sshConnection;
-    private Poller $_poller;
+    private Extractor $_extractor;
     private Config $_config;
 
-    public function __construct(SSHConnector $sshConnection, RemoteFilePoller $poller,  Config $config)
+    public function __construct(SSHConnector $sshConnection, Extractor $extractor,  Config $config)
     {
         $this->_sshConnection = $sshConnection;
-        $this->_poller = $poller;
+        $this->_extractor = $extractor;
         $this->_config = $config;
     }
 
