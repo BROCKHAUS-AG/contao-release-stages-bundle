@@ -68,6 +68,23 @@ class Database
     }
 
     /**
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    public function getKindOfReleaseById(int $id): string
+    {
+        $result = $this->_dbConnection
+            ->createQueryBuilder()
+            ->select("kindOfRelease")
+            ->from(Constants::DEPLOYMENT_TABLE)
+            ->where("id = :id")
+            ->setParameter("id", $id)
+            ->execute()
+            ->fetchAssociative();
+        return $result["kindOfRelease"];
+    }
+
+    /**
      * @throws DatabaseQueryEmptyResult
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws Exception
@@ -281,4 +298,5 @@ class Database
         $state = $result[0]["state"];
         return $state == DeploymentState::PENDING;
     }
+
 }
