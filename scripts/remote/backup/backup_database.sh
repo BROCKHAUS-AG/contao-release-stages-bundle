@@ -29,11 +29,10 @@ mkdir -p "$final_path"
 
 BACKUP_FILE="$final_path/$(date +%s).sql"
 {
-  mysqldump --opt --no-tablespaces -u "$user" -p"$password" -h"$host" "$database" > "$BACKUP_FILE"
+  mysqldump --column-statistics=0 -u "$user" -p"$password" -h"$host" "$database" > "$BACKUP_FILE"
 } || {
   rm "$BACKUP_FILE"
   create_finish_failure_file "$STATE_FILE"
 }
 
 create_finish_success_file "$STATE_FILE"
-
