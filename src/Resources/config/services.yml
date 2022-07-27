@@ -95,8 +95,9 @@ services:
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseRollbacker:
         arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Rollbacker'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Extractor'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
         shared: false
 

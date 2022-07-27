@@ -14,25 +14,52 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsProdStage;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseRollback;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Extractor;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\Poller;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Rollbacker;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
+use Exception;
 
 class DatabaseRollbacker
 {
+    private Rollbacker $_rollbacker;
     private SSHConnector $_sshConnection;
-    private Extractor $_extractor;
+    private Poller $_poller;
     private Config $_config;
 
-    public function __construct(SSHConnector $sshConnection, Extractor $extractor,  Config $config)
+    public function __construct(Rollbacker $rollbacker, SSHConnector $sshConnection, RemoteFilePoller $poller,
+                                Config $config)
     {
+        $this->_rollbacker = $rollbacker;
         $this->_sshConnection = $sshConnection;
-        $this->_extractor = $extractor;
+        $this->_poller = $poller;
         $this->_config = $config;
     }
 
+    /**
+     * @throws DatabaseRollback
+     */
     public function rollback(): void
     {
+        try {
+            $path = $this->_config->getFileServerConfiguration()->getPath();
+            $extractTo = $path. ConstantsProdStage::DATABASE_EXTRACTED_MIGRATION_DIRECTORY;
+            $this->_rollbacker->rollback($extractTo,
+                ConstantsProdStage::DATABASE_ROLLBACK_FILE_NAME,
+                $path, $path. ConstantsProdStage::BACKUP_DATABASE_PATH,
+                Constants::FILE_TIMESTAMP_PATTERN);
+            $this->uploadBackup();
 
+        } catch (Exception $e) {
+            throw new DatabaseRollback("Couldn't rollback database: $e");
+        }
+    }
+
+    private function uploadBackup()
+    {
     }
 }

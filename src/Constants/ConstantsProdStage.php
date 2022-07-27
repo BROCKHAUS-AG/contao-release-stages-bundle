@@ -29,6 +29,7 @@ abstract class ConstantsProdStage
     public const BACKUP_DATABASE_POLL_FILENAME = self::BACKUP_DIRECTORY. "/database_backup";
 
     public const BACKUP_FILE_SYSTEM_PATH = "/backups/file_system/". Constants::FILE_TIMESTAMP_PATTERN. ".tar.gz" ;
+    public const BACKUP_DATABASE_PATH = "/backups/database/". Constants::FILE_TIMESTAMP_PATTERN. ".sql";
 
     public const UN_ARCHIVE_SCRIPT = self::SCRIPT_DIRECTORY. "/un_archive.sh";
     public const MIGRATE_DATABASE_SCRIPT = self::SCRIPT_DIRECTORY. "/migrate_database.sh";
@@ -44,6 +45,7 @@ abstract class ConstantsProdStage
 
     public const UN_ARCHIVE_FILE_NAME_EXTENSION = "un_archive_";
     public const DATABASE_MIGRATION_FILE_COMPRESSED = "database_migration";
+    public const DATABASE_ROLLBACK_FILE_NAME = "file_system_rollback";
     public const FILE_SYSTEM_MIGRATION_FILE_NAME = "file_system_migration";
     public const FILE_SYSTEM_ROLLBACK_FILE_NAME = "file_system_rollback";
 
