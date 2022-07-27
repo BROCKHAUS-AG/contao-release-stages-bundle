@@ -10,7 +10,7 @@
 . ~/scripts/create_state.sh
 
 
-while getopts u:p:h:d:t: flag
+while getopts u:p:h:d:f: flag
 do
   case "${flag}" in
     u) user=${OPTARG};;
