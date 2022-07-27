@@ -21,7 +21,6 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ftp;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ssh;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
 
@@ -59,11 +58,6 @@ class Config {
         return $this->getConfig()->getDnsRecords();
     }
 
-    public function getWhereToCopy(): string
-    {
-        return $this->getConfig()->getCopyTo();
-    }
-
     public function getFileServerConfiguration(): FileServer
     {
         return $this->getConfig()->getFileServer();
@@ -77,11 +71,6 @@ class Config {
     public function getSSHConfiguration(): Ssh
     {
         return $this->getFileServerConfiguration()->getSsh();
-    }
-
-    public function getLocalFileServerConfiguration(): Local
-    {
-        return $this->getConfig()->getLocal();
     }
 
     public function getMaxSpendTimeWhileCreatingRelease(): int
