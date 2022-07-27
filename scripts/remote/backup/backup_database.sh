@@ -33,6 +33,7 @@ BACKUP_FILE="$final_path/$(date +%s).sql"
 } || {
   rm "$BACKUP_FILE"
   create_finish_failure_file "$STATE_FILE"
+  exit
 }
 
 create_finish_success_file "$STATE_FILE"
