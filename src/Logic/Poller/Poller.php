@@ -14,6 +14,13 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\PollTimeout;
+
 abstract class Poller {
+    /**
+     * @throws Poll
+     * @throws PollTimeout
+     */
     public abstract function pollFile(string $filePath): void;
 }

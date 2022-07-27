@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Database;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsProdStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsTestStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseDeployment;
@@ -72,8 +73,9 @@ class DatabaseDeployer
 
     private function getFilePath(SSHRunner $runner, string $path): string
     {
-        return $runner->getPathOfLatestFileWithPattern($path. str_replace("%timestamp%",
-                "*", ConstantsProdStage::DATABASE_MIGRATION_FILE));
+        return $runner->getPathOfLatestFileWithPattern($path. str_replace(
+            Constants::FILE_TIMESTAMP_PATTERN, "*",
+            ConstantsProdStage::DATABASE_MIGRATION_FILE));
     }
 
     /**
