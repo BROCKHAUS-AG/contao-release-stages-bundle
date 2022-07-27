@@ -62,6 +62,11 @@
                 <source>Execution time</source>
                 <target>Ausführungszeit</target>
             </trans-unit>
+
+            <trans-unit id="tl_release_stages.rollback.0">
+                <source>Rollback</source>
+                <target>Wiederherstellung</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
