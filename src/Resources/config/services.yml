@@ -130,10 +130,16 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
         shared: false
 
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DeleteStatementsMigrationBuilder:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database'
+        shared: false
+
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrationBuilder:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\CreateTableStatementsMigrationBuilder'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\InsertStatementsMigrationBuilder'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DeleteStatementsMigrationBuilder'
             - '%kernel.project_dir%'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'

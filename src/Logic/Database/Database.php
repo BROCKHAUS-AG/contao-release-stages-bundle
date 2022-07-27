@@ -299,4 +299,24 @@ class Database
         return $state == DeploymentState::PENDING;
     }
 
+    /**
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws DatabaseQueryEmptyResult
+     */
+    public function getDeleteStatementsFromTlLogTable(): array
+    {
+        $result = $this->_dbConnection
+            ->createQueryBuilder()
+            ->select("text")
+            ->from("tl_log")
+            ->where("text LIKE 'DELETE FROM %'")
+            ->execute()
+            ->fetchAllAssociative();
+
+        if ($result == NULL) {
+            throw new DatabaseQueryEmptyResult();
+        }
+        return $result;
+    }
 }

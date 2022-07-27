@@ -19,6 +19,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsTestStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Compress;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\BuildDatabaseMigration;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\CreateTableMigrationBuilder;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\DeleteMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\Migrator\InsertMigrationBuilder;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Compressor;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
@@ -32,6 +33,7 @@ class DatabaseMigrationBuilder
 {
     private CreateTableStatementsMigrationBuilder $_createTableStatementsMigrationBuilder;
     private InsertStatementsMigrationBuilder $_insertStatementsMigrationBuilder;
+    private DeleteStatementsMigrationBuilder  $_deleteStatementsMigrationBuilder;
     private string $_path;
     private FTPConnector $_ftpConnector;
     private Config $_config;
@@ -39,11 +41,13 @@ class DatabaseMigrationBuilder
     private IO $_io;
 
     public function __construct(CreateTableStatementsMigrationBuilder $createTableStatementsMigrationBuilder,
-                                InsertStatementsMigrationBuilder $insertStatementsMigrationBuilder, string $path,
+                                InsertStatementsMigrationBuilder $insertStatementsMigrationBuilder,
+                                DeleteStatementsMigrationBuilder $deleteStatementsMigrationBuilder, string $path,
                                 FTPConnector $ftpConnector, Config $config, Compressor $compressor)
     {
         $this->_createTableStatementsMigrationBuilder = $createTableStatementsMigrationBuilder;
         $this->_insertStatementsMigrationBuilder = $insertStatementsMigrationBuilder;
+        $this->_deleteStatementsMigrationBuilder = $deleteStatementsMigrationBuilder;
         $this->_path = $path;
         $this->_ftpConnector = $ftpConnector;
         $this->_config = $config;
@@ -77,17 +81,20 @@ class DatabaseMigrationBuilder
     /**
      * @throws InsertMigrationBuilder
      * @throws CreateTableMigrationBuilder
+     * @throws DeleteMigrationBuilder
      */
     private function buildStatements(): array
     {
         $createTableStatements = $this->_createTableStatementsMigrationBuilder->build();
         $insertStatements = $this->_insertStatementsMigrationBuilder->build();
-        return $this->combineStatements($createTableStatements, $insertStatements);
+        $deleteStatements = $this->_deleteStatementsMigrationBuilder->build();
+        return $this->combineStatements($createTableStatements, $insertStatements, $deleteStatements);
     }
 
-    private function combineStatements(array $createTableStatements, array $insertStatements): array
+    private function combineStatements(array $createTableStatements, array $insertStatements,
+                                       array $deleteStatements): array
     {
-        return array_merge($createTableStatements, $insertStatements);
+        return array_merge($createTableStatements, $insertStatements, $deleteStatements);
     }
 
     private function saveStatementsToMigrationFile(array $statements): void
