@@ -81,10 +81,15 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseDeployer'
         shared: false
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\FileSystemRollbacker:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Rollbacker:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Extractor'
+        shared: false
+
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\FileSystemRollbacker:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Rollbacker'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
         shared: false
 
