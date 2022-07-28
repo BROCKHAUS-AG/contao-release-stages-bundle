@@ -27,11 +27,16 @@ create_pending_file "$STATE_FILE"
 final_path="$to_path/database"
 mkdir -p "$final_path"
 
-BACKUP_FILE="$final_path/$(date +%s).sql"
+BACKUP_TEMP_FILE="$final_path/temp.sql"
+BACKUP_FILE="$final_path/$(date +%s).tar.gz"
 {
-  mysqldump --column-statistics=0 -u "$user" -p"$password" -h"$host" "$database" > "$BACKUP_FILE"
+  mysqldump --column-statistics=0 -u "$user" -p"$password" -h"$host" "$database" > "$BACKUP_TEMP_FILE"
+  if [ -d "$final_path" ]; then
+    tar czf "$BACKUP_FILE" --directory="$final_path" .
+    rm "$BACKUP_TEMP_FILE"
+  fi
 } || {
-  rm "$BACKUP_FILE"
+  rm "$BACKUP_TEMP_FILE"
   create_finish_failure_file "$STATE_FILE"
   exit
 }
