@@ -37,7 +37,7 @@ class ReleaseRollbacker
     {
         try {
             $this->_fileSystemRollbacker->rollback();
-            //$this->_databaseRollbacker->rollback();
+            $this->_databaseRollbacker->rollback();
         }catch (Exception $exception) {
             throw new ReleaseRollback("Couldn't rollback release: $exception");
         }

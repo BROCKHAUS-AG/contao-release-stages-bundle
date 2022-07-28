@@ -18,13 +18,10 @@ use BrockhausAg\ContaoReleaseStagesBundle\Constants\Constants;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsProdStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsTestStage;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\Database\DatabaseDeployment;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\PollTimeout;
 use BrockhausAg\ContaoReleaseStagesBundle\Exception\SSH\SSHConnection;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrator;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Extractor;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\Poller;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHRunner;
 use Exception;
@@ -33,15 +30,15 @@ class DatabaseDeployer
 {
     private SSHConnector $_sshConnection;
     private Extractor $_extractor;
-    private Poller $_poller;
     private Config $_config;
+    private DatabaseMigrator $_databaseMigrator;
 
-    public function __construct(SSHConnector $sshConnection, Extractor $extractor, RemoteFilePoller $poller,
+    public function __construct(SSHConnector $sshConnection, Extractor $extractor, DatabaseMigrator $databaseMigrator,
                                 Config $config)
     {
         $this->_sshConnection = $sshConnection;
         $this->_extractor = $extractor;
-        $this->_poller = $poller;
+        $this->_databaseMigrator = $databaseMigrator;
         $this->_config = $config;
     }
 
@@ -55,7 +52,7 @@ class DatabaseDeployer
         try {
             $path = $this->_config->getFileServerConfiguration()->getPath();
             $this->extract($runner, $path);
-            $this->migrate($runner, $path);
+            $this->_databaseMigrator->migrate($runner, ConstantsTestStage::DATABASE_MIGRATION_FILE);
         } catch (Exception $e) {
             throw new DatabaseDeployment("Couldn't deploy database: $e");
         }finally {
@@ -76,34 +73,5 @@ class DatabaseDeployer
         return $runner->getPathOfLatestFileWithPattern($path. str_replace(
             Constants::FILE_TIMESTAMP_PATTERN, "*",
             ConstantsProdStage::DATABASE_MIGRATION_FILE));
-    }
-
-    /**
-     * @throws Poll
-     * @throws PollTimeout
-     */
-    private function migrate(SSHRunner $runner, string $path)
-    {
-        $scriptPath = $path. ConstantsProdStage::MIGRATE_DATABASE_SCRIPT;
-        $tags = $this->createTagsToMigrate($path);
-        $runner->executeBackgroundScript($scriptPath, $tags);
-        $this->_poller->pollFile($path. ConstantsProdStage::MIGRATE_DATABASE_POLL_FILE);
-    }
-
-    private function createTagsToMigrate(string $path): array
-    {
-        $config = $this->_config->getDatabaseConfiguration();
-        $username = $config->getUsername();
-        $password = $config->getPassword();
-        $host = $config->getServer();
-        $database = $config->getName();
-
-        return array(
-            "-u \"$username\"",
-            "-p \"$password\"",
-            "-h \"$host\"",
-            "-d \"$database\"",
-            "-f \"$path". ConstantsTestStage::DATABASE_MIGRATION_FILE. "\""
-        );
     }
 }
