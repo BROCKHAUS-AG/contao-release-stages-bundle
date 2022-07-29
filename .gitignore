@@ -4,3 +4,4 @@
 /.phpunit.result.cache
 /scripts/local/database_migration.success
 /scripts/local/file_system_migration.success
+/composer.phar
