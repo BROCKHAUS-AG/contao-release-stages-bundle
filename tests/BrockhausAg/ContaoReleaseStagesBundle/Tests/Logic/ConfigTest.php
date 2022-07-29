@@ -179,21 +179,6 @@ class ConfigTest extends ContaoTestCase
         self::assertSame($expected, $actual);
     }
 
-    public function testGetFileFormats(): void
-    {
-        $expected = array("a", "b", "c");
-        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
-            self::createMock(Database::class), $this->createMock(FileServer::class),
-            0, self::createMock(DNSRecordCollection::class), $expected);
-        $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
-
-        $actual = $ioLogic->getFileFormats();
-
-        for ($x = 0; $x != count($actual); $x++) {
-            self::assertSame($expected[$x], $actual[$x]);
-        }
-    }
-
     private function createIOLogicInstanceWithConfigMock(\BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config $willReturn): Config
     {
         $systemConfigMock = self::createMock(SystemConfig::class);

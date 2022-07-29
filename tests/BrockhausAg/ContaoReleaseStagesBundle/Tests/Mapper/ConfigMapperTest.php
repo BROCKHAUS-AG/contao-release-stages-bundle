@@ -77,11 +77,6 @@ class ConfigMapperTest extends ContaoTestCase
                   "alias": "example-site-better",
                   "dns": "www.example-site-better.de"
                 }
-              ],
-              "fileFormats": [
-                "jpg",
-                "mp4",
-                "MP4"
               ]
             }
         ';
@@ -94,8 +89,8 @@ class ConfigMapperTest extends ContaoTestCase
         $expectedDNSRecords = new DNSRecordCollection();
         $expectedDNSRecords->add(new DNSRecord("example-site", "www.example-site.de"));
         $expectedDNSRecords->add(new DNSRecord("example-site-better", "www.example-site-better.de"));
-        $expected = new Config($expectedDatabase, $expectedFileServer, 0, $expectedDNSRecords,
-            array("jpg", "mp4", "MP4"));
+        $expected = new Config($expectedDatabase, $expectedFileServer, 0,
+            $expectedDNSRecords);
         $mapper = new ConfigMapper();
 
         $actual = $mapper->map(json_decode($input));
@@ -122,6 +117,5 @@ class ConfigMapperTest extends ContaoTestCase
                 $actual->getDnsRecords()->getByIndex($x)->getDns());
         }
         self::assertSame($expected->getMaxSpendTimeWhileCreatingRelease(), $actual->getMaxSpendTimeWhileCreatingRelease());
-        self::assertSame($expected->getFileFormats(), $actual->getFileFormats());
     }
 }

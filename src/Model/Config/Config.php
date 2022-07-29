@@ -10,16 +10,14 @@ class Config
     private FileServer $fileServer;
     private int $maxSpendTimeWhileCreatingRelease;
     private DNSRecordCollection $dnsRecords;
-    private array $fileFormats;
 
     public function __construct(Database $database, FileServer $fileServer, int $maxSpendTimeWhileCreatingRelease,
-                                DNSRecordCollection $dnsRecords, array $fileFormats)
+                                DNSRecordCollection $dnsRecords)
     {
         $this->database = $database;
         $this->fileServer = $fileServer;
         $this->maxSpendTimeWhileCreatingRelease = $maxSpendTimeWhileCreatingRelease;
         $this->dnsRecords = $dnsRecords;
-        $this->fileFormats = $fileFormats;
     }
 
     public function getDatabase(): Database
@@ -40,10 +38,5 @@ class Config
     public function getDnsRecords(): DNSRecordCollection
     {
         return $this->dnsRecords;
-    }
-
-    public function getFileFormats(): array
-    {
-        return $this->fileFormats;
     }
 }

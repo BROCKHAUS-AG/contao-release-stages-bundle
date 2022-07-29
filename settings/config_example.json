@@ -35,23 +35,5 @@
       "alias": "example-site-better",
       "dns": "www.example-site-better.de"
     }
-  ],
-  "fileFormats": [
-    "jpg",
-    "JPG",
-    "jpeg",
-    "JPEG",
-    "webp",
-    "WEBP",
-    "png",
-    "PNG",
-    "svg",
-    "SVG",
-    "pdf",
-    "PDF",
-    "mp4",
-    "MP4",
-    "vcf",
-    "VCF"
   ]
 }

@@ -64,8 +64,8 @@ class SystemConfigTest extends ContaoTestCase
         $expectedDNSRecords = new DNSRecordCollection();
         $expectedDNSRecords->add(new DNSRecord("example-site", "www.example-site.de"));
         $expectedDNSRecords->add(new DNSRecord("example-site-better", "www.example-site-better.de"));
-        $expected = new Config($expectedDatabase, $expectedFileServer, 0, $expectedDNSRecords,
-            array("jpg", "mp4", "MP4"));
+        $expected = new Config($expectedDatabase, $expectedFileServer, 0,
+            $expectedDNSRecords);
 
         $reflection = new ReflectionClass($systemConfig);
         $reflection_property = $reflection->getProperty("_config");
@@ -95,6 +95,5 @@ class SystemConfigTest extends ContaoTestCase
             self::assertSame($expectedDNSRecords->getByIndex($x)->getDns(),
                 $actual->getDnsRecords()->getByIndex($x)->getDns());
         }
-        self::assertSame($expected->getFileFormats(), $actual->getFileFormats());
     }
 }
