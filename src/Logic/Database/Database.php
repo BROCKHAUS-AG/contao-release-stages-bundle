@@ -314,9 +314,6 @@ class Database
             ->execute()
             ->fetchAllAssociative();
 
-        if ($result == NULL) {
-            throw new DatabaseQueryEmptyResult();
-        }
         return $result;
     }
 }
