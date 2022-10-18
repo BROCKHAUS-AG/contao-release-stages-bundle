@@ -32,7 +32,7 @@ class DatabaseMigrator
     {
         $this->_poller = $poller;
         $this->_config = $config;
-        $this->_path = $path;
+        $this->_path = $this->_config->getFileServerConfiguration()->getPath();;
     }
 
     /**
