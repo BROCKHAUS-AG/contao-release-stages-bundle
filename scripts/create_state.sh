@@ -8,6 +8,7 @@ write_state()
   echo "" > $1
 }
 
+
 delete_file() {
   if [ -f "$1" ]; then
     rm "$1"
