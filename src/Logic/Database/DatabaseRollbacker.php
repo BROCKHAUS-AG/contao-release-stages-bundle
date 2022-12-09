@@ -48,7 +48,7 @@ class DatabaseRollbacker
     public function rollback(): void
     {
         try {
-            $path = $this->_config->getFileServerConfiguration()->getPath();
+            $path = $this->_config->getFileServerConfiguration()->getRootPath();
             $extractTo = $path. ConstantsProdStage::DATABASE_ROLLBACK_DIRECTORY;
             $this->_rollbacker->rollback($extractTo,
                 ConstantsProdStage::DATABASE_ROLLBACK_FILE_NAME,

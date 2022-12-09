@@ -38,7 +38,7 @@ class FileSystemRollbacker
     public function rollback(): void
     {
         try {
-            $path = $this->_config->getFileServerConfiguration()->getPath();
+            $path = $this->_config->getFileServerConfiguration()->getRootPath();
             $extractTo = $path. ConstantsProdStage::FILE_SYSTEM_PATH;
             $this->_rollbacker->rollback($extractTo,
                 ConstantsProdStage::FILE_SYSTEM_ROLLBACK_FILE_NAME,

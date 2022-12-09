@@ -153,7 +153,7 @@ class ConfigTest extends ContaoTestCase
         $actual = $ioLogic->getFileServerConfiguration();
 
         self::assertSame($expected->getServer(), $actual->getServer());
-        self::assertSame($expected->getPath(), $actual->getPath());
+        self::assertSame($expected->getRootPath(), $actual->getRootPath());
 
         self::assertSame($expected->getFtp()->getPort(), $actual->getFtp()->getPort());
         self::assertSame($expected->getFtp()->getUsername(), $actual->getFtp()->getUsername());

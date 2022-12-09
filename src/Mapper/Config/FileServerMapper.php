@@ -18,6 +18,6 @@ class FileServerMapper extends Mapper
         $sshMapper = new SshMapper();
         $ssh = $sshMapper->map($data->ssh);
 
-       return new FileServer($data->server, $data->path, $ftp, $ssh);
+       return new FileServer($data->server, $data->path, $ftp, $ssh, $data->contaopath);
     }
 }

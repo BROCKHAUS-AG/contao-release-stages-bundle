@@ -28,7 +28,7 @@ mkdir -p "$final_path"
 BACKUP_TEMP_FILE="$final_path/backup.sql"
 BACKUP_FILE="$final_path/$(date +%s).tar.gz"
 {
-  mysqldump --column-statistics=0 -u "$user" -p"$password" -h"$host" "$database" > "$BACKUP_TEMP_FILE"
+  mysqldump --column-statistics=0 --no-tablespaces -u "$user" -p"$password" -h"$host" "$database" > "$BACKUP_TEMP_FILE"
   if [ -d "$final_path" ]; then
     tar czf "$BACKUP_FILE" --directory="$final_path" .
     rm "$BACKUP_TEMP_FILE"
