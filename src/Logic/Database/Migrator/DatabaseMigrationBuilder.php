@@ -125,7 +125,7 @@ class DatabaseMigrationBuilder
     {
         try {
             $runner = $this->_ftpConnector->connect();
-            $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
+            $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getRootPath();
             $file = $this->buildFile($fileServerConfigurationPath);
             $runner->copy($file);
             $this->_ftpConnector->disconnect($runner->getConn());

@@ -81,7 +81,7 @@ class SystemConfigTest extends ContaoTestCase
         self::assertSame($expectedDatabase->getPassword(), $actual->getDatabase()->getPassword());
         self::assertSame($expectedDatabase->getIgnoredTables(), $actual->getDatabase()->getIgnoredTables());
         self::assertSame($expectedFileServer->getServer(), $actual->getFileServer()->getServer());
-        self::assertSame($expectedFileServer->getPath(), $actual->getFileServer()->getPath());
+        self::assertSame($expectedFileServer->getRootPath(), $actual->getFileServer()->getRootPath());
         self::assertSame($expectedFtp->getPort(), $actual->getFileServer()->getFtp()->getPort());
         self::assertSame($expectedFtp->getUsername(), $actual->getFileServer()->getFtp()->getUsername());
         self::assertSame($expectedFtp->getPassword(), $actual->getFileServer()->getFtp()->getPassword());

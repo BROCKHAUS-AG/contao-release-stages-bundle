@@ -50,7 +50,7 @@ class DatabaseDeployer
     {
         $runner = $this->_sshConnection->connect();
         try {
-            $path = $this->_config->getFileServerConfiguration()->getPath();
+            $path = $this->_config->getFileServerConfiguration()->getRootPath();
             $this->extract($runner, $path);
             $this->_databaseMigrator->migrate($runner, ConstantsTestStage::DATABASE_MIGRATION_FILE);
         } catch (Exception $e) {

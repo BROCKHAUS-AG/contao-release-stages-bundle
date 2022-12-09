@@ -57,7 +57,7 @@ class FileServerMapperTest extends ContaoTestCase
         $actual = $mapper->map(json_decode($input));
 
         self::assertSame($expected->getServer(), $actual->getServer());
-        self::assertSame($expected->getPath(), $actual->getPath());
+        self::assertSame($expected->getRootPath(), $actual->getRootPath());
         self::assertSame($expectedFtp->getPort(), $actual->getFtp()->getPort());
         self::assertSame($expectedFtp->getUsername(), $actual->getFtp()->getUsername());
         self::assertSame($expectedFtp->getPassword(), $actual->getFtp()->getPassword());

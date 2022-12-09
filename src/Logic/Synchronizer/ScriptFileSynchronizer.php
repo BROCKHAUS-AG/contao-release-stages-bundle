@@ -36,7 +36,7 @@ class ScriptFileSynchronizer
     public function __construct(string $path, FTPConnector $ftpConnector, Config $config)
     {
         $this->_path = $path;
-        $this->_fileServerPath = $config->getFileServerConfiguration()->getPath();
+        $this->_fileServerPath = $config->getFileServerConfiguration()->getRootPath();
         $this->_ftpConnector = $ftpConnector;
     }
 

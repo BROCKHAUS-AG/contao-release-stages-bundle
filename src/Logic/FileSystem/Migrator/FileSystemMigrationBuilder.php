@@ -73,7 +73,7 @@ class FileSystemMigrationBuilder
     private function copy(string $migrationFile): void
     {
         $runner = $this->_ftpConnector->connect();
-        $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getPath();
+        $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getRootPath();
         $prodPath = $this->buildPathForProd($fileServerConfigurationPath);
         $file = new File(
             "$migrationFile/". ConstantsProdStage::FILE_SYSTEM_MIGRATION_FILE_NAME. ".tar.gz",
