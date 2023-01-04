@@ -44,7 +44,6 @@ class BackupCreator
     public function create(): void
     {
         $path = $this->_config->getFileServerConfiguration()->getRootPath();
-        $contentPath = $this->_config->getFileServerConfiguration()->getContentPath();
         $runner = $this->_sshConnection->connect();
         try {
             $this->createFileServerBackup($path, $runner);
