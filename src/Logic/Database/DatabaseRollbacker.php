@@ -68,7 +68,7 @@ class DatabaseRollbacker
     {
         $runner = $this->_sshConnection->connect();
         try {
-            $migrationFile = $this->_path. ConstantsProdStage::DATABASE_ROLLBACK_DIRECTORY. "/backup.sql";
+            $migrationFile = ConstantsProdStage::DATABASE_ROLLBACK_DIRECTORY. "/backup.sql";
             $this->_databaseMigrator->migrate($runner, $migrationFile);
         }catch (Exception $e) {
             throw new DatabaseRollback("Couldn't upload backup.sql file: $e");
