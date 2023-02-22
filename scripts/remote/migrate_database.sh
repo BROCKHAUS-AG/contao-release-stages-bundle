@@ -7,7 +7,10 @@
 #   -d'database' -> here comes the name from the database
 #   -f'path/from' -> here comes the path where the migration file is placed
 
-. ~/scripts/create_state.sh
+basedir=$BASH_SOURCE
+cd "$(dirname "$basedir")"
+
+. create_state.sh
 
 
 while getopts u:p:h:d:f: flag

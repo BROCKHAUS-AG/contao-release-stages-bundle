@@ -6,7 +6,13 @@
 #   -h'hostName' -> here comes the host name
 #   -d'database' -> here comes the name from the database
 #   -t'path/to' -> here comes the path where the backup should be saved
-. ~/scripts/create_state.sh
+
+BASEDIR=$BASH_SOURCE
+parentdir="$(dirname "$BASEDIR")"
+cd "$(dirname "$parentdir")"
+
+. create_state.sh
+
 while getopts u:p:h:d:t: flag
 do
   case "${flag}" in
