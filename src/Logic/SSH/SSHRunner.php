@@ -35,12 +35,12 @@ class SSHRunner
 
     public function executeScript(string $scriptName, array $tags = array())
     {
-        return $this->execute("bash $scriptName ". implode(" ", $tags));
+        return $this->execute("$scriptName ". implode(" ", $tags));
     }
 
     public function executeBackgroundScript(string $scriptName, array $tags = array()): int
     {
-        $data = $this->executeScript("$scriptName ". implode(" ", $tags). " & echo $!;");
+        $data = $this->executeScript("bash ". "$scriptName ". implode(" ", $tags). " & echo $!;");
         return $this->getResourceId($data);
     }
 

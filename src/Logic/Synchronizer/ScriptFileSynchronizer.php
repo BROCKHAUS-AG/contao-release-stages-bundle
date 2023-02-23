@@ -36,7 +36,7 @@ class ScriptFileSynchronizer
     public function __construct(string $path, FTPConnector $ftpConnector, Config $config)
     {
         $this->_path = $path;
-        $this->_fileServerPath = $config->getFileServerConfiguration()->getPath();
+        $this->_fileServerPath = $config->getFileServerConfiguration()->getRootPath();
         $this->_ftpConnector = $ftpConnector;
     }
 
@@ -72,7 +72,7 @@ class ScriptFileSynchronizer
     {
         return array(
             $this->_fileServerPath. ConstantsProdStage::SCRIPT_DIRECTORY,
-            $this->_fileServerPath. ConstantsProdStage::BACKUP_DIRECTORY,
+            $this->_fileServerPath. ConstantsProdStage::BACKUP_DIRECTORY_SCRIPTS,
             $this->_fileServerPath. ConstantsProdStage::MIGRATION_DIRECTORY,
             $this->_fileServerPath. ConstantsProdStage::DATABASE_MIGRATION_FOLDER,
             $this->_fileServerPath. ConstantsProdStage::FILE_SYSTEM_MIGRATION_FOLDER

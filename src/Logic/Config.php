@@ -21,7 +21,6 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\DNSRecordCollection;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\FileServer;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ftp;
-use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Local;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Ssh;
 use BrockhausAg\ContaoReleaseStagesBundle\System\SystemConfig;
 
@@ -50,18 +49,13 @@ class Config {
     public function getDatabaseIgnoredTablesConfiguration(): array
     {
         $ignoredTables = $this->getConfig()->getDatabase()->getIgnoredTables();
-        array_push($ignoredTables, "tl_user", "tl_cron_job", Constants::DEPLOYMENT_TABLE, "tl_search_index");
+        array_push($ignoredTables, "tl_user", "tl_cron_job", Constants::DEPLOYMENT_TABLE, "tl_search_index", "tl_search");
         return $ignoredTables;
     }
 
     public function getDNSRecords(): DNSRecordCollection
     {
         return $this->getConfig()->getDnsRecords();
-    }
-
-    public function getWhereToCopy(): string
-    {
-        return $this->getConfig()->getCopyTo();
     }
 
     public function getFileServerConfiguration(): FileServer
@@ -77,11 +71,6 @@ class Config {
     public function getSSHConfiguration(): Ssh
     {
         return $this->getFileServerConfiguration()->getSsh();
-    }
-
-    public function getLocalFileServerConfiguration(): Local
-    {
-        return $this->getConfig()->getLocal();
     }
 
     public function getMaxSpendTimeWhileCreatingRelease(): int

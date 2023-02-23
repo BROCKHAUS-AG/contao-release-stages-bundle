@@ -58,11 +58,17 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Extractor'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
 
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrator:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
+            - '%kernel.project_dir%'
+
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseDeployer:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Extractor'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrator'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Release\ReleaseBuilder:
@@ -81,18 +87,25 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseDeployer'
         shared: false
 
-    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\FileSystemRollbacker:
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Rollbacker:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Extractor'
+        shared: false
+
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem\FileSystemRollbacker:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Rollbacker'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
         shared: false
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\DatabaseRollbacker:
         arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Rollbacker'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector'
-            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Extractor'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrator'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
+            - '%kernel.project_dir%'
         shared: false
 
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Release\ReleaseRollbacker:
@@ -124,10 +137,16 @@ services:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'
         shared: false
 
+    BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DeleteStatementsMigrationBuilder:
+        arguments:
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Database'
+        shared: false
+
     BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DatabaseMigrationBuilder:
         arguments:
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\CreateTableStatementsMigrationBuilder'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\InsertStatementsMigrationBuilder'
+            - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Database\Migrator\DeleteStatementsMigrationBuilder'
             - '%kernel.project_dir%'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector'
             - '@BrockhausAg\ContaoReleaseStagesBundle\Logic\Config'

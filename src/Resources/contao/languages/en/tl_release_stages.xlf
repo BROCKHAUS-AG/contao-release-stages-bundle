@@ -40,6 +40,18 @@
             <trans-unit id="tl_release_stages.state.0">
                 <source>State</source>
             </trans-unit>
+
+            <trans-unit id="tl_release_stages.information.0">
+                <source>Information</source>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages.execution_time.0">
+                <source>Execution time</source>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages.rollback.0">
+                <source>Rollback</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

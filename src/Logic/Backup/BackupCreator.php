@@ -43,11 +43,11 @@ class BackupCreator
      */
     public function create(): void
     {
-        $path = $this->_config->getFileServerConfiguration()->getPath();
+        $path = $this->_config->getFileServerConfiguration()->getRootPath();
         $runner = $this->_sshConnection->connect();
         try {
-            $this->createDatabaseBackup($path, $runner);
             $this->createFileServerBackup($path, $runner);
+            $this->createDatabaseBackup($path, $runner);
         }catch (Exception $e) {
             throw new \BrockhausAg\ContaoReleaseStagesBundle\Exception\BackupCreator(
                 "Couldn't create backup from database or file server: $e");

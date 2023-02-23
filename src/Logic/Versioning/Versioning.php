@@ -24,12 +24,12 @@ use BrockhausAg\ContaoReleaseStagesBundle\Model\Version\Version;
 use Doctrine\DBAL\Driver\Exception;
 
 class Versioning {
-    private Database $database;
+    private Database $_database;
     private Logger $_logger;
 
     public function __construct(Database $database, Logger $logger)
     {
-        $this->database = $database;
+        $this->_database = $database;
         $this->_logger = $logger;
     }
 
@@ -42,10 +42,10 @@ class Versioning {
      */
     public function generateNewVersionNumber(int $id): void
     {
-        if ($this->database->hasTableOneRow(Constants::DEPLOYMENT_TABLE)) {
+        if ($this->_database->hasTableOneRow(Constants::DEPLOYMENT_TABLE)) {
             $latestVersion = $this->createDummyVersion();
         }else {
-            $latestVersion = $this->database->getLatestReleaseVersion();
+            $latestVersion = $this->_database->getLatestReleaseVersion();
         }
         $this->createAndUpdateToNewVersion($id, $latestVersion);
     }
@@ -55,22 +55,24 @@ class Versioning {
      */
     private function createDummyVersion(): Version
     {
-        return new Version(0, "majorRelease", "0.0", DeploymentState::PENDING);
+        return new Version(0, "majorRelease", "1.0", DeploymentState::PENDING);
     }
 
     /**
      * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     private function createAndUpdateToNewVersion(int $id, Version $latestVersion): void
     {
-        $versionNumber = $this->createVersionNumber($latestVersion, "release");
-        $this->database->updateVersion($id, $versionNumber);
+        $actualKindOfRelease = $this->_database->getKindOfReleaseById($id);
+        $versionNumber = $this->createVersionNumber($latestVersion, $actualKindOfRelease);
+        $this->_database->updateVersion($id, $versionNumber);
     }
 
-    public function createVersionNumber(Version $latestVersion, string $kindOfNewVersion): string
+    public function createVersionNumber(Version $latestVersion, string $actualKindOfRelease): string
     {
         $splitVersion = explode(".", $latestVersion->getVersion());
-        if ($kindOfNewVersion == "release") {
+        if ($actualKindOfRelease == "release") {
             return $this->createRelease($splitVersion);
         }
         return $this->createMajorRelease($splitVersion);

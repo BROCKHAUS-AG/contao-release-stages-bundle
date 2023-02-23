@@ -44,7 +44,7 @@ class FileSystemDeployer
     {
         $runner = $this->_sshConnection->connect();
         try {
-            $path = $this->_config->getFileServerConfiguration()->getPath();
+            $path = $this->_config->getFileServerConfiguration()->getRootPath();
             $toBeExtracted = $this->getFilePath($runner, $path);
             $extractedPath = $path. ConstantsProdStage::FILE_SYSTEM_PATH;
             $this->_extractor->extract($runner, $toBeExtracted, $extractedPath, ConstantsProdStage::FILE_SYSTEM_MIGRATION_FILE_NAME, $path);

@@ -3,7 +3,10 @@
 #   -e'path/to' -> here comes the path where the extracted files should be saved
 #   -n'name' -> here comes the name of the process
 
-. ~/scripts/create_state.sh
+basedir=$BASH_SOURCE
+cd "$(dirname "$basedir")"
+
+. create_state.sh
 
 while getopts f:e:n: flag
 do

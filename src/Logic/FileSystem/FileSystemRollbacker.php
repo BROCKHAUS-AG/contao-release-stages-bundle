@@ -14,27 +14,38 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\FileSystem;
 
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\Constants;
+use BrockhausAg\ContaoReleaseStagesBundle\Constants\ConstantsProdStage;
+use BrockhausAg\ContaoReleaseStagesBundle\Exception\FileSystem\FileSystemRollback;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\Poller;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller\RemoteFilePoller;
-use BrockhausAg\ContaoReleaseStagesBundle\Logic\SSH\SSHConnector;
+use BrockhausAg\ContaoReleaseStagesBundle\Logic\Rollbacker;
 use Exception;
 
 class FileSystemRollbacker
 {
-    private SSHConnector $_sshConnection;
-    private Poller $_poller;
+    private Rollbacker $_rollbacker;
     private Config $_config;
 
-    public function __construct(SSHConnector $sshConnection, RemoteFilePoller $poller,  Config $config)
+    public function __construct(Rollbacker $rollbacker, Config $config)
     {
-        $this->_sshConnection = $sshConnection;
-        $this->_poller = $poller;
+        $this->_rollbacker = $rollbacker;
         $this->_config = $config;
     }
 
+    /**
+     * @throws FileSystemRollback
+     */
     public function rollback(): void
     {
-
+        try {
+            $path = $this->_config->getFileServerConfiguration()->getRootPath();
+            $extractTo = $path. ConstantsProdStage::FILE_SYSTEM_PATH;
+            $this->_rollbacker->rollback($extractTo,
+                ConstantsProdStage::FILE_SYSTEM_ROLLBACK_FILE_NAME,
+                $path, $path. ConstantsProdStage::BACKUP_FILE_SYSTEM_PATH,
+                Constants::FILE_TIMESTAMP_PATTERN);
+        } catch (Exception $e) {
+            throw new FileSystemRollback("Couldn't rollback file system: $e");
+        }
     }
 }

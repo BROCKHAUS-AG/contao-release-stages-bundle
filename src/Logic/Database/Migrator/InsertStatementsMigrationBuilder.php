@@ -145,7 +145,7 @@ class InsertStatementsMigrationBuilder
     private function checkIfColumnTypeIsText(string $type): bool
     {
         return strpos($type, "varchar") || strpos($type, "string") || strpos($type, "char") ||
-            strcmp($type, "char(1)") == 0 || strpos($type, "text");
+            strcmp($type, "char(1)") == 0 || strcmp($type, "text") == 0 || strpos($type, "text");
     }
 
     private function createRowsAndColumnValuesForText(array &$rows, string $field, array &$columnAndValue,

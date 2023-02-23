@@ -7,7 +7,11 @@
 #   -d'database' -> here comes the name from the database
 #   -t'path/to' -> here comes the path where the backup should be saved
 
-. ~/scripts/create_state.sh
+BASEDIR=$BASH_SOURCE
+parentdir="$(dirname "$BASEDIR")"
+cd "$(dirname "$parentdir")"
+
+. create_state.sh
 
 while getopts u:p:h:d:t: flag
 do
@@ -27,13 +31,18 @@ create_pending_file "$STATE_FILE"
 final_path="$to_path/database"
 mkdir -p "$final_path"
 
-BACKUP_FILE="$final_path/$(date +%s).sql"
+BACKUP_TEMP_FILE="$final_path/backup.sql"
+BACKUP_FILE="$final_path/$(date +%s).tar.gz"
 {
-  mysqldump --opt --no-tablespaces -u "$user" -p"$password" -h"$host" "$database" > "$BACKUP_FILE"
+  mysqldump --no-tablespaces -u "$user" -p"$password" -h"$host" "$database" > "$BACKUP_TEMP_FILE"
+  if [ -d "$final_path" ]; then
+    tar czf "$BACKUP_FILE" --directory="$final_path" backup.sql
+    rm "$BACKUP_TEMP_FILE"
+  fi
 } || {
-  rm "$BACKUP_FILE"
+  rm "$BACKUP_TEMP_FILE"
   create_finish_failure_file "$STATE_FILE"
+  exit
 }
 
 create_finish_success_file "$STATE_FILE"
-

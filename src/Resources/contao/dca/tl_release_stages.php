@@ -34,9 +34,10 @@ $GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
         (
             'mode' => 1,
             'fields' => array('version'),
-            'flag' => 1,
+            'flag' => 4,
             'panelLayout' => 'sort,search,limit'
         ),
+        // https://docs.contao.org/dev/reference/dca/callbacks/#config-onload show if rollback was successful or not but only if rollback was tried
         'label' => array(
             'fields' => array('version', 'state', 'title'),
             'format' => 'v%s - %s - %s'
@@ -57,7 +58,7 @@ $GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
         ),
         'tstamp' => array(
             'search' => true,
-            'sql' => ['type' => 'integer', 'length' => '10', 'unsigned' => true, 'default' => 0]
+            'sql' => ['type' => 'integer', 'length' => '10', 'unsigned' => true, 'default' => time()]
         ),
         'version' => array(
             'search' => true,
@@ -104,6 +105,9 @@ $GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
         ),
         'execution_time' => array(
             'sql' => ['type' => 'integer', 'notnull' => false]
+        ),
+        'rollback' => array(
+            'sql' => ['type' => 'boolean', 'default' => false]
         )
     ),
     'palettes' => array(

@@ -12,15 +12,14 @@ declare(strict_types=1);
  * @link https://github.com/brockhaus-ag/contao-release-stages-bundle
  */
 
-namespace BrockhausAg\ContaoReleaseStagesBundle\Logic\Poller;
+namespace BrockhausAg\ContaoReleaseStagesBundle\Exception\Database;
 
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\Poll;
-use BrockhausAg\ContaoReleaseStagesBundle\Exception\Poll\PollTimeout;
+use Exception;
 
-abstract class Poller {
-    /**
-     * @throws Poll
-     * @throws PollTimeout
-     */
-    public abstract function pollFile(string $filePath): void;
+class DatabaseRollback extends Exception
+{
+    public function __construct($message = "", $code = 0)
+    {
+        parent::__construct($message, $code);
+    }
 }

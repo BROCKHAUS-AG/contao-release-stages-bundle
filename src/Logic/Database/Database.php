@@ -68,6 +68,23 @@ class Database
     }
 
     /**
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    public function getKindOfReleaseById(int $id): string
+    {
+        $result = $this->_dbConnection
+            ->createQueryBuilder()
+            ->select("kindOfRelease")
+            ->from(Constants::DEPLOYMENT_TABLE)
+            ->where("id = :id")
+            ->setParameter("id", $id)
+            ->execute()
+            ->fetchAssociative();
+        return $result["kindOfRelease"];
+    }
+
+    /**
      * @throws DatabaseQueryEmptyResult
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws Exception
@@ -112,17 +129,20 @@ class Database
     /**
      * @throws Exception
      */
-    public function updateState(string $state, int $id, int $executionTime, string $information){
+    public function updateState(string $state, int $id, int $executionTime, string $information, bool $rollback): void
+    {
         $this->_dbConnection
             ->createQueryBuilder()
             ->update(Constants::DEPLOYMENT_TABLE)
             ->set("state", ":state")
             ->set("information", ":information")
             ->set("execution_time", ":execution_time")
+            ->set("rollback", ":rollback")
             ->where("id = :id")
             ->setParameter("state", $state)
             ->setParameter("information", $information)
             ->setParameter("execution_time", $executionTime)
+            ->setParameter("rollback", $rollback ? 1 : 0)
             ->setParameter("id", $id)
             ->execute();
     }
@@ -277,5 +297,23 @@ class Database
         }
         $state = $result[0]["state"];
         return $state == DeploymentState::PENDING;
+    }
+
+    /**
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws DatabaseQueryEmptyResult
+     */
+    public function getDeleteStatementsFromTlLogTable(): array
+    {
+        $result = $this->_dbConnection
+            ->createQueryBuilder()
+            ->select("text")
+            ->from("tl_log")
+            ->where("text LIKE 'DELETE FROM %'")
+            ->execute()
+            ->fetchAllAssociative();
+
+        return $result;
     }
 }

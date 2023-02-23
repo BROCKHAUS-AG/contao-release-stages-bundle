@@ -46,7 +46,6 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
   </ol>
 </details>
 <!-- ------------------------------------------------------------------------- -->
@@ -54,9 +53,9 @@
 
 ## About The Project
 
-
-
-Look at the [deployment process](images/deploymentProcess.png) diagram to learn more about the project structure.
+To now how a release/deployment process works, you could have a look at the following
+[diagram](images/deploymentProcess.png). Also, you can have a look at the description
+[here](README_deploymentProcess.md).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 <!-- ------------------------------------------------------------------------- -->
@@ -79,7 +78,7 @@ Before you can install the contao release stages bundle, you have to meet certai
 ### Installation
 
 1. You have to use ```composer``` to install the bundle. The command would be
-```composer require brockhaus-ag/contao-release-stages-bundle```.
+```composer require brockhaus-ag/contao-release-stages-bundle``` or you can also install it with the Contao manager.
 2. Configure the configuration file
    1. You can find an example configuration here [settings/config_example.json](settings/config_example.json).
 

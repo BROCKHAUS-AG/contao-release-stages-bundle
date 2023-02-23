@@ -7,14 +7,14 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Model\Config;
 class FileServer
 {
     private string $server;
-    private string $path;
+    private string $rootPath;
     private Ftp $ftp;
     private Ssh $ssh;
 
-    public function __construct(string $server, string $path, Ftp $ftp, Ssh $ssh)
+    public function __construct(string $server, string $rootPath, Ftp $ftp, Ssh $ssh)
     {
         $this->server = $server;
-        $this->path = $path;
+        $this->rootPath = $rootPath;
         $this->ftp = $ftp;
         $this->ssh = $ssh;
     }
@@ -24,9 +24,9 @@ class FileServer
         return $this->server;
     }
 
-    public function getPath(): string
+    public function getRootPath(): string
     {
-        return $this->path;
+        return $this->rootPath;
     }
 
     public function getFtp(): Ftp

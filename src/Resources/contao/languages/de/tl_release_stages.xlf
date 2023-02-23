@@ -52,6 +52,21 @@
                 <source>State</source>
                 <target>Status</target>
             </trans-unit>
+
+            <trans-unit id="tl_release_stages.information.0">
+                <source>Information</source>
+                <target>Information</target>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages.execution_time.0">
+                <source>Execution time</source>
+                <target>Ausführungszeit</target>
+            </trans-unit>
+
+            <trans-unit id="tl_release_stages.rollback.0">
+                <source>Rollback</source>
+                <target>Wiederherstellung</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

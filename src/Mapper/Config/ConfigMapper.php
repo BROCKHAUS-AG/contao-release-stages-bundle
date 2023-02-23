@@ -23,8 +23,6 @@ class ConfigMapper extends Mapper {
 
         $maxSpendTimeWhileCreatingRelease = $data->maxSpendTimeWhileCreatingRelease;
 
-        $fileFormats = $data->fileFormats;
-
-        return new Config($database, $fileServer, $maxSpendTimeWhileCreatingRelease, $dnsRecords, $fileFormats);
+        return new Config($database, $fileServer, $maxSpendTimeWhileCreatingRelease, $dnsRecords);
     }
 }

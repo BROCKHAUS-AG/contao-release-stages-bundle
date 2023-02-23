@@ -7,10 +7,13 @@
 #   -d'database' -> here comes the name from the database
 #   -f'path/from' -> here comes the path where the migration file is placed
 
-. ~/scripts/create_state.sh
+basedir=$BASH_SOURCE
+cd "$(dirname "$basedir")"
+
+. create_state.sh
 
 
-while getopts u:p:h:d:t: flag
+while getopts u:p:h:d:f: flag
 do
   case "${flag}" in
     u) user=${OPTARG};;
@@ -26,7 +29,7 @@ STATE_FILE="$(dirname $0)/migrate_database"
 create_pending_file "$STATE_FILE"
 
 {
-  mysql -u"$user" -p"$password" -h"$host" "$database" < "$from_path"
+  mysql -u"$user" -p"$password" -h"$host" "$database" < "$from_path" --force
 } || {
   create_finish_failure_file "$STATE_FILE"
   exit

@@ -58,8 +58,9 @@ class ReleaseStages
         $this->_timer->start();
         $actualId = $this->_stateSynchronizer->getActualId();
         try {
-            $this->_releaseBuilder->build($actualId);
+            $this->_releaseBuilder->build($actualId); //builds and copies the files
             $this->_releaseDeployer->deploy();
+            //throw new ReleaseDeployment('test');
             $this->_finisher->finishWithSuccess($actualId, $this->_timer->getSpendTime());
         }catch (ReleaseBuild $exception) {
             $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(), $exception->getMessage());
@@ -76,7 +77,7 @@ class ReleaseStages
         try {
             $this->_releaseRollbacker->rollback();
             $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(),
-                $releaseDeploymentException->getMessage());
+                $releaseDeploymentException->getMessage(), true);
         }catch (ReleaseRollback $releaseRollbackException) {
             $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(),
                 $releaseDeploymentException->getMessage(). $releaseRollbackException->getMessage());

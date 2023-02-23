@@ -153,7 +153,7 @@ class ConfigTest extends ContaoTestCase
         $actual = $ioLogic->getFileServerConfiguration();
 
         self::assertSame($expected->getServer(), $actual->getServer());
-        self::assertSame($expected->getPath(), $actual->getPath());
+        self::assertSame($expected->getRootPath(), $actual->getRootPath());
 
         self::assertSame($expected->getFtp()->getPort(), $actual->getFtp()->getPort());
         self::assertSame($expected->getFtp()->getUsername(), $actual->getFtp()->getUsername());
@@ -177,21 +177,6 @@ class ConfigTest extends ContaoTestCase
         $actual = $ioLogic->getMaxSpendTimeWhileCreatingRelease();
 
         self::assertSame($expected, $actual);
-    }
-
-    public function testGetFileFormats(): void
-    {
-        $expected = array("a", "b", "c");
-        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
-            self::createMock(Database::class), $this->createMock(FileServer::class),
-            0, self::createMock(DNSRecordCollection::class), $expected);
-        $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
-
-        $actual = $ioLogic->getFileFormats();
-
-        for ($x = 0; $x != count($actual); $x++) {
-            self::assertSame($expected[$x], $actual[$x]);
-        }
     }
 
     private function createIOLogicInstanceWithConfigMock(\BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config $willReturn): Config
