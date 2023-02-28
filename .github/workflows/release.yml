@@ -23,7 +23,7 @@ jobs:
               env:
                   COMMITTEXT: "${{ github.event.head_commit.message }}"
               run: |
-                php create-release-notes.php
+                php create-release--file.php
             - name: Set Tag Output
               id: set-tag
               run: echo "::set-output name=tag_name::$(sh get-version.sh)"
