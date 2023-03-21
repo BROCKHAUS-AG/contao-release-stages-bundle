@@ -321,7 +321,7 @@ class Database
         if($result[0]["execution_time"] == null) {
             return -1;
         } else {
-            return $result[0]["execution_time"];
+            return intval($result[0]["execution_time"]);
         }
     }
 
