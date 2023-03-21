@@ -282,7 +282,7 @@ class Database
      */
     public function isOldDeploymentPending(int $actualId): bool
     {
-        $result = $this->_dbConnection
+        $pendingResult = $this->_dbConnection
             ->createQueryBuilder()
             ->select("state")
             ->from(Constants::DEPLOYMENT_TABLE)
@@ -292,11 +292,37 @@ class Database
             ->setParameter("id", $actualId)
             ->execute()
             ->fetchAllAssociative();
-        if ($result == null) {
+
+        $executionTimeValidationResult = $this->getExecutionTimeFromGivenId($actualId);
+
+        if ($pendingResult == null || $executionTimeValidationResult == -1) {
             return false;
         }
-        $state = $result[0]["state"];
+        $state = $pendingResult[0]["state"];
         return $state == DeploymentState::PENDING;
+    }
+
+    /**
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    public function getExecutionTimeFromGivenId(int $givenId): int
+    {
+        $result = $this->_dbConnection
+            ->createQueryBuilder()
+            ->select("execution_time")
+            ->from(Constants::DEPLOYMENT_TABLE)
+            ->where("execution_time > 0")
+            ->andWhere("id != :id")
+            ->setParameter("id", $givenId)
+            ->execute()
+            ->fetchAllAssociative();
+
+        if($result[0]["execution_time"] == null) {
+            return -1;
+        } else {
+            return $result[0]["execution_time"];
+        }
     }
 
     /**
