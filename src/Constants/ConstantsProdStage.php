@@ -25,7 +25,7 @@ abstract class ConstantsProdStage
     public const BACKUP_DIRECTORY_SCRIPTS = self::SCRIPT_DIRECTORY. "/backup";
     public const BACKUP_FILE_SYSTEM_SCRIPT = self::BACKUP_DIRECTORY_SCRIPTS. "/backup_file_system.sh";
     public const BACKUP_FILE_SYSTEM_POLL_FILENAME = self::BACKUP_DIRECTORY_SCRIPTS. "/file_system_backup";
-    public const BACKUP_DATABASE_SCRIPT = self::BACKUP_DIRECTORY_SCRIPTS. "/backup_database.sh";
+    public const BACKUP_DATABASE_SCRIPT = self::BACKUP_DIRECTORY_SCRIPTS. "/backup_prod_database.sh";
     public const BACKUP_DATABASE_POLL_FILENAME = self::BACKUP_DIRECTORY_SCRIPTS. "/database_backup";
 
     public const BACKUP_DIRECTORY = "/backups";

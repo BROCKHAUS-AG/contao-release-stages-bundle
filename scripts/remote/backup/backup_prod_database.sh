@@ -9,7 +9,7 @@
 
 BASEDIR=$BASH_SOURCE
 parentdir="$(dirname "$BASEDIR")"
-cd "$(dirname "$parentdir")"
+cd "$(dirname "$parentdir")" || exit
 
 . create_state.sh
 
@@ -44,5 +44,4 @@ BACKUP_FILE="$final_path/$(date +%s).tar.gz"
   create_finish_failure_file "$STATE_FILE"
   exit
 }
-
 create_finish_success_file "$STATE_FILE"

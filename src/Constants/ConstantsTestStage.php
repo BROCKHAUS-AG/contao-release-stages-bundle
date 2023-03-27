@@ -24,16 +24,18 @@ abstract class ConstantsTestStage
 
     public const BACKUP_DIRECTORY = self::REMOTE_DIRECTORY. "/backup";
     public const BACKUP_FILE_SYSTEM_SCRIPT = self::BACKUP_DIRECTORY. "/backup_file_system.sh";
-    public const BACKUP_DATABASE_SCRIPT = self::BACKUP_DIRECTORY. "/backup_database.sh";
+    public const BACKUP_DATABASE_SCRIPT = self::BACKUP_DIRECTORY. "/backup_prod_database.sh";
 
     public const UN_ARCHIVE_SCRIPT = self::REMOTE_DIRECTORY. "/un_archive.sh";
     public const MIGRATE_DATABASE_SCRIPT = self::REMOTE_DIRECTORY. "/migrate_database.sh";
 
     public const LOCAL_DIRECTORY = self::SCRIPT_DIRECTORY. "/local";
     public const CREATE_ARCHIVE_SCRIPT = self::LOCAL_DIRECTORY. "/create_archive.sh";
+    public const BACKUP_LOCAL_DATABASE = self::LOCAL_DIRECTORY. "/backup_local_database.sh";
 
     public const MIGRATION_DIRECTORY = "/migrations";
 
     public const DATABASE_MIGRATION_DIRECTORY = self::MIGRATION_DIRECTORY. "/database";
     public const DATABASE_MIGRATION_FILE = self::DATABASE_MIGRATION_DIRECTORY. "/database_migration.sql";
+    public const DATABASE_COMPRESSED_MIGRATION_DIRECTORY = self::DATABASE_MIGRATION_DIRECTORY. "/compressed";
 }

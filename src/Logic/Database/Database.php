@@ -236,22 +236,12 @@ class Database
     {
         return $this->_dbConnection
             ->createQueryBuilder()
-            ->select("hex(:column)")
+            ->select("$column")
             ->from($tableName)
             ->where("id = :id")
-            ->setParameter("column", $column)
             ->setParameter("id", $id)
             ->execute()
             ->fetchAllAssociative();
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function checkForDeletedFilesInTlLogTable() : Result
-    {
-        return $this->_dbConnection
-            ->executeQuery("SELECT text FROM tl_log WHERE text LIKE 'File or folder % has been deleted'");
     }
 
     /**

@@ -57,10 +57,12 @@ class DatabaseMigrationBuilder
 
     /**
      * @throws BuildDatabaseMigration
+     * @throws Compress
      */
     public function buildAndCopy(): void
     {
         $this->createMigrationFile();
+        $this->compressMigrationFile();
         $this->copyMigrationFileToProd();
     }
 
@@ -69,42 +71,21 @@ class DatabaseMigrationBuilder
      */
     private function createMigrationFile(): void
     {
-        try {
-            $statements = $this->buildStatements();
-            $this->saveStatementsToMigrationFile($statements);
-            $this->compressMigrationFile();
-        } catch (Throwable $e) {
-            throw new BuildDatabaseMigration("Couldn't build migration: $e");
+        $ignoredTables = $this->getIgnoreTablesAsString();
+        $data = shell_exec("bash " . $this->_path . ConstantsTestStage::BACKUP_LOCAL_DATABASE . " -i'".$ignoredTables."' -u'root' -p'admin1234' -h'database' -P'3306' -d'contao' -t'" . $this->_path . ConstantsTestStage::DATABASE_MIGRATION_DIRECTORY . "' 2>&1");
+        if($data) {
+            throw new BuildDatabaseMigration("Exception while building migration on test stage: " . $data, -1);
         }
     }
 
-    /**
-     * @throws InsertMigrationBuilder
-     * @throws CreateTableMigrationBuilder
-     * @throws DeleteMigrationBuilder
-     */
-    private function buildStatements(): array
+    private function getIgnoreTablesAsString() : string
     {
-        $createTableStatements = $this->_createTableStatementsMigrationBuilder->build();
-        $insertStatements = $this->_insertStatementsMigrationBuilder->build();
-        $deleteStatements = $this->_deleteStatementsMigrationBuilder->build();
-        return $this->combineStatements($createTableStatements, $insertStatements, $deleteStatements);
-    }
-
-    private function combineStatements(array $createTableStatements, array $insertStatements,
-                                       array $deleteStatements): array
-    {
-        return array_merge($createTableStatements, $insertStatements, $deleteStatements);
-    }
-
-    private function saveStatementsToMigrationFile(array $statements): void
-    {
-        $convertedStatements = "";
-        foreach ($statements as $statement)
-        {
-            $convertedStatements = $convertedStatements. $statement. "\n";
+        $ignoredTables = $this->_config->getDatabaseIgnoredTablesConfiguration();
+        $formattedIgnoredTables = "";
+        foreach($ignoredTables as $ignoredTable) {
+            $formattedIgnoredTables = $formattedIgnoredTables . "--ignore-table=contao." . $ignoredTable . " ";
         }
-        $this->_io->write($convertedStatements);
+        return $formattedIgnoredTables;
     }
 
     /**
@@ -112,8 +93,8 @@ class DatabaseMigrationBuilder
      */
     private function compressMigrationFile(): void
     {
-        $migrationFile = $this->_path. ConstantsTestStage::MIGRATION_DIRECTORY;
-        $directory = $this->_path . ConstantsTestStage::DATABASE_MIGRATION_DIRECTORY;
+        $migrationFile = $this->_path . ConstantsTestStage::DATABASE_COMPRESSED_MIGRATION_DIRECTORY;
+        $directory = $this->_path. ConstantsTestStage::DATABASE_MIGRATION_DIRECTORY;
         $name = ConstantsProdStage::DATABASE_MIGRATION_FILE_COMPRESSED;
         $this->_compressor->compress($directory, $migrationFile, $name);
     }
@@ -137,7 +118,7 @@ class DatabaseMigrationBuilder
     private function buildFile(string $fileServerConfigurationPath): File
     {
         $fileProd = $this->buildFileProdPath($fileServerConfigurationPath);
-        $fileLocal = $this->_path. ConstantsTestStage::MIGRATION_DIRECTORY. "/". ConstantsProdStage::DATABASE_MIGRATION_FILE_COMPRESSED. ".tar.gz";
+        $fileLocal = $this->_path. ConstantsTestStage::DATABASE_COMPRESSED_MIGRATION_DIRECTORY. "/". ConstantsProdStage::DATABASE_MIGRATION_FILE_COMPRESSED. ".tar.gz";
         return new File($fileLocal, $fileProd);
     }
 

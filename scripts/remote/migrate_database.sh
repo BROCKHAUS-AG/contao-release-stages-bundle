@@ -8,7 +8,7 @@
 #   -f'path/from' -> here comes the path where the migration file is placed
 
 basedir=$BASH_SOURCE
-cd "$(dirname "$basedir")"
+cd "$(dirname "$basedir")" || exit
 
 . create_state.sh
 
@@ -24,12 +24,12 @@ do
   esac
 done
 
-STATE_FILE="$(dirname $0)/migrate_database"
+STATE_FILE="$(dirname "$0")/migrate_database"
 
 create_pending_file "$STATE_FILE"
 
 {
-  mysql -u"$user" -p"$password" -h"$host" "$database" < "$from_path" --force
+  mysql -u"$user" -p"$password" -h"$host" "$database" --binary-mode < "$from_path"
 } || {
   create_finish_failure_file "$STATE_FILE"
   exit
