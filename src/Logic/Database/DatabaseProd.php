@@ -97,4 +97,14 @@ class DatabaseProd
         return sprintf( "mysql:host=%s;dbname=%s;port=%d", $database->getServer(), $database->getName(),
             $database->getPort());
     }
+
+    public function overwriteDns() {
+        $dnsList = $this->_config->getDNSRecords();
+
+        for($index = 0; $index < $dnsList->getLength(); $index++) {
+            $dns = $dnsList->getByIndex($index);
+            $statement = $this->_conn->prepare(" UPDATE tl_page SET dns = '" . $dns->getDns() . "' WHERE alias = '" . $dns->getAlias() . "'");
+            $temp = $statement->execute();
+        }
+    }
 }

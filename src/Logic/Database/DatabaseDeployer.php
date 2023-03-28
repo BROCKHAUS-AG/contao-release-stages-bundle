@@ -32,6 +32,7 @@ class DatabaseDeployer
     private Extractor $_extractor;
     private Config $_config;
     private DatabaseMigrator $_databaseMigrator;
+    private DatabaseProd $_databaseProd;
 
     public function __construct(SSHConnector $sshConnection, Extractor $extractor, DatabaseMigrator $databaseMigrator,
                                 Config $config)
@@ -40,6 +41,8 @@ class DatabaseDeployer
         $this->_extractor = $extractor;
         $this->_databaseMigrator = $databaseMigrator;
         $this->_config = $config;
+        $this->_databaseProd = new DatabaseProd($this->_config);
+        $this->_databaseProd->setUp();
     }
 
     /**
@@ -53,6 +56,7 @@ class DatabaseDeployer
             $path = $this->_config->getFileServerConfiguration()->getRootPath();
             $this->extract($runner, $path);
             $this->_databaseMigrator->migrate($runner, ConstantsTestStage::DATABASE_MIGRATION_FILE);
+            $this->_databaseProd->overwriteDns();
         } catch (Exception $e) {
             throw new DatabaseDeployment("Couldn't deploy database: $e");
         }finally {
