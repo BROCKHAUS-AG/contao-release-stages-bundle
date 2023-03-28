@@ -25,6 +25,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\Logic\Compressor;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\Config;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\FTP\FTPConnector;
 use BrockhausAg\ContaoReleaseStagesBundle\Logic\IO;
+use BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Database;
 use BrockhausAg\ContaoReleaseStagesBundle\Model\File;
 use Exception;
 use Throwable;
@@ -39,6 +40,7 @@ class DatabaseMigrationBuilder
     private Config $_config;
     private Compressor $_compressor;
     private IO $_io;
+    private Database $_testDatabaseConfig;
 
     public function __construct(CreateTableStatementsMigrationBuilder $createTableStatementsMigrationBuilder,
                                 InsertStatementsMigrationBuilder $insertStatementsMigrationBuilder,
@@ -53,6 +55,7 @@ class DatabaseMigrationBuilder
         $this->_config = $config;
         $this->_compressor = $compressor;
         $this->_io = new IO($path. ConstantsTestStage::DATABASE_MIGRATION_FILE);
+        $this->_testDatabaseConfig = $this->_config->getTestDatabaseConfiguration();
     }
 
     /**
@@ -72,8 +75,7 @@ class DatabaseMigrationBuilder
     private function createMigrationFile(): void
     {
         $ignoredTables = $this->getIgnoreTablesAsString();
-        $testDatabaseConfig = $this->_config->getTestDatabaseConfiguration();
-        $data = shell_exec("bash " . $this->_path . ConstantsTestStage::BACKUP_LOCAL_DATABASE . " -i'".$ignoredTables."' -u'".$testDatabaseConfig->getUsername()."' -p'".$testDatabaseConfig->getPassword()."' -h'".$testDatabaseConfig->getServer()."' -P'".$testDatabaseConfig->getPort()."' -d'".$testDatabaseConfig->getName()."' -t'" . $this->_path . ConstantsTestStage::DATABASE_MIGRATION_DIRECTORY . "' 2>&1");
+        shell_exec("bash " . $this->_path . ConstantsTestStage::BACKUP_LOCAL_DATABASE . " -i'".$ignoredTables."' -u'".$this->_testDatabaseConfig->getUsername()."' -p'".$this->_testDatabaseConfig->getPassword()."' -h'".$this->_testDatabaseConfig->getServer()."' -P'".$this->_testDatabaseConfig->getPort()."' -d'".$this->_testDatabaseConfig->getName()."' -t'" . $this->_path . ConstantsTestStage::DATABASE_MIGRATION_DIRECTORY . "' 2>&1");
     }
 
     private function getIgnoreTablesAsString() : string
@@ -81,7 +83,7 @@ class DatabaseMigrationBuilder
         $ignoredTables = $this->_config->getDatabaseIgnoredTablesConfiguration();
         $formattedIgnoredTables = "";
         foreach($ignoredTables as $ignoredTable) {
-            $formattedIgnoredTables = $formattedIgnoredTables . "--ignore-table=contao." . $ignoredTable . " ";
+            $formattedIgnoredTables = $formattedIgnoredTables . "--ignore-table=" . $this->_testDatabaseConfig->getName() . "." . $ignoredTable . " ";
         }
         return $formattedIgnoredTables;
     }
