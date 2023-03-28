@@ -22,6 +22,7 @@ done
 
 rm -d -r -f "$to_path"
 mkdir -p "$to_path"
+chmod -R 0777 "$to_path"
 
 BACKUP_TEMP_FILE="$to_path/database_migration.sql"
 

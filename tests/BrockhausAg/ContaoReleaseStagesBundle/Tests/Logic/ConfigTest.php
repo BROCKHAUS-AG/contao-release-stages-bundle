@@ -59,7 +59,7 @@ class ConfigTest extends ContaoTestCase
             self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
-        $actual = $ioLogic->getDatabaseConfiguration();
+        $actual = $ioLogic->getProdDatabaseConfiguration();
 
         self::assertSame($expected->getServer(), $actual->getServer());
         self::assertSame($expected->getName(), $actual->getName());

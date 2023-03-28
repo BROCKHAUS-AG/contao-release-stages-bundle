@@ -49,7 +49,7 @@ class DatabaseMigrator
 
     private function createTagsToMigrate(string $migrationFile): array
     {
-        $config = $this->_config->getDatabaseConfiguration();
+        $config = $this->_config->getProdDatabaseConfiguration();
         $username = $config->getUsername();
         $password = $config->getPassword();
         $host = $config->getServer();

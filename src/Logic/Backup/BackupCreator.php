@@ -69,7 +69,7 @@ class BackupCreator
 
     private function getDatabaseTags($path): array
     {
-        $config = $this->_config->getDatabaseConfiguration();
+        $config = $this->_config->getProdDatabaseConfiguration();
         $username = $config->getUsername();
         $password = $config->getPassword();
         $host = $config->getServer();

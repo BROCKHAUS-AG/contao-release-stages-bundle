@@ -6,23 +6,30 @@ namespace BrockhausAg\ContaoReleaseStagesBundle\Model\Config;
 
 class Config
 {
-    private Database $database;
+    private Database $databaseProd;
+    private Database $databaseTest;
     private FileServer $fileServer;
     private int $maxSpendTimeWhileCreatingRelease;
     private DNSRecordCollection $dnsRecords;
 
-    public function __construct(Database $database, FileServer $fileServer, int $maxSpendTimeWhileCreatingRelease,
+    public function __construct(Database $databaseProd, Database $databaseTest, FileServer $fileServer, int $maxSpendTimeWhileCreatingRelease,
                                 DNSRecordCollection $dnsRecords)
     {
-        $this->database = $database;
+        $this->databaseProd = $databaseProd;
+        $this->databaseTest = $databaseTest;
         $this->fileServer = $fileServer;
         $this->maxSpendTimeWhileCreatingRelease = $maxSpendTimeWhileCreatingRelease;
         $this->dnsRecords = $dnsRecords;
     }
 
-    public function getDatabase(): Database
+    public function getProdDatabase(): Database
     {
-        return $this->database;
+        return $this->databaseProd;
+    }
+
+    public function getTestDatabase(): Database
+    {
+        return $this->databaseTest;
     }
 
     public function getFileServer(): FileServer

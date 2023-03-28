@@ -83,7 +83,7 @@ class DatabaseProd
 
     private function getDatabaseConfiguration(): Database
     {
-        return $this->_config->getDatabaseConfiguration();
+        return $this->_config->getProdDatabaseConfiguration();
     }
 
     private function createConnectionToProdDatabase(Database $database): PDO
@@ -104,7 +104,7 @@ class DatabaseProd
         for($index = 0; $index < $dnsList->getLength(); $index++) {
             $dns = $dnsList->getByIndex($index);
             $statement = $this->_conn->prepare(" UPDATE tl_page SET dns = '" . $dns->getDns() . "' WHERE alias = '" . $dns->getAlias() . "'");
-            $temp = $statement->execute();
+            $statement->execute();
         }
     }
 }

@@ -41,14 +41,19 @@ class Config {
         return $this->_contaoPath. "/files";
     }
 
-    public function getDatabaseConfiguration(): Database
+    public function getProdDatabaseConfiguration(): Database
     {
-        return $this->getConfig()->getDatabase();
+        return $this->getConfig()->getProdDatabase();
+    }
+
+    public function getTestDatabaseConfiguration(): Database
+    {
+        return $this->getConfig()->getTestDatabase();
     }
 
     public function getDatabaseIgnoredTablesConfiguration(): array
     {
-        $ignoredTables = $this->getConfig()->getDatabase()->getIgnoredTables();
+        $ignoredTables = $this->getConfig()->getProdDatabase()->getIgnoredTables();
         array_push($ignoredTables, "tl_user", "tl_cron_job", Constants::DEPLOYMENT_TABLE, "tl_search_index", "tl_search");
         return $ignoredTables;
     }

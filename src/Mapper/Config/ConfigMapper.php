@@ -12,8 +12,8 @@ class ConfigMapper extends Mapper {
     public function map(stdClass $data) : Config
     {
         $databaseMapper = new DatabaseMapper();
-        $database = $databaseMapper->map($data->database);
-
+        $databaseProd = $databaseMapper->map($data->databaseProd);
+        $databaseTest = $databaseMapper->map($data->databaseTest);
 
         $fileServerMapper = new FileServerMapper();
         $fileServer = $fileServerMapper->map($data->fileServer);
@@ -23,6 +23,6 @@ class ConfigMapper extends Mapper {
 
         $maxSpendTimeWhileCreatingRelease = $data->maxSpendTimeWhileCreatingRelease;
 
-        return new Config($database, $fileServer, $maxSpendTimeWhileCreatingRelease, $dnsRecords);
+        return new Config($databaseProd, $databaseTest, $fileServer, $maxSpendTimeWhileCreatingRelease, $dnsRecords);
     }
 }

@@ -74,12 +74,12 @@ class SystemConfigTest extends ContaoTestCase
 
         $actual = $systemConfig->getConfig();
 
-        self::assertSame($expectedDatabase->getServer(), $actual->getDatabase()->getServer());
-        self::assertSame($expectedDatabase->getName(), $actual->getDatabase()->getName());
-        self::assertSame($expectedDatabase->getPort(), $actual->getDatabase()->getPort());
-        self::assertSame($expectedDatabase->getUsername(), $actual->getDatabase()->getUsername());
-        self::assertSame($expectedDatabase->getPassword(), $actual->getDatabase()->getPassword());
-        self::assertSame($expectedDatabase->getIgnoredTables(), $actual->getDatabase()->getIgnoredTables());
+        self::assertSame($expectedDatabase->getServer(), $actual->getProdDatabase()->getServer());
+        self::assertSame($expectedDatabase->getName(), $actual->getProdDatabase()->getName());
+        self::assertSame($expectedDatabase->getPort(), $actual->getProdDatabase()->getPort());
+        self::assertSame($expectedDatabase->getUsername(), $actual->getProdDatabase()->getUsername());
+        self::assertSame($expectedDatabase->getPassword(), $actual->getProdDatabase()->getPassword());
+        self::assertSame($expectedDatabase->getIgnoredTables(), $actual->getProdDatabase()->getIgnoredTables());
         self::assertSame($expectedFileServer->getServer(), $actual->getFileServer()->getServer());
         self::assertSame($expectedFileServer->getRootPath(), $actual->getFileServer()->getRootPath());
         self::assertSame($expectedFtp->getPort(), $actual->getFileServer()->getFtp()->getPort());
