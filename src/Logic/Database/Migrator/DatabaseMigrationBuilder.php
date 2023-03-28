@@ -74,9 +74,6 @@ class DatabaseMigrationBuilder
         $ignoredTables = $this->getIgnoreTablesAsString();
         $testDatabaseConfig = $this->_config->getTestDatabaseConfiguration();
         $data = shell_exec("bash " . $this->_path . ConstantsTestStage::BACKUP_LOCAL_DATABASE . " -i'".$ignoredTables."' -u'".$testDatabaseConfig->getUsername()."' -p'".$testDatabaseConfig->getPassword()."' -h'".$testDatabaseConfig->getServer()."' -P'".$testDatabaseConfig->getPort()."' -d'".$testDatabaseConfig->getName()."' -t'" . $this->_path . ConstantsTestStage::DATABASE_MIGRATION_DIRECTORY . "' 2>&1");
-        if($data) {
-            throw new BuildDatabaseMigration("Exception while building migration on test stage: " . $data, -1);
-        }
     }
 
     private function getIgnoreTablesAsString() : string
