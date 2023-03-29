@@ -37,5 +37,5 @@ abstract class ConstantsTestStage
 
     public const DATABASE_MIGRATION_DIRECTORY = self::MIGRATION_DIRECTORY. "/database";
     public const DATABASE_MIGRATION_FILE = self::DATABASE_MIGRATION_DIRECTORY. "/database_migration.sql";
-    public const DATABASE_COMPRESSED_MIGRATION_DIRECTORY = self::DATABASE_MIGRATION_DIRECTORY. "/compressed";
+    public const DATABASE_COMPRESSED_MIGRATION_DIRECTORY = self::MIGRATION_DIRECTORY. "/local_database_migration";
 }

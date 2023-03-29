@@ -20,11 +20,13 @@ STATE_FILE="$(dirname $0)/$name"
 create_pending_file "$STATE_FILE"
 
 final_path="$to_path"
+rm -r -f "$final_path"
 mkdir -p "$final_path"
+chmod -R 0777 "$final_path"
 
 FILE_SYSTEM_PATH="$final_path/$name.tar.gz"
 {
-  tar czf $FILE_SYSTEM_PATH --directory=$from_path .
+  tar czf "$FILE_SYSTEM_PATH" --directory="$from_path" .
 } || {
   create_finish_failure_file "$STATE_FILE"
   exit
