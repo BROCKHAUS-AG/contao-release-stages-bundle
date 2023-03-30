@@ -1,18 +1,36 @@
 {
-  "database": {
-    "server": "meine-db.de",
+  "databaseProd": {
+    "server": "hier-sollen-die-daten-hin.de",
     "name": "contao",
     "port": 3306,
     "username": "admin",
     "password": "admin1234",
     "ignoredTables": [
-      "tl_to_be_ignored",
-      "tl_to_be_ignored_too"
+      "tl_bundle_generator",
+	  "tl_member",
+	  "tl_member_group",
+	  "tl_user",
+	  "tl_user_group"
     ]
   },
+  "databaseTest": {
+    "server": "hier-kommen-die-daten-her",
+    "name": "contao",
+    "port": 3306,
+    "username": "admin",
+    "password": "admin1234",
+    "ignoredTables": [
+      "tl_bundle_generator",
+	  "tl_member",
+	  "tl_member_group",
+	  "tl_user",
+	  "tl_user_group"
+    ]
+  },
+
   "fileServer": {
-    "server": "mein-server.de",
-    "path": "/var/www/html/contao",
+    "server": "prod-server.de",
+    "path": "/html/contao",
     "ftp": {
       "username": "admin",
       "password": "admin1234",
@@ -32,8 +50,8 @@
       "dns": "www.example-site.de"
     },
     {
-      "alias": "example-site-better",
-      "dns": "www.example-site-better.de"
+      "alias": "second-example-site",
+      "dns": "www.second-example-site.de"
     }
   ]
 }
