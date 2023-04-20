@@ -51,33 +51,52 @@ class ConfigTest extends ContaoTestCase
         self::assertSame($expected, $actual);
     }
 
-    public function testGetDatabaseConfiguration(): void
+    public function testGetDatabaseProdConfiguration(): void
     {
-        $expected = new Database("server", "name", 0, "username", "password", array());
-        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config($expected,
-            self::createMock(FileServer::class), 0,
-            self::createMock(DNSRecordCollection::class), array());
+        $expectedDatabaseProd = new Database("server", "name", 0, "username", "password", array());
+        $emptyDatabaseTest = new Database("", "", -1, "", "", array());
+        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config($expectedDatabaseProd, $emptyDatabaseTest,
+            self::createMock(FileServer::class), 0, self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
         $actual = $ioLogic->getProdDatabaseConfiguration();
 
-        self::assertSame($expected->getServer(), $actual->getServer());
-        self::assertSame($expected->getName(), $actual->getName());
-        self::assertSame($expected->getPort(), $actual->getPort());
-        self::assertSame($expected->getUsername(), $actual->getUsername());
-        self::assertSame($expected->getPassword(), $actual->getPassword());
-        self::assertSame($expected->getIgnoredTables(), $actual->getIgnoredTables());
+        self::assertSame($expectedDatabaseProd->getServer(), $actual->getServer());
+        self::assertSame($expectedDatabaseProd->getName(), $actual->getName());
+        self::assertSame($expectedDatabaseProd->getPort(), $actual->getPort());
+        self::assertSame($expectedDatabaseProd->getUsername(), $actual->getUsername());
+        self::assertSame($expectedDatabaseProd->getPassword(), $actual->getPassword());
+        self::assertSame($expectedDatabaseProd->getIgnoredTables(), $actual->getIgnoredTables());
+    }
+
+    public function testGetDatabaseTestConfiguration(): void
+    {
+        $emptyDatabaseProd = new Database("", "", -1, "", "", array());
+        $expectedDatabaseTest = new Database("server", "name", 0, "username", "password", array());
+        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config($emptyDatabaseProd, $expectedDatabaseTest,
+            self::createMock(FileServer::class), 0, self::createMock(DNSRecordCollection::class), array());
+        $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
+
+        $actual = $ioLogic->getTestDatabaseConfiguration();
+
+        self::assertSame($expectedDatabaseTest->getServer(), $actual->getServer());
+        self::assertSame($expectedDatabaseTest->getName(), $actual->getName());
+        self::assertSame($expectedDatabaseTest->getPort(), $actual->getPort());
+        self::assertSame($expectedDatabaseTest->getUsername(), $actual->getUsername());
+        self::assertSame($expectedDatabaseTest->getPassword(), $actual->getPassword());
+        self::assertSame($expectedDatabaseTest->getIgnoredTables(), $actual->getIgnoredTables());
     }
 
     public function testGetDatabaseIgnoredTablesConfiguration(): void
     {
-        $database = new Database("server", "name", 0, "username", "password",
+        $databaseProd = new Database("server", "name", 0, "username", "password",
             array("a", "b"));
-        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config($database,
+        $databaseTest = new Database("", "", 0, "", "", array());
+        $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config($databaseProd, $databaseTest,
             self::createMock(FileServer::class),0,
             self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
-        $expected = $database->getIgnoredTables();
+        $expected = $databaseProd->getIgnoredTables();
         array_push($expected, "tl_user", "tl_cron_job", Constants::DEPLOYMENT_TABLE);
 
         $actual = $ioLogic->getDatabaseIgnoredTablesConfiguration();
@@ -93,7 +112,7 @@ class ConfigTest extends ContaoTestCase
         $expected->add(new DNSRecord("a", "b"));
         $expected->add(new DNSRecord("c", "d"));
         $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
-            self::createMock(Database::class),self::createMock(FileServer::class),
+            self::createMock(Database::class), self::createMock(Database::class), self::createMock(FileServer::class),
             0, $expected, array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
@@ -110,7 +129,7 @@ class ConfigTest extends ContaoTestCase
         $expected = new Ftp(0, "username", "password", true);
         $fileServer = new FileServer("server", "path", $expected, self::createMock(Ssh::class));
         $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
-            self::createMock(Database::class),$fileServer,0,
+            self::createMock(Database::class), self::createMock(Database::class), $fileServer,0,
             self::createMock(DNSRecordCollection::class), array());
 
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
@@ -128,7 +147,7 @@ class ConfigTest extends ContaoTestCase
         $expected = new Ssh(0, "username", "password");
         $fileServer = new FileServer("server", "path", self::createMock(Ftp::class), $expected);
         $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
-            self::createMock(Database::class), $fileServer,0,
+            self::createMock(Database::class), self::createMock(Database::class), $fileServer,0,
             self::createMock(DNSRecordCollection::class), array());
 
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
@@ -146,7 +165,7 @@ class ConfigTest extends ContaoTestCase
         $expected_ssh = new Ssh(0, "username", "password");
         $expected = new FileServer("server", "path", $expected_ftp, $expected_ssh);
         $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
-            self::createMock(Database::class), $expected, 0,
+            self::createMock(Database::class), self::createMock(Database::class), $expected, 0,
             self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
@@ -170,7 +189,7 @@ class ConfigTest extends ContaoTestCase
     {
         $expected = 0;
         $willReturn = new \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config(
-            self::createMock(Database::class), self::createMock(FileServer::class),
+            self::createMock(Database::class), self::createMock(Database::class), self::createMock(FileServer::class),
             0, self::createMock(DNSRecordCollection::class), array());
         $ioLogic = $this->createIOLogicInstanceWithConfigMock($willReturn);
 
