@@ -46,7 +46,8 @@
         "contao/test-case": "^4.0",
         "phpunit/phpunit": "^8.4",
         "symfony/http-client": "4.4.*",
-        "symfony/phpunit-bridge": "4.4.*"
+        "symfony/phpunit-bridge": "4.4.*",
+        "phpstan/phpstan": "^1.10"
     },
     "autoload": {
         "psr-4": {
