@@ -30,7 +30,6 @@ class DatabaseRollbacker
     private SSHConnector $_sshConnection;
     private DatabaseMigrator $_databaseMigrator;
     private Config $_config;
-    private string $_path;
 
     public function __construct(Rollbacker $rollbacker, SSHConnector $sshConnection, DatabaseMigrator $databaseMigrator,
                                 Config $config, string $path)
@@ -39,7 +38,6 @@ class DatabaseRollbacker
         $this->_sshConnection = $sshConnection;
         $this->_databaseMigrator = $databaseMigrator;
         $this->_config = $config;
-        $this->_path = $path;
     }
 
     /**

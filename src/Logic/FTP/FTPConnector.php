@@ -68,12 +68,13 @@ class FTPConnector {
      */
     private function connectToSFTPServer(): SFTP
     {
+        $sftpConn = new SFTP($this->server, $this->port);
         try {
-            $sftpConn = new SFTP($this->server, $this->port);
             $sftpConn->login($this->username, $this->password);
-            return $sftpConn;
         }catch (\Exception $e) {
             $this->errorMessage("Connection to SFTP Server \"$this->server:$this->port\" failed: $e");
+        }finally {
+            return $sftpConn;
         }
     }
 

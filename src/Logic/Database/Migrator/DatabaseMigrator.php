@@ -28,7 +28,7 @@ class DatabaseMigrator
     private Config $_config;
     private string $_path;
 
-    public function __construct(RemoteFilePoller $poller, Config $config, string $path)
+    public function __construct(RemoteFilePoller $poller, Config $config)
     {
         $this->_poller = $poller;
         $this->_config = $config;

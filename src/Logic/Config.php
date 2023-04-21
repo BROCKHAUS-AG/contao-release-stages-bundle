@@ -83,11 +83,6 @@ class Config {
         return $this->getConfig()->getMaxSpendTimeWhileCreatingRelease();
     }
 
-    public function getFileFormats(): array
-    {
-        return $this->getConfig()->getFileFormats();
-    }
-
     private function getConfig(): \BrockhausAg\ContaoReleaseStagesBundle\Model\Config\Config
     {
         try {
