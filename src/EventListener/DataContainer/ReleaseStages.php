@@ -57,11 +57,12 @@ class ReleaseStages
     {
         $this->_timer->start();
         $actualId = $this->_stateSynchronizer->getActualId();
+        $debugMessage = "";
         try {
-            $this->_releaseBuilder->build($actualId); //builds and copies the files
-            $this->_releaseDeployer->deploy();
+            $debugMessage .= $this->_releaseBuilder->build($actualId, $debugMessage) . "\n"; //builds and copies the files
+            $debugMessage .= $this->_releaseDeployer->deploy() . "\n";
             //throw new ReleaseDeployment('test');
-            $this->_finisher->finishWithSuccess($actualId, $this->_timer->getSpendTime());
+            $this->_finisher->finishWithSuccess($actualId, $this->_timer->getSpendTime(), $debugMessage);
         }catch (ReleaseBuild $exception) {
             $this->_finisher->finishWithFailure($actualId, $this->_timer->getSpendTime(), $exception->getMessage());
         }catch (ReleaseDeployment $releaseDeploymentException) {

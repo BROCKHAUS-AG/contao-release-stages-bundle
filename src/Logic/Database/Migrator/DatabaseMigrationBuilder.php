@@ -39,7 +39,6 @@ class DatabaseMigrationBuilder
     private FTPConnector $_ftpConnector;
     private Config $_config;
     private Compressor $_compressor;
-    private IO $_io;
     private Database $_testDatabaseConfig;
 
     public function __construct(CreateTableStatementsMigrationBuilder $createTableStatementsMigrationBuilder,
@@ -54,7 +53,6 @@ class DatabaseMigrationBuilder
         $this->_ftpConnector = $ftpConnector;
         $this->_config = $config;
         $this->_compressor = $compressor;
-        $this->_io = new IO($path. ConstantsTestStage::DATABASE_MIGRATION_FILE);
         $this->_testDatabaseConfig = $this->_config->getTestDatabaseConfiguration();
     }
 
@@ -62,20 +60,24 @@ class DatabaseMigrationBuilder
      * @throws BuildDatabaseMigration
      * @throws Compress
      */
-    public function buildAndCopy(): void
+    public function buildAndCopy(): string
     {
-        $this->createMigrationFile();
-        $this->compressMigrationFile();
-        $this->copyMigrationFileToProd();
+        $debugMessage = $this->createMigrationFile() . "\n";
+        $debugMessage .= $this->compressMigrationFile() . "\n";
+        $debugMessage .= $this->copyMigrationFileToProd() . "\n";
+        return $debugMessage;
     }
 
     /**
      * @throws BuildDatabaseMigration
      */
-    private function createMigrationFile(): void
+    private function createMigrationFile(): string
     {
         $ignoredTables = $this->getIgnoreTablesAsString();
+        $debugMessage = date("H:i:s:u") . " migration ignore tables: " . implode(",", $ignoredTables) . "\n";
         shell_exec("bash " . $this->_path . ConstantsTestStage::BACKUP_LOCAL_DATABASE . " -i'".$ignoredTables."' -u'".$this->_testDatabaseConfig->getUsername()."' -p'".$this->_testDatabaseConfig->getPassword()."' -h'".$this->_testDatabaseConfig->getServer()."' -P'".$this->_testDatabaseConfig->getPort()."' -d'".$this->_testDatabaseConfig->getName()."' -t'" . $this->_path . ConstantsTestStage::DATABASE_MIGRATION_DIRECTORY . "' 2>&1");
+        $debugMessage .= date("H:i:s:u") . " backuped local database \n";
+        return $debugMessage;
     }
 
     private function getIgnoreTablesAsString() : string
@@ -91,25 +93,32 @@ class DatabaseMigrationBuilder
     /**
      * @throws Compress
      */
-    private function compressMigrationFile(): void
+    private function compressMigrationFile(): string
     {
         $migrationFile = $this->_path . ConstantsTestStage::DATABASE_COMPRESSED_MIGRATION_DIRECTORY;
         $directory = $this->_path. ConstantsTestStage::DATABASE_MIGRATION_DIRECTORY;
         $name = ConstantsProdStage::DATABASE_MIGRATION_FILE_COMPRESSED;
         $this->_compressor->compress($directory, $migrationFile, $name);
+        $debugMessage = date("H:i:s:u") . " compressed migration file\n";
+        $debugMessage .= date("H:i:s:u") . " directory " . $directory . ", migrationfile " . $migrationFile . ", name" . $name . "\n";
+        return $debugMessage;
     }
 
     /**
      * @throws BuildDatabaseMigration
      */
-    private function copyMigrationFileToProd(): void
+    private function copyMigrationFileToProd(): string
     {
         try {
             $runner = $this->_ftpConnector->connect();
+            $debugMessage = date("H:i:s:u") . " connected to ftp ";
             $fileServerConfigurationPath = $this->_config->getFileServerConfiguration()->getRootPath();
             $file = $this->buildFile($fileServerConfigurationPath);
             $runner->copy($file);
+            $debugMessage .= date("H:i:s:u") . " and copied file\n";
             $this->_ftpConnector->disconnect($runner->getConn());
+            $debugMessage .= date("H:i:s:u") . " disconnected from ftp\n";
+            return $debugMessage;
         }catch (Exception $e) {
             throw new BuildDatabaseMigration("Couldn't copy migration file: $e");
         }

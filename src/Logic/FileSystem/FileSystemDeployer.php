@@ -40,18 +40,22 @@ class FileSystemDeployer
      * @throws SSHConnection
      * @throws FileSystemDeployment
      */
-    public function deploy(): void
+    public function deploy(): string
     {
         $runner = $this->_sshConnection->connect();
+        $debugMessage = date("H:i:s:u") . " connected to ssh\n";
         try {
             $path = $this->_config->getFileServerConfiguration()->getRootPath();
             $toBeExtracted = $this->getFilePath($runner, $path);
             $extractedPath = $path. ConstantsProdStage::FILE_SYSTEM_PATH;
             $this->_extractor->extract($runner, $toBeExtracted, $extractedPath, ConstantsProdStage::FILE_SYSTEM_MIGRATION_FILE_NAME, $path);
+            $debugMessage .= date("H:i:s:u") . " executed extract script with parameters: " . $toBeExtracted . ", " . $extractedPath . " , " . $path . "\n";
+
         } catch (Exception $e) {
             throw new FileSystemDeployment("Couldn't deploy file system: $e");
         }finally {
             $this->_sshConnection->disconnect();
+            return $debugMessage;
         }
     }
 

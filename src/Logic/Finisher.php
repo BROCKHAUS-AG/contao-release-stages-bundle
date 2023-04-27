@@ -33,9 +33,9 @@ class Finisher {
     /**
      * @throws Exception
      */
-    public function finishWithSuccess(int $actualId, int $executionTime): void
+    public function finishWithSuccess(int $actualId, int $executionTime, string $debugMessage): void
     {
-        $this->_stateSynchronizer->updateState(DeploymentState::SUCCESS, $actualId, $executionTime);
+        $this->_stateSynchronizer->updateState(DeploymentState::SUCCESS, $actualId, $executionTime, $debugMessage);
         $this->_logger->info("Successfully deployed new version.");
     }
 

@@ -41,18 +41,21 @@ class BackupCreator
      * @throws SSHConnection
      * @throws \BrockhausAg\ContaoReleaseStagesBundle\Exception\BackupCreator
      */
-    public function create(): void
+    public function create(): string
     {
         $path = $this->_config->getFileServerConfiguration()->getRootPath();
+        $debugMessage = date("H:i:s:u") . " got root path: " . $path . "\n";
         $runner = $this->_sshConnection->connect();
+        $debugMessage .= date("H:i:s:u") . " connected to ssh\n";
         try {
-            $this->createFileServerBackup($path, $runner);
+            $debugMessage .= $this->createFileServerBackup($path, $runner) . "\n";
             $this->createDatabaseBackup($path, $runner);
         }catch (Exception $e) {
             throw new \BrockhausAg\ContaoReleaseStagesBundle\Exception\BackupCreator(
                 "Couldn't create backup from database or file server: $e");
         }finally {
             $this->_sshConnection->disconnect();
+            return $debugMessage;
         }
     }
 
@@ -88,11 +91,14 @@ class BackupCreator
      * @throws Poll
      * @throws PollTimeout
      */
-    private function createFileServerBackup(string $path, SSHRunner $runner): void
+    private function createFileServerBackup(string $path, SSHRunner $runner): string
     {
         $tags = $this->getFileServerTags($path);
+        $debugMessage = date("H:i:s:u") . " got file server tags: " . implode(",", $tags)  . "\n";
         $runner->executeBackgroundScript($path. ConstantsProdStage::BACKUP_FILE_SYSTEM_SCRIPT, $tags);
+        $debugMessage .= date("H:i:s:u") . " executed background script: " . $path . " with tags: " . implode(",", $tags) . " \n";
         $this->_poller->pollFile($path. ConstantsProdStage::BACKUP_FILE_SYSTEM_POLL_FILENAME);
+        return $debugMessage;
     }
 
     private function getFileServerTags(string $path): array

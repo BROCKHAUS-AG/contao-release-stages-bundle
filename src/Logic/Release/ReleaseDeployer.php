@@ -36,12 +36,14 @@ class ReleaseDeployer
     /**
      * @throws ReleaseDeployment
      */
-    public function deploy(): void
+    public function deploy(): string
     {
         try {
-            $this->deployNewRelease();
+            $debugMessage = $this->deployNewRelease() . "\n";
         } catch (Exception $e) {
            throw new ReleaseDeployment("Failed to deploy new release: $e");
+        } finally {
+            return $debugMessage;
         }
     }
 
@@ -51,9 +53,10 @@ class ReleaseDeployer
      * @throws DatabaseDeployment
      * @throws Exception
      */
-    private function deployNewRelease(): void
+    private function deployNewRelease(): string
     {
-        $this->_fileSystemDeployer->deploy();
-        $this->_databaseDeployer->deploy();
+        $debugMessage = $this->_fileSystemDeployer->deploy() . "\n";
+        $debugMessage .= $this->_databaseDeployer->deploy() . "\n";
+        return $debugMessage;
     }
 }

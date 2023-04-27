@@ -45,14 +45,18 @@ class FileSystemMigrationBuilder
     /**
      * @throws BuildFileSystemMigration
      */
-    public function buildAndCopy(): void
+    public function buildAndCopy(): string
     {
         $migrationFile = $this->_path. ConstantsTestStage::MIGRATION_DIRECTORY;
         try {
             $this->compressFiles($migrationFile);
+            $debugMessage = date("H:i:s:u") . " compressed migration file from path: " . $migrationFile . "\n";
             $this->copy($migrationFile);
+            $debugMessage .= date("H:i:s:u") . " copied migration file\n";
         } catch (Exception $e) {
             throw new BuildFileSystemMigration("Couldn't create file system migration: $e");
+        } finally {
+            return $debugMessage;
         }
     }
 

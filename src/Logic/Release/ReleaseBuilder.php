@@ -48,10 +48,11 @@ class ReleaseBuilder
     /**
      * @throws ReleaseBuild
      */
-    public function build(int $actualId): bool
+    public function build(int $actualId, string $debugMessage): string
     {
         try {
-            return $this->buildDeployment($actualId);
+            $debugMessage .= $this->buildDeployment($actualId, $debugMessage) . "\n";
+            return $debugMessage;
         }catch (Exception | \Doctrine\DBAL\Driver\Exception $e) {
             throw new ReleaseBuild("Failed to build release: $e");
         }
@@ -61,16 +62,18 @@ class ReleaseBuilder
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
-    private function buildDeployment(int $actualId): bool
+    private function buildDeployment(int $actualId, string $debugMessage): string
     {
         if ($this->_stateSynchronizer->isOldDeploymentPending($actualId)) {
-            return false;
+            $debugMessage .= date("H:i:s:u") . " OLD DEPLOYMENT IS PENDING!\n";
         }
         $this->_versioning->generateNewVersionNumber($actualId);
+        $debugMessage .= date("H:i:s:u") . " generated new version number\n";
         $this->_scriptFileSynchronizer->synchronize();
-        $this->_backupCreator->create();
-        $this->_databaseMigrationBuilder->buildAndCopy();
-        $this->_fileSystemMigrationBuilder->buildAndCopy();
-        return true;
+        $debugMessage .= date("H:i:s:u") . " synchronized script files\n";
+        $debugMessage .= $this->_backupCreator->create() ."\n";
+        $debugMessage .= $this->_databaseMigrationBuilder->buildAndCopy() . "\n";
+        $debugMessage .= $this->_fileSystemMigrationBuilder->buildAndCopy() . "\n";
+        return $debugMessage;
     }
 }

@@ -49,18 +49,23 @@ class DatabaseDeployer
      * @throws SSHConnection
      * @throws DatabaseDeployment
      */
-    public function deploy(): void
+    public function deploy(): string
     {
         $runner = $this->_sshConnection->connect();
+        $debugMessage = date("H:i:s:u") . " connected to ssh\n";
         try {
             $path = $this->_config->getFileServerConfiguration()->getRootPath();
             $this->extract($runner, $path);
+            $debugMessage .= date("H:i:s:u") . " extracted: " . $path . "\n";
             $this->_databaseMigrator->migrate($runner, ConstantsTestStage::DATABASE_MIGRATION_FILE);
+            $debugMessage .= date("H:i:s:u") . " migrated: " . ConstantsTestStage::DATABASE_MIGRATION_FILE . "\n";
             $this->_databaseProd->overwriteDns();
+            $debugMessage .= date("H:i:s:u") . " overwrote dns\n";
         } catch (Exception $e) {
             throw new DatabaseDeployment("Couldn't deploy database: $e");
         }finally {
             $this->_sshConnection->disconnect();
+            return $debugMessage;
         }
     }
 
