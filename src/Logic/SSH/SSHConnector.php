@@ -69,6 +69,8 @@ class SSHConnector {
 
     public function disconnect(): void
     {
-        fclose($this->_conn);
+        if (is_resource($this->_conn) && get_resource_type($this->_conn) === 'SSH2 Connection') {
+            unset($this->_conn);
+        }
     }
 }
