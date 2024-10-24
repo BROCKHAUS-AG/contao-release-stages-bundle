@@ -40,7 +40,7 @@ class Compressor {
             shell_exec("bash $archiveScriptPath -f \"$directory\" -t \"$compressedFile\" -n \"$name\"");
             $this->_poller->pollFile( $this->_path. ConstantsTestStage::LOCAL_DIRECTORY. "/$name");
         }catch (Exception $e) {
-            throw new Compress("Failed to compress to: \"$compressedFile\". $e");
+            throw new Compress("Failed to compress to: \"$compressedFile\".\nException message: $e");
         }
     }
 }
