@@ -26,7 +26,7 @@ chmod -R 0777 "$to_path"
 
 BACKUP_TEMP_FILE="$to_path/database_migration.sql"
 
-mysqldump --no-tablespaces "$ignoredTables" -u "$user" -p"$password" -h"$host" -P"$port" "$database" > "$BACKUP_TEMP_FILE"
+mysqldump --no-tablespaces -u "$user" -p"$password" -h"$host" -P"$port" $ignoredTables "$database" > "$BACKUP_TEMP_FILE"
 
 # Das hier ist der exit Code vom vorherigen Befehl
 exitCode=$?

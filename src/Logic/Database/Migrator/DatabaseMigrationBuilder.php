@@ -73,7 +73,7 @@ class DatabaseMigrationBuilder
      */
     private function createMigrationFile(): string
     {
-        $ignoredTables = $this->getIgnoreTablesAsString();
+        $ignoredTables = trim($this->getIgnoreTablesAsString());
         $debugMessage = date("H:i:s:u") . " migration ignore tables: " . $ignoredTables . "\n";
         $exitCode = shell_exec("bash " . $this->_path . ConstantsTestStage::BACKUP_LOCAL_DATABASE . " -i'".$ignoredTables."' -u'".$this->_testDatabaseConfig->getUsername()."' -p'".$this->_testDatabaseConfig->getPassword()."' -h'".$this->_testDatabaseConfig->getServer()."' -P'".$this->_testDatabaseConfig->getPort()."' -d'".$this->_testDatabaseConfig->getName()."' -t'" . $this->_path . ConstantsTestStage::DATABASE_MIGRATION_DIRECTORY . "' 2>&1");
         if($exitCode != 0) {
