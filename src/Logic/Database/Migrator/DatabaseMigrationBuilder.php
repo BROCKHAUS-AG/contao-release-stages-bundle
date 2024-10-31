@@ -79,7 +79,7 @@ class DatabaseMigrationBuilder
         if($exitCode != 0 && $exitCode) {
             throw new Exception("Failed to create local database backup. Output: $exitCode");
         } else {
-            $debugMessage .= date("H:i:s:u") . " backuped local database \n";
+            $debugMessage .= date("H:i:s:u") . " backuped local database using script: " . $this->_path . ConstantsTestStage::BACKUP_LOCAL_DATABASE . " \n";
         }
         return $debugMessage;
     }
