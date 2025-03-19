@@ -18,7 +18,7 @@ use BrockhausAg\ContaoReleaseStagesBundle\EventListener\DataContainer\ReleaseSta
 
 $GLOBALS['TL_DCA'][Constants::DEPLOYMENT_TABLE] = array(
     'config' => array(
-        'dataContainer' => 'Table',
+        'dataContainer' => \Contao\DC_Table::class,
         'enableVersioning' => true,
         'sql' => array(
             'keys' => array(

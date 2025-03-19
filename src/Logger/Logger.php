@@ -47,6 +47,7 @@ class Logger {
         $this->_logger->log(
             $level,
             $message,
-            ['contao' => new ContaoContext(__METHOD__, TL_ACCESS)]);
+            ['contao' => ContaoContext::ACCESS]
+        );
     }
 }

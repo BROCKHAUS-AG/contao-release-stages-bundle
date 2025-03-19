@@ -26,7 +26,7 @@
         "source": "https://github.com/brockhaus-ag/contao-release-stages-bundle"
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.3",
         "contao/core-bundle": "5.3.*",
         "symfony/config": "*",
         "symfony/dependency-injection": "*",
